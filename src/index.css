@@ -1,0 +1,112 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Luxury Watch Marketplace Design System - Light Theme */
+
+@layer base {
+  :root {
+    /* Luxury Light Theme with Gold Accents */
+    --background: 0 0% 100%; /* Pure white */
+    --foreground: 222 84% 4.9%; /* Dark charcoal for text */
+
+    --card: 0 0% 100%; /* White cards */
+    --card-foreground: 222 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 84% 4.9%;
+
+    --primary: 38 92% 50%; /* Luxury gold - slightly darker for better contrast */
+    --primary-foreground: 0 0% 100%; /* White text on gold */
+
+    --secondary: 210 40% 95%; /* Light gray */
+    --secondary-foreground: 222 84% 4.9%;
+
+    --muted: 210 40% 98%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 38 92% 50%; /* Gold accent */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 38 92% 50%;
+
+    --radius: 0.75rem;
+
+    /* Luxury specific colors - adjusted for light theme */
+    --luxury-gold: 38 92% 50%;
+    --luxury-platinum: 210 15% 15%;
+    --luxury-rose-gold: 15 75% 55%;
+    --luxury-black: 222 84% 4.9%;
+    --luxury-cream: 38 16% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Luxury typography */
+  .luxury-title {
+    @apply text-4xl font-bold tracking-tight;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .luxury-subtitle {
+    @apply text-xl font-medium tracking-wide;
+    letter-spacing: 0.05em;
+  }
+
+  /* Luxury components - adjusted for light theme */
+  .luxury-card {
+    @apply bg-card border border-border rounded-lg p-6 shadow-lg;
+    backdrop-filter: blur(10px);
+  }
+
+  .luxury-button {
+    @apply bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium;
+    @apply transition-all duration-300 hover:shadow-lg hover:scale-105;
+    @apply border border-primary/20;
+  }
+
+  .luxury-input {
+    @apply bg-input border border-border rounded-lg px-4 py-3;
+    @apply focus:ring-2 focus:ring-primary/50 focus:border-primary;
+    @apply transition-all duration-200;
+  }
+}
+
+/* Custom animations for luxury feel */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.luxury-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 215, 0, 0.1),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.luxury-gradient {
+  background: linear-gradient(135deg, 
+    hsl(var(--luxury-gold)) 0%, 
+    hsl(var(--luxury-rose-gold)) 100%
+  );
+}
