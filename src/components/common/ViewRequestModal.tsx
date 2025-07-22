@@ -89,7 +89,7 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
           )}
 
           {/* Bids Section - For now showing bid count since bids are stored as IDs */}
-          {request.bids && request.bids.length > 0 && (
+          {/* {request.bids && request.bids.length > 0 && (
             <div>
               <h3 className="font-semibold mb-2">Bids ({request.bids.length})</h3>
               <div className="p-3 border rounded-lg">
@@ -98,17 +98,18 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
                 </p>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Action Buttons */}
           <div className="flex gap-2 pt-4">
-            <Button variant="outline" className="flex-1">
+            {/* <Button variant="outline" className="flex-1">
               <MessageSquare className="w-4 h-4 mr-2" />
               Contact Dealer
-            </Button>
-            <Button variant="outline" onClick={onClose}>
+            </Button> */}
+            <Button className="ml-auto" variant="outline" onClick={onClose}>
               Close
             </Button>
+
           </div>
         </div>
       </DialogContent>
