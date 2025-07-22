@@ -1,47 +1,40 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Crown, 
-  Clock, 
-  Shield, 
-  Users, 
-  Zap, 
-  Award,
+import { Input } from '@/components/ui/input';
+import { PremiumLogo, FullyInsuredLogo, CertifiedDealersLogo, MailLogo } from '@/svg';
+
+import {
+  Crown,
+  Clock,
+  Shield,
+  Users,
   CheckCircle,
   ArrowRight,
-  Star
+  Star,
 } from 'lucide-react';
+import FAQSection from '@/components/ui/faq';
+import TheProcess from '@/components/ui/theprocess';
+import WhatWeOffer from '@/components/ui/whatweoffer';
+import WhyChooseBid from '@/components/ui/whychoosebid';
+import BuildToLast from '@/components/ui/buildtolast';
+import Footer from '@/components/layout/Footer';
 
-const Index = () => {
-  const { isAuthenticated, user } = useAuth();
 
-  const features = [
-    {
-      icon: Crown,
-      title: 'Luxury Service Network',
-      description: 'Connect with certified dealers specializing in premium timepieces'
-    },
-    {
-      icon: Clock,
-      title: 'Fast Turnaround',
-      description: 'Get competitive bids and quick service from verified professionals'
-    },
-    {
-      icon: Shield,
-      title: 'Secure & Trusted',
-      description: 'All dealers are vetted and insured for your peace of mind'
-    },
-    {
-      icon: Users,
-      title: 'Expert Network',
-      description: 'Access a curated network of watch specialists and collectors'
-    }
-  ];
+
+
+const bgimage = "/assests/images/bgimage.png";
+const smallimage = "/assests/images/herosectionwatch.png";
+const Index: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  const [email, setEmail] = useState('');
+
+  const handleJoinWaitlist = () => {
+    console.log('Email:', email);
+  };
 
   const brands = [
     'Rolex', 'Patek Philippe', 'Audemars Piguet', 'Omega', 'Cartier',
@@ -49,156 +42,94 @@ const Index = () => {
   ];
 
   return (
+
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative py-20 px-4 bg-gradient-to-br from-background via-background to-muted/20">
-        <div className="absolute inset-0 bg-[url('/api/placeholder/1920/1080')] bg-cover bg-center opacity-5"></div>
-        <div className="container mx-auto text-center relative z-10">
-          <div className="max-w-4xl mx-auto">
-            <Badge variant="outline" className="mb-6 px-4 py-2">
-              <Crown className="w-4 h-4 mr-2" />
-              Premium Watch Services
-            </Badge>
-            
-            <h1 className="font-luxury text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-              ChronoBid
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
-              The premier marketplace for luxury watch services. Connect with certified dealers, 
-              get competitive bids, and ensure your timepieces receive the care they deserve.
-            </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              {isAuthenticated ? (
-                <Button asChild className="luxury-button text-lg px-8 py-6">
-                  <Link to="/dashboard">
-                    Go to Dashboard
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Link>
-                </Button>
-              ) : (
-                <>
-                  <Button asChild className="luxury-button text-lg px-8 py-6">
-                    <Link to="/register">
-                      Get Started
-                      <ArrowRight className="ml-2 w-5 h-5" />
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" className="text-lg px-8 py-6 border-primary/20">
-                    <Link to="/login">Sign In</Link>
-                  </Button>
-                </>
-              )}
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                Certified Dealers
-              </div>
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-blue-500" />
-                Fully Insured
-              </div>
-              <div className="flex items-center gap-2">
-                <Award className="w-4 h-4 text-yellow-500" />
-                Premium Service
-              </div>
-            </div>
-          </div>
+      <section className="relative min-h-[100vh] sm:h-[90vh] bg-black text-white overflow-hidden pt-16 sm:pt-20">
+        <div className="absolute inset-0">
+          <img
+            src={bgimage}
+            alt="Luxury Watch"
+            className="w-full h-full object-cover object-center"
+          />
         </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="luxury-title text-3xl md:text-4xl mb-4">
-              Why Choose ChronoBid
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Experience the future of luxury watch services with our innovative platform
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-0 py-6 sm:py-12 flex flex-col justify-center min-h-[calc(100vh-4rem)] sm:min-h-[calc(90vh-5rem)] max-w-[95%] sm:max-w-[85%] lg:max-w-[70%]">
+
+          <div className="self-start mt-4 sm:mt-8 lg:-mt-24">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[48px] font-guyot  lg:leading-[120%] mb-6 sm:mb-8 lg:mb-12">
+              Time deserves Care; Be among <br className="hidden sm:block" />
+              the first to experience the future <br className="hidden md:block" />
+              of <span className="whitespace-nowrap">service.</span>
+            </h1>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center text-base sm:text-lg md:text-xl text-gray-200 max-w-full sm:max-w-2xl mb-6 sm:mb-8 sm:px-0 md:px-12">
+            <img
+              src={smallimage}
+              alt="Icon"
+              className="w-[45px] h-[45px] sm:w-[50px] sm:h-[50px] md:w-[55px] md:h-[55px] mb-3 sm:mb-0 sm:mr-6 flex-shrink-0"
+            />
+            <p className="text-sm sm:text-base md:text-[18px] leading-[120%] font-light">
+              We're building a modern platform to service and protect your favorite timepieces —
+              with clear pricing, expert hands, and no surprises.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="luxury-card group hover:scale-105 transition-all duration-300">
-                <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
-                    <feature.icon className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="flex w-full max-w-full sm:max-w-[661px] bg-white rounded-full overflow-hidden mb-6 sm:mb-8 mt-2 items-center h-[52px] sm:h-[52px] md:h-[56px]">
+            <div className="text-black px-3 sm:px-4 flex-shrink-0">
+              <MailLogo />
+            </div>
+            <Input
+              type="email"
+              placeholder="Enter your email to get early access"
+              className="flex-1 border-0 focus:ring-0 focus-visible:ring-0 text-black bg-transparent placeholder:text-black h-full px-2 sm:px-0 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base min-w-0"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Button
+              className="bg-[#f59f0a] text-white px-3 sm:px-6 md:px-8 h-full rounded-tr-[120px] rounded-br-[120px] rounded-bl-[999px] rounded-tl-none hover:bg-[#e09000] transition text-xs sm:text-base whitespace-nowrap flex-shrink-0"
+              onClick={handleJoinWaitlist}
+            >
+              <span className="hidden sm:inline">Join the Waitlist</span>
+              <span className="sm:hidden">Join</span>
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm md:text-[14px] text-white/80 mb-8 sm:mb-0">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <CertifiedDealersLogo />
+              <span className="whitespace-nowrap">Certified Dealers</span>
+            </div>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <FullyInsuredLogo />
+              <span className="whitespace-nowrap">Fully Insured</span>
+            </div>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <PremiumLogo />
+              <span className="whitespace-nowrap">Premium Service</span>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Supported Brands */}
-      <section className="py-20 px-4 bg-muted/20">
-        <div className="container mx-auto text-center">
-          <h2 className="luxury-title text-3xl md:text-4xl mb-4">
-            Trusted by Collectors Worldwide
-          </h2>
-          <p className="text-xl text-muted-foreground mb-12">
-            Our network services all major luxury watch brands
-          </p>
-          
-          <div className="flex flex-wrap justify-center gap-4">
-            {brands.map((brand, index) => (
-              <Badge 
-                key={index} 
-                variant="outline" 
-                className="px-4 py-2 text-sm font-medium hover:bg-primary/10 transition-colors"
-              >
-                {brand}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      </section>
+      <BuildToLast />
+      {/* Features Section */}
 
+      <WhyChooseBid />
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
-        <div className="container mx-auto text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="luxury-title text-3xl md:text-4xl mb-6">
-              Ready to Experience Premium Watch Services?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of watch enthusiasts who trust ChronoBid for their timepiece needs.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild className="luxury-button text-lg px-8 py-6">
-                <Link to="/register">
-                  <Crown className="mr-2 w-5 h-5" />
-                  Start Your Journey
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="text-lg px-8 py-6 border-primary/20">
-                <Link to="/login">Learn More</Link>
-              </Button>
-            </div>
+      <div className="bg-gray-50">
 
-            <div className="mt-8 flex justify-center items-center gap-1 text-sm text-muted-foreground">
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span className="ml-2">Rated 5.0 by 1,200+ customers</span>
-            </div>
-          </div>
-        </div>
-      </section>
+        <WhatWeOffer />
+        <TheProcess />
+        <FAQSection />
+        <Footer />
+        {/* CTA Section Design 1 */}
+
+      </div>
     </div>
   );
 };
 
-export default Index;
+export default Index; 

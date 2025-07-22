@@ -104,7 +104,7 @@ const Dashboard = () => {
               </CardContent>
             </Card>
 
-            <Card className="luxury-card">
+            {/* <Card className="luxury-card">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="w-5 h-5 text-green-500" />
@@ -119,7 +119,7 @@ const Dashboard = () => {
                   <Link to="/messages">Open Messages</Link>
                 </Button>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
 
           {/* Recent Activity */}

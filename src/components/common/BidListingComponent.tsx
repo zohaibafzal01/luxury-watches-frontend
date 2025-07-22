@@ -363,9 +363,10 @@ export const BidListingComponent: React.FC = () => {
                                     <Clock className="w-4 h-4" />
                                     {bid.turnaroundTime} days
                                   </span>
-                                  <span className="text-sm capitalize">
-                                    {bid.deliveryMethod}
-                                  </span>
+                                <span className="flex items-center gap-1">
+                        <Package className="w-4 h-4" />
+                        {request.deliveryPreference}
+                      </span>
                                 </div>
                                 <span className="text-xs text-muted-foreground">
                                   {new Date(bid.submittedAt).toLocaleDateString()}

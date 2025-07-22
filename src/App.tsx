@@ -50,6 +50,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: string[] }> 
 };
 
 const AppRoutes = () => {
+  
   const { isAuthenticated } = useAuth();
 
   return (

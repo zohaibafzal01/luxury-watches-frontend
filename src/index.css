@@ -5,6 +5,13 @@
 
 /* Luxury Watch Marketplace Design System - Light Theme */
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
 @layer base {
   :root {
     /* Luxury Light Theme with Gold Accents */
@@ -60,7 +67,7 @@
   /* Luxury typography */
   .luxury-title {
     @apply text-4xl font-bold tracking-tight;
-    font-family: 'Playfair Display', serif;
+    font-family: 'StevieSans', sans-serif;
   }
 
   .luxury-subtitle {
