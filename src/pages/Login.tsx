@@ -1,8 +1,19 @@
 
 import { LoginForm } from '@/components/auth/LoginForm';
+import Footer from '@/components/layout/Footer';
 
 const Login = () => {
-  return <LoginForm />;
+  return (
+    <>
+  
+  
+  <LoginForm />
+  <Footer/>
+  </>
+
+  )
+
+
 };
 
 export default Login;

@@ -117,18 +117,26 @@ const Index: React.FC = () => {
       <BuildToLast />
       {/* Features Section */}
 
-      <WhyChooseBid />
-      {/* CTA Section */}
-      <div className="bg-gray-50">
+      <section id="why-choose-us">
+        <WhyChooseBid />
+      </section>
 
+      <section id="what-we-offer">
         <WhatWeOffer />
-        <TheProcess />
-        <FAQSection />
-        <Footer />
-        {/* CTA Section Design 1 */}
+      </section>
 
-      </div>
+      <section id="the-process">
+        <TheProcess />
+      </section>
+
+      <section id="faqs">
+        <FAQSection />
+      </section>
+      <Footer />
+      {/* CTA Section Design 1 */}
+
     </div>
+
   );
 };
 

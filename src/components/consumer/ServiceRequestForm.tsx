@@ -214,7 +214,7 @@ export const ServiceRequestForm: React.FC = () => {
               </div>
 
               {/* Photo Upload */}
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Photos</h3>
                 <p className="text-sm text-muted-foreground">
                   Upload photos of your watch to help dealers provide accurate estimates (max 5 photos)
@@ -278,7 +278,7 @@ export const ServiceRequestForm: React.FC = () => {
                   onChange={handleFileUpload}
                   className="hidden"
                 />
-              </div>
+              </div> */}
 
               {/* Delivery Preference */}
               <div className="space-y-4">
@@ -300,7 +300,7 @@ export const ServiceRequestForm: React.FC = () => {
               </div>
 
               {/* Location */}
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Location</h3>
                 <div className="flex gap-2">
                   <Button
@@ -317,7 +317,7 @@ export const ServiceRequestForm: React.FC = () => {
                     </Badge>
                   )}
                 </div>
-              </div>
+              </div> */}
 
               <Button
                 type="submit"

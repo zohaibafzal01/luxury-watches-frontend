@@ -27,7 +27,7 @@ export const DealerDashboard: React.FC = () => {
         description: 'Crown is not screwing down properly and the watch is losing time.',
         deliveryPreference: 'shipping',
         photos: [
-          { id: '1', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
+          // { id: '1', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
         ],
         status: 'pending',
         createdAt: new Date().toISOString(),
@@ -43,7 +43,7 @@ export const DealerDashboard: React.FC = () => {
         description: 'Chronograph function is not working, second hand gets stuck.',
         deliveryPreference: 'drop-off',
         photos: [
-          { id: '2', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
+          // { id: '2', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
         ],
         status: 'bidding',
         createdAt: new Date().toISOString(),
@@ -166,7 +166,7 @@ export const DealerDashboard: React.FC = () => {
             </CardContent>
           </Card>
           
-          <Card className="luxury-card">
+          {/* <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -176,7 +176,7 @@ export const DealerDashboard: React.FC = () => {
                 <TrendingUp className="w-8 h-8 text-purple-500" />
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         <Tabs defaultValue="requests" className="space-y-6">
