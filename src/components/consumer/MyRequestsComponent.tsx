@@ -28,7 +28,7 @@ export const MyRequestsComponent: React.FC = () => {
         description: 'Crown is not screwing down properly and the watch is losing time.',
         deliveryPreference: 'shipping',
         photos: [
-          { id: '1', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
+          // { id: '1', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
         ],
         status: 'bidding',
         createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
@@ -44,7 +44,7 @@ export const MyRequestsComponent: React.FC = () => {
         description: 'Chronograph function is not working properly. Second hand gets stuck occasionally.',
         deliveryPreference: 'drop-off',
         photos: [
-          { id: '2', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
+          // { id: '2', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
         ],
         status: 'accepted',
         createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),

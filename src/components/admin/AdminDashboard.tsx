@@ -158,7 +158,7 @@ export const AdminDashboard: React.FC = () => {
             </CardContent>
           </Card>
           
-          <Card className="luxury-card">
+          {/* <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -168,9 +168,9 @@ export const AdminDashboard: React.FC = () => {
                 <Activity className="w-8 h-8 text-green-500" />
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
           
-          <Card className="luxury-card">
+          {/* <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -180,14 +180,14 @@ export const AdminDashboard: React.FC = () => {
                 <TrendingUp className="w-8 h-8 text-purple-500" />
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
-        <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-md">
+        <Tabs defaultValue="users" className="space-y-6 ">
+          <TabsList className=" grid grid-cols-1 max-w-[15%]">
             <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="requests">Service Requests</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+            {/* <TabsTrigger value="requests">Service Requests</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger> */}
           </TabsList>
 
           <TabsContent value="users" className="space-y-4">

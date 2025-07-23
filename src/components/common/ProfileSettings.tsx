@@ -176,10 +176,10 @@ export const ProfileSettings: React.FC = () => {
         </Card>
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-md">
+          <TabsList className="grid w-full grid-cols-2 max-w-md">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="preferences">Preferences</TabsTrigger>
+            {/* <TabsTrigger value="preferences">Preferences</TabsTrigger> */}
           </TabsList>
 
           <TabsContent value="profile">
