@@ -15,8 +15,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { LoginCredentials } from "@/types/auth";
 import { Eye, EyeOff, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import authApi from "@/api/auth";
 
-export const LoginForm: React.FC = () => {
+export const AdminLogin: React.FC = () => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: "",
     password: "",
@@ -25,29 +26,39 @@ export const LoginForm: React.FC = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
-      await login(credentials);
-      toast({
-        title: "Welcome back!",
-        description: "You have been successfully signed in.",
-      });
-      navigate("/dashboard");
+      // Call the adminLogin API from authApi
+      const response = await authApi.adminLogin(
+        credentials.email,
+        credentials.password
+      );
+
+      if (response) {
+        // If login is successful, show a success message and navigate to the dashboard
+        toast({
+          title: "Welcome back!",
+          description: "You have been successfully signed in.",
+        });
+        navigate("/admin/dashboard"); // Navigate to the dashboard after login
+      }
     } catch (err) {
+      // If there's an error, display it
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Stop the loading spinner
     }
   };
 
+  // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCredentials((prev) => ({
       ...prev,
@@ -62,7 +73,9 @@ export const LoginForm: React.FC = () => {
           <div className="w-16 h-16 bg-luxury-gradient rounded-full flex items-center justify-center mx-auto mb-4">
             <Crown className="w-8 h-8 text-luxury-black" />
           </div>
-          <CardTitle className="luxury-title text-2xl">Welcome Back</CardTitle>
+          <CardTitle className="luxury-title text-2xl">
+            Welcome Back Admin
+          </CardTitle>
           <CardDescription>
             Sign in to your ChronoBid account to continue your luxury watch
             journey
@@ -107,7 +120,7 @@ export const LoginForm: React.FC = () => {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent hover:text-muted-foreground"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (

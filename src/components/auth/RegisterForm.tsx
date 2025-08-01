@@ -1,85 +1,101 @@
-
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/contexts/AuthContext';
-import { RegisterData, UserRole } from '@/types/auth';
-import { Eye, EyeOff, Crown } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Eye, EyeOff, Crown } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import authApi from "@/api/auth"; // Import your auth API
 
 export const RegisterForm: React.FC = () => {
-  const [formData, setFormData] = useState<RegisterData>({
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    role: 'consumer',
-    phone: '',
-    company: '',
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    role: "admin", // Default role set to admin
+    phone: "",
+    company: "",
   });
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { register } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (formData.password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError("Password must be at least 6 characters long");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      await register(formData);
+      // Call your register API
+      const response = await authApi.register(
+        formData.firstName,
+        formData.lastName,
+        formData.email,
+        formData.role, // This will be admin, dealer, or consumer
+        formData.phone,
+        formData.password,
+        "active" // Default status
+      );
+
       toast({
-        title: 'Account created!',
-        description: 'Welcome to ChronoBid. Please verify your email address.',
+        title: "Account created!",
+        description:
+          "Welcome to ChronoBid. Your account has been created successfully.",
       });
-      navigate('/dashboard');
+
+      // Navigate to login or dashboard based on your app flow
+      navigate("/login");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Registration failed. Please try again.";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
 
-  const handleRoleChange = (role: UserRole) => {
-    setFormData(prev => ({ ...prev, role }));
-  };
-
-  const getRoleDescription = (role: UserRole) => {
-    const descriptions = {
-      consumer: 'Request watch services and repairs',
-      dealer: 'Bid on service requests and manage inventory',
-      wholesaler: 'Access dealer network and inventory',
-      admin: 'Full platform administration access',
-    };
-    return descriptions[role];
+  const handleRoleChange = (role: string) => {
+    setFormData((prev) => ({ ...prev, role }));
   };
 
   return (
@@ -89,7 +105,9 @@ export const RegisterForm: React.FC = () => {
           <div className="w-16 h-16 bg-luxury-gradient rounded-full flex items-center justify-center mx-auto mb-4">
             <Crown className="w-8 h-8 text-luxury-black" />
           </div>
-          <CardTitle className="luxury-title text-2xl">Join ChronoBid</CardTitle>
+          <CardTitle className="luxury-title text-2xl">
+            Join ChronoBid
+          </CardTitle>
           <CardDescription>
             Create your account and enter the world of luxury timepieces
           </CardDescription>
@@ -148,38 +166,26 @@ export const RegisterForm: React.FC = () => {
                   <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="consumer">
+                  <SelectItem value="admin">
                     <div className="flex flex-col">
-                      <span className="font-medium">Consumer</span>
-                      <span className="text-xs text-muted-foreground">
-                        Request watch services and repairs
-                      </span>
+                      <span className="font-medium">Admin</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="dealer">
                     <div className="flex flex-col">
                       <span className="font-medium">Dealer</span>
-                      <span className="text-xs text-muted-foreground">
-                        Bid on service requests and manage inventory
-                      </span>
                     </div>
                   </SelectItem>
-                  <SelectItem value="wholesaler">
+                  <SelectItem value="consumer">
                     <div className="flex flex-col">
-                      <span className="font-medium">Wholesaler</span>
-                      <span className="text-xs text-muted-foreground">
-                        Access dealer network and inventory
-                      </span>
+                      <span className="font-medium">Consumer</span>
                     </div>
                   </SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                {getRoleDescription(formData.role)}
-              </p>
             </div>
 
-            {(formData.role === 'dealer' || formData.role === 'wholesaler') && (
+            {formData.role === "dealer" && (
               <div className="space-y-2">
                 <Label htmlFor="company">Company Name</Label>
                 <Input
@@ -212,7 +218,7 @@ export const RegisterForm: React.FC = () => {
                 <Input
                   id="password"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={handleChange}
                   className="luxury-input pr-10"
@@ -223,7 +229,7 @@ export const RegisterForm: React.FC = () => {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent hover:text-muted-foreground"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -253,13 +259,16 @@ export const RegisterForm: React.FC = () => {
               className="w-full luxury-button"
               disabled={isLoading}
             >
-              {isLoading ? 'Creating Account...' : 'Create Account'}
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
 
             <div className="text-center">
               <span className="text-sm text-muted-foreground">
-                Already have an account?{' '}
-                <Link to="/login" className="text-primary hover:underline font-medium">
+                Already have an account?{" "}
+                <Link
+                  to="/login"
+                  className="text-primary hover:underline font-medium"
+                >
                   Sign in
                 </Link>
               </span>

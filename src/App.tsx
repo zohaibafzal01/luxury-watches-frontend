@@ -19,6 +19,7 @@ import BidListing from "./pages/BidListing";
 import NotFound from "./pages/NotFound";
 import WholesalerDashboard from "./pages/WholesalerDashboard";
 import ProfileSettings from "./pages/ProfileSettings";
+import { AdminLogin } from "./components/auth/AdminLogin";
 
 const queryClient = new QueryClient();
 
@@ -56,13 +57,23 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route 
-        path="/login" 
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
+      <Route
+        path="/login"
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
+        }
       />
-      <Route 
-        path="/register" 
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} 
+      <Route
+        path="/admin/login"
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <AdminLogin />
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />
+        }
       />
       <Route
         path="/dashboard"
@@ -83,7 +94,7 @@ const AppRoutes = () => {
       <Route
         path="/service-request"
         element={
-          <ProtectedRoute roles={['consumer']}>
+          <ProtectedRoute roles={["consumer"]}>
             <ServiceRequest />
           </ProtectedRoute>
         }
@@ -91,7 +102,7 @@ const AppRoutes = () => {
       <Route
         path="/my-requests"
         element={
-          <ProtectedRoute roles={['consumer']}>
+          <ProtectedRoute roles={["consumer"]}>
             <MyRequests />
           </ProtectedRoute>
         }
@@ -99,7 +110,7 @@ const AppRoutes = () => {
       <Route
         path="/dealer/dashboard"
         element={
-          <ProtectedRoute roles={['dealer']}>
+          <ProtectedRoute roles={["dealer"]}>
             <DealerDashboard />
           </ProtectedRoute>
         }
@@ -107,7 +118,7 @@ const AppRoutes = () => {
       <Route
         path="/dealer/inventory"
         element={
-          <ProtectedRoute roles={['dealer']}>
+          <ProtectedRoute roles={["dealer"]}>
             <Inventory />
           </ProtectedRoute>
         }
@@ -115,7 +126,7 @@ const AppRoutes = () => {
       <Route
         path="/wholesaler/dashboard"
         element={
-          <ProtectedRoute roles={['wholesaler']}>
+          <ProtectedRoute roles={["wholesaler"]}>
             <WholesalerDashboard />
           </ProtectedRoute>
         }
@@ -123,7 +134,7 @@ const AppRoutes = () => {
       <Route
         path="/admin/dashboard"
         element={
-          <ProtectedRoute roles={['admin']}>
+          <ProtectedRoute roles={["admin"]}>
             <Admin />
           </ProtectedRoute>
         }
