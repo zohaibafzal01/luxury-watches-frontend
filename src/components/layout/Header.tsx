@@ -24,7 +24,7 @@ import {
   Search,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Logo } from '@/svg';
+import { Logo, PersonIcon, } from '@/svg';
 
 export const Header: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -60,6 +60,7 @@ export const Header: React.FC = () => {
     navigate('/');
     setIsMobileMenuOpen(false);
   };
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const getInitials = (firstName: string, lastName: string) =>
     `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -94,7 +95,7 @@ export const Header: React.FC = () => {
       dealer: [
         { to: '/dealer/dashboard', label: 'Dashboard', icon: Home },
         // { to: '/dealer/inventory', label: 'Inventory', icon: Package },
-        { to: '/bid-listing', label: 'Browse Bids', icon: ShoppingCart },
+        // { to: '/bid-listing', label: 'Browse Bids', icon: ShoppingCart },
       ],
       wholesaler: [
         { to: '/wholesaler/dashboard', label: 'Dashboard', icon: Home },
@@ -143,53 +144,30 @@ export const Header: React.FC = () => {
 
   return (
     <header className={`sticky top-0 z-50 w-full transition-all duration-300  ${isAuthenticated && user ? "bg-white" : "bg-black"}`}>
-      <div className="container mx-auto px-2 sm:px-4 h-14 sm:h-16 flex items-center justify-between">
-        {/* Left Section: Logo, Search Bar, Static Nav */}
+      <div className="container mx-auto px-2 sm:px-4 h-14 sm:h-20 flex items-center justify-between space-x-2 sm:space-x-4">
         <div className="flex items-center space-x-4">
-          {/* Logo */}
-          {/* <Link  className="flex items-center space-x-2 sm:space-x-3 group"> */}
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden flex items-center justify-center">
-            <Logo />
-          </div>
-          <span className={`font-guyot  text-lg sm:text-xl md:text-[24px] cursor-pointer ${isAuthenticated && user ? "text-black" : "text-white"} font-guyot`}>
-            <a
-              href={isAuthenticated && user ? "/" : "#"}
-              onClick={(e) => {
-                if (isAuthenticated || user) {
-                  e.preventDefault(); 
-                }
-              }}
-            >
-              <span className={isAuthenticated && user ? '' : ''}>ChronoBid</span>
-            </a>
-
-          </span>
-          {/* </Link> */}
-
-          {/* Search Bar (hidden on mobile) */}
-          {!isAuthenticated && (
-            <div className='flex items-center gap-4'>
-              <div className="relative w-[200px] md:w-[300px] lg:w-[300px] hidden md:block">
-                <input
-                  type="search"
-                  placeholder="Search service"
-                  className="w-full rounded-full py-2 pl-10 pr-4 text-white placeholder:text-gray-300
-                bg-gradient-to-br from-[#2c2c2e] via-[#2c2c2e] to-[#005670]/100
-                backdrop-blur-md border-none outline-none focus:ring-2 focus:ring-[#F59F0A] transition-all text-sm"
-                />
-                <Search className="absolute top-1/2 left-3 -translate-y-1/2 text-white opacity-70" size={18} />
+          <div className="flex flex-col items-center justify-center space-y-1 mx-auto">
+            <div className="flex items-center space-x-2 cursor-pointer xl:ml-[600px] md:ml-[535px] sm:ml-[300px]">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden flex items-center justify-center">
+                <Logo />
               </div>
-
-              {/* Static Nav Links (desktop only) */}
-              <nav className="hidden xl:flex space-x-4 lg:space-x-6 text-white font-stevie text-xs lg:text-[14px]">
-                <a href="#why-choose-us" className="hover:text-[#F59F0A] whitespace-nowrap">Why choose us</a>
-                <a href="#what-we-offer" className="hover:text-[#F59F0A] whitespace-nowrap">What we offer</a>
-                <a href="#the-process" className="hover:text-[#F59F0A] whitespace-nowrap">The Process</a>
-                <a href="#faqs" className="hover:text-[#F59F0A]">FAQs</a>
-              </nav>
+              <span
+                className={`font-guyot text-lg sm:text-xl md:text-[24px] ${isAuthenticated && user ? "text-black" : "text-white"
+                  }`}
+              >
+                <a
+                  href={isAuthenticated && user ? "/" : "#"}
+                  onClick={(e) => {
+                    if (isAuthenticated || user) {
+                      e.preventDefault();
+                    }
+                  }}
+                >
+                  ChronoBid
+                </a>
+              </span>
             </div>
-          )}
-
+          </div>
         </div>
 
         {/* Right Section: Auth/User Navigation */}
@@ -253,7 +231,6 @@ export const Header: React.FC = () => {
             <>
 
               <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3">
-                {/* Mobile Menu for Non-Authenticated Users */}
                 <Sheet>
                   <SheetTrigger asChild>
                     <Button
@@ -269,7 +246,6 @@ export const Header: React.FC = () => {
                   </SheetTrigger>
                   <SheetContent side="right" className="w-80 sm:w-96 bg-black text-white border-l border-gray-800 p-0">
                     <div className="flex flex-col h-full">
-                      {/* Fixed Mobile Header with Logo */}
                       <div className="flex items-center justify-between p-6 border-b border-gray-800 flex-shrink-0">
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
@@ -278,11 +254,8 @@ export const Header: React.FC = () => {
                           <span className="font-bold text-xl text-white font-guyot">ChronoBid</span>
                         </div>
                       </div>
-
-                      {/* Scrollable Content Area */}
                       <div className="flex-1 overflow-y-auto">
                         <div className="px-6">
-                          {/* Mobile Search */}
                           <div className="py-6 border-b border-gray-800">
                             <div className="relative">
                               <input
@@ -295,8 +268,6 @@ export const Header: React.FC = () => {
                               <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400" size={20} />
                             </div>
                           </div>
-
-                          {/* Navigation Links */}
                           <nav className="py-6 pb-6">
                             <div className="space-y-1">
                               <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -330,8 +301,6 @@ export const Header: React.FC = () => {
                           </nav>
                         </div>
                       </div>
-
-                      {/* Fixed Bottom Action Buttons */}
                       <div className="border-t border-gray-800 p-6 space-y-3 flex-shrink-0">
                         <Button
                           asChild
@@ -355,30 +324,69 @@ export const Header: React.FC = () => {
                     </div>
                   </SheetContent>
                 </Sheet>
+                <div className="hidden md:flex items-center space-x-1 sm:space-x-2 md:space-x-3">
+                  {!isAuthenticated && (
+                    <div className="hidden lg:block relative inline-block">
+                      <button
+                        className="text-white hover:text-[#F59F0A] text-lg md:text-xl"
+                        onClick={() => setMenuOpen(!menuOpen)}
+                      >
+                        {menuOpen ? "✖" : "☰"}
+                      </button>
 
-                {/* Desktop Buttons - Hidden on mobile */}
-                <div className="hidden md:flex items-center space-x-2 md:space-x-3">
+                      {menuOpen && (
+                        <div className="absolute top-full mt-2 right-0 bg-black/80 backdrop-blur-md rounded-md text-white flex flex-col items-start p-4 lg:p-6 space-y-3 lg:space-y-4 font-stevie text-xs lg:text-sm shadow-md z-50 w-48 lg:w-64">
+                          <a href="#why-choose-us" className="hover:text-[#F59F0A] flex items-center space-x-2" onClick={() => setMenuOpen(false)}>
+                            <span className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-[#F59F0A] rounded-full inline-block"></span>
+                            <span>Why choose us</span>
+                          </a>
+
+                          <a href="#what-we-offer" className="hover:text-[#F59F0A] flex items-center space-x-2" onClick={() => setMenuOpen(false)}>
+                            <span className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-[#F59F0A] rounded-full inline-block"></span>
+                            <span>What we offer</span>
+                          </a>
+
+                          <a href="#the-process" className="hover:text-[#F59F0A] flex items-center space-x-2" onClick={() => setMenuOpen(false)}>
+                            <span className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-[#F59F0A] rounded-full inline-block"></span>
+                            <span>The Process</span>
+                          </a>
+
+                          <a href="#faqs" className="hover:text-[#F59F0A] flex items-center space-x-2" onClick={() => setMenuOpen(false)}>
+                            <span className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-[#F59F0A] rounded-full inline-block"></span>
+                            <span>FAQs</span>
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <Button
                     asChild
-                    className="bg-black border hover:bg-[#F59F0A] text-white font-semibold text-xs sm:text-sm md:text-[14px] px-2 sm:px-4 h-8 sm:h-9 md:h-10"
+                    className="bg-black border hover:bg-[#F59F0A] text-white font-semibold text-xs md:text-sm lg:text-[14px] px-2 md:px-3 lg:px-4 h-8 md:h-9 lg:h-10"
                   >
                     <Link to="/">
-                      <span className="hidden sm:inline">Order Lookup</span>
-                      <span className="sm:hidden">Order</span>
+                      <span className="hidden md:inline lg:hidden">Order</span>
+                      <span className="hidden lg:inline">Order Lookup</span>
+                      <span className="md:hidden">Order</span>
                     </Link>
                   </Button>
+
                   <Button
                     asChild
-                    className="bg-white text-[#F59F0A] hover:bg-[#F59F0A] hover:text-white font-semibold text-xs sm:text-sm md:text-[14px] px-2 sm:px-4 h-8 sm:h-9 md:h-10"
+                    className="bg-white text-[#F59F0A] hover:bg-[#F59F0A] hover:text-white font-semibold text-xs md:text-sm lg:text-[14px] px-2 md:px-3 lg:px-4 h-8 md:h-9 lg:h-10"
                   >
-                    <Link to="/">
-                      <span className="hidden sm:inline">Contact Us</span>
-                      <span className="sm:hidden">Contact</span>
+                    {/* <Link to="/">
+      <span className="hidden md:inline lg:hidden">Contact</span>
+      <span className="hidden lg:inline">Contact Us</span>
+      <span className="md:hidden">Contact</span>
+    </Link> */}
+                  </Button>
+
+                  <button className="text-white hover:text-[#F59F0A] p-1 md:p-2">
+                    <Link to="/login">
+                      <PersonIcon />
                     </Link>
-                  </Button>
-                  <Button variant="ghost" asChild className='bg-[#F59F0A] text-white text-xs sm:text-sm md:text-[14px] px-2 sm:px-4 h-8 sm:h-9 md:h-10'>
-                    <Link to="/login">Sign In</Link>
-                  </Button>
+                  </button>
                 </div>
               </div>
             </>

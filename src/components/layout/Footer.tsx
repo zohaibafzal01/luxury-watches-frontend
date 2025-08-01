@@ -24,7 +24,7 @@ export default function Footer() {
                     <a href="#" className="hover:text-yellow-500 transition"><InstaIcon /></a>
                     <a href="#" className="hover:text-yellow-500 transition"><LinkedInIcon /></a>
                 </div>
-                <div className="flex justify-end ml-auto cursor-pointer">
+                <div className="fixed bottom-4 right-4 cursor-pointer sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 lg:bottom-28 lg:right-16 xl:bottom-32 xl:right-20 2xl:bottom-32 2xl:right-32 z-50">
                     <FooterSmsicon />
                 </div>
                 {/* Divider */}
