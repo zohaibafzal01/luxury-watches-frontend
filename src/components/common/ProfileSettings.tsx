@@ -234,7 +234,7 @@ export const ProfileSettings: React.FC = () => {
                         placeholder="Enter your phone number"
                       />
                     </div>
-                    {(user.role === 'dealer' || user.role === 'wholesaler') && (
+                    {(user.role === 'dealer') && (
                       <div className="space-y-2">
                         <Label htmlFor="company">Company Name</Label>
                         <Input

@@ -120,7 +120,7 @@ export const DealerDashboard: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-4">
       <div className="container mx-auto">
         <div className="mb-8">
-          <h1 className="luxury-title text-3xl mb-2">Dealer Dashboard</h1>
+          <h1 className="luxury-title text-3xl mb-2">Dashboard</h1>
           <p className="text-muted-foreground">
             Manage service requests, track bids, and grow your watch service business
           </p>
@@ -156,7 +156,7 @@ export const DealerDashboard: React.FC = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Bid Value</p>
+                  <p className="text-sm text-muted-foreground">Total Revenue</p>
                   <p className="text-2xl font-bold text-green-500">
                     ${myBids.reduce((sum, bid) => sum + bid.estimatedPrice, 0)}
                   </p>

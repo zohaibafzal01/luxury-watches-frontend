@@ -66,7 +66,7 @@ export const AdminDashboard: React.FC = () => {
       {
         id: '4',
         email: 'wholesaler@chronobid.com',
-        role: 'wholesaler',
+        role: 'admin',
         firstName: 'Mike',
         lastName: 'Wholesaler',
         company: 'Global Watch Supply',
