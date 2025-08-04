@@ -53,7 +53,7 @@ const Index: React.FC = () => {
       className="w-full h-full object-cover object-center"
     />
     {/* Oval Overlay */}
-    <div className="absolute inset-0 bg-black/40">
+    <div className="absolute inset-0 bg-black/60">
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/30 to-black/60"></div>
     </div>
   </div>
@@ -62,9 +62,8 @@ const Index: React.FC = () => {
     
     <div className="self-center mt-4 sm:mt-8 lg:-mt-32 text-center">
       <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[48px] font-guyot lg:leading-[120%] mb-6 sm:mb-8 lg:mb-2">
-        Time deserves Care; Be among <br className="hidden sm:block" />
-        the first to experience the future <br className="hidden md:block" />
-        of <span className="whitespace-nowrap">service.</span>
+        Reliable Service, Perfectly Matched <br className="hidden sm:block" />
+       
       </h1>
     </div>
 
@@ -79,14 +78,20 @@ const Index: React.FC = () => {
         with clear pricing, expert hands, and no surprises.
       </p>
     </div>
+    <div className="flex flex-col self-center text-center sm:flex-row sm:items-center text-base sm:text-lg md:text-xl text-gray-200 max-w-full sm:max-w-2xl mb-4 sm:px-0 md:px-12">
+      <p className="text-sm sm:text-base md:text-[15px] leading-[120%] font-light">
+        Join the Waitlist & Get Our Free Guide: “Top 5 Signs Your Watch Needs a Service”
+      </p>
+    </div>
 
-    <div className="flex self-center w-full max-w-full sm:max-w-[500px] bg-white rounded-full overflow-hidden mb-6  mt-2 items-center h-[52px] sm:h-[52px] md:h-[40px]">
+    <div className="flex self-center w-full max-w-full sm:max-w-[500px] bg-white rounded-full overflow-hidden mb-6 items-center h-[52px] sm:h-[52px] md:h-[40px]">
+     
       <div className="text-black px-3 sm:px-4 flex-shrink-0">
         <MailLogo />
       </div>
       <Input
         type="email"
-        placeholder="Enter your email to get early access"
+        placeholder="you@example.com"
         className="flex-1 border-0 focus:ring-0 focus-visible:ring-0 text-black bg-transparent placeholder:text-black h-full px-2 sm:px-0 text-sm sm:text-base placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base min-w-0"
         value={email}
         onChange={(e) => setEmail(e.target.value)}

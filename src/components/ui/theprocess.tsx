@@ -43,10 +43,10 @@ export default function TheProcess() {
               <h3 className="text-[20px] font-semibold mb-2 font-guyot">{step.title}</h3>
               <p className="text-gray-700 text-[16px] leading-relaxed font-stevie leading-[150%]">{step.description}</p>
 
-              {/* Desktop arrows (curved alternating) */}
+             
               {index < steps.length - 1 && (
                 <>
-                  {/* Desktop curved arrows */}
+
                   <div
                     className={`hidden md:block absolute w-[110px] h-[50px]
         ${index === 0 ? 'right-[-25px] top-[100%]' : ''}

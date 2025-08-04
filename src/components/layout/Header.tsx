@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,7 +24,7 @@ import {
   Search,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Logo, PersonIcon, } from '@/svg';
+import { Logo, PersonIcon, SrchIcon } from '@/svg';
 
 export const Header: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -32,6 +32,8 @@ export const Header: React.FC = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const sidebarRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Detect scroll
   useEffect(() => {
@@ -39,6 +41,20 @@ export const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
 
   // Determine if on a dashboard/admin page
   const isDashboardPage = location.pathname.includes('/dashboard') ||
@@ -60,7 +76,7 @@ export const Header: React.FC = () => {
     navigate('/');
     setIsMobileMenuOpen(false);
   };
-  const [menuOpen, setMenuOpen] = useState(false);
+
 
   const getInitials = (firstName: string, lastName: string) =>
     `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -144,10 +160,69 @@ export const Header: React.FC = () => {
 
   return (
     <header className={`sticky top-0 z-50 w-full transition-all duration-300  ${isAuthenticated && user ? "bg-white" : "bg-black"}`}>
-      <div className="container mx-auto px-2 sm:px-4 h-14 sm:h-20 flex items-center justify-between space-x-2 sm:space-x-4">
+      <div className="  px-2 sm:px-4 h-14 sm:h-20 flex items-center justify-between  sm:space-x-4">
+        {!isAuthenticated && (
+          <div className="hidden  lg:block relative inline-block" ref={sidebarRef}>
+            <button
+              className="text-white hover:text-[#F59F0A] text-lg md:text-xl"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {/* Always show burger icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+
+            {menuOpen && (
+              <div className="fixed top-0 left-4 z-50">
+                {/* Backdrop */}
+                <div
+                  className="fixed inset-0 bg-black bg-opacity-50"
+                  onClick={() => setMenuOpen(false)}
+                />
+
+                {/* Sidebar container */}
+                <div
+                  ref={sidebarRef}
+                  className="relative bg-[#1A1A1A] text-white shadow-lg rounded-md px-6 py-6 mt-[72px] mr-4 min-w-[220px] max-w-xs flex flex-col space-y-3 transition-all duration-300"
+                >
+
+                  {[
+                    { href: "#why-choose-us", label: "Why choose us" },
+                    { href: "#what-we-offer", label: "What we offer" },
+                    { href: "#the-process", label: "The Process" },
+                    { href: "#faqs", label: "FAQs" },
+                  ].map(({ href, label }) => (
+                    <a
+                      key={href}
+                      href={href}
+                      onClick={() => setMenuOpen(false)}
+                      className="w-full px-3 py-2 text-sm rounded hover:bg-[#2C2C2C] hover:text-[#F59F0A] transition"
+                    >
+                      {label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+
+          </div>
+        )}
         <div className="flex items-center space-x-4">
           <div className="flex flex-col items-center justify-center space-y-1 mx-auto">
-            <div className="flex items-center space-x-2 cursor-pointer xl:ml-[600px] md:ml-[535px] sm:ml-[300px]">
+            <div className="flex items-center space-x-2 cursor-pointer xl:ml-[50px] md:ml-[100px] sm:ml-[300px]">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden flex items-center justify-center">
                 <Logo />
               </div>
@@ -268,6 +343,7 @@ export const Header: React.FC = () => {
                               <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400" size={20} />
                             </div>
                           </div>
+
                           <nav className="py-6 pb-6">
                             <div className="space-y-1">
                               <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -324,69 +400,24 @@ export const Header: React.FC = () => {
                     </div>
                   </SheetContent>
                 </Sheet>
-                <div className="hidden md:flex items-center space-x-1 sm:space-x-2 md:space-x-3">
-                  {!isAuthenticated && (
-                    <div className="hidden lg:block relative inline-block">
-                      <button
-                        className="text-white hover:text-[#F59F0A] text-lg md:text-xl"
-                        onClick={() => setMenuOpen(!menuOpen)}
-                      >
-                        {menuOpen ? "✖" : "☰"}
-                      </button>
-
-                      {menuOpen && (
-                        <div className="absolute top-full mt-2 right-0 bg-black/80 backdrop-blur-md rounded-md text-white flex flex-col items-start p-4 lg:p-6 space-y-3 lg:space-y-4 font-stevie text-xs lg:text-sm shadow-md z-50 w-48 lg:w-64">
-                          <a href="#why-choose-us" className="hover:text-[#F59F0A] flex items-center space-x-2" onClick={() => setMenuOpen(false)}>
-                            <span className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-[#F59F0A] rounded-full inline-block"></span>
-                            <span>Why choose us</span>
-                          </a>
-
-                          <a href="#what-we-offer" className="hover:text-[#F59F0A] flex items-center space-x-2" onClick={() => setMenuOpen(false)}>
-                            <span className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-[#F59F0A] rounded-full inline-block"></span>
-                            <span>What we offer</span>
-                          </a>
-
-                          <a href="#the-process" className="hover:text-[#F59F0A] flex items-center space-x-2" onClick={() => setMenuOpen(false)}>
-                            <span className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-[#F59F0A] rounded-full inline-block"></span>
-                            <span>The Process</span>
-                          </a>
-
-                          <a href="#faqs" className="hover:text-[#F59F0A] flex items-center space-x-2" onClick={() => setMenuOpen(false)}>
-                            <span className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-[#F59F0A] rounded-full inline-block"></span>
-                            <span>FAQs</span>
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  <Button
-                    asChild
-                    className="bg-black border hover:bg-[#F59F0A] text-white font-semibold text-xs md:text-sm lg:text-[14px] px-2 md:px-3 lg:px-4 h-8 md:h-9 lg:h-10"
-                  >
+                <div className="hidden md:flex items-center space-x-1 sm:space-x-2 ">
+                  <button className="text-white hover:text-[#F59F0A] p-1">
                     <Link to="/">
-                      <span className="hidden md:inline lg:hidden">Order</span>
-                      <span className="hidden lg:inline">Order Lookup</span>
-                      <span className="md:hidden">Order</span>
+                      <SrchIcon />
                     </Link>
-                  </Button>
+                  </button>
 
-                  <Button
-                    asChild
-                    className="bg-white text-[#F59F0A] hover:bg-[#F59F0A] hover:text-white font-semibold text-xs md:text-sm lg:text-[14px] px-2 md:px-3 lg:px-4 h-8 md:h-9 lg:h-10"
-                  >
-                    {/* <Link to="/">
-      <span className="hidden md:inline lg:hidden">Contact</span>
-      <span className="hidden lg:inline">Contact Us</span>
-      <span className="md:hidden">Contact</span>
-    </Link> */}
-                  </Button>
 
-                  <button className="text-white hover:text-[#F59F0A] p-1 md:p-2">
+
+                  <button className="text-white hover:text-[#F59F0A] p-1">
                     <Link to="/login">
                       <PersonIcon />
                     </Link>
                   </button>
+
+
+                  {/* Other buttons remain unchanged */}
+
                 </div>
               </div>
             </>
