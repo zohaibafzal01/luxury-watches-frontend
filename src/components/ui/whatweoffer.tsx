@@ -112,9 +112,9 @@ export default function WhatWeOffer() {
 
             const getWidth = () => {
               if (isHovered) {
-                return 'w-[280px] xl:w-[340px]'; 
+                return 'w-[280px] xl:w-[300px]'; 
               }
-              return 'w-[180px] xl:w-[220px]'; 
+              return 'w-[180px] xl:w-[200px]'; 
             };
 
             return (
