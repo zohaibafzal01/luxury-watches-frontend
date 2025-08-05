@@ -275,7 +275,7 @@ export const Header: React.FC = () => {
                     }
                   }}
                 >
-                  <a href="/" className="text-white text-lg font-bold">
+                  <a href="/" className={`text-white text-lg font-bold ${isAuthenticated && user ? "text-white" : "-black"}`}>
                     ChronoBid
                   </a>
                 </a>
