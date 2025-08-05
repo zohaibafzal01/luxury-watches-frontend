@@ -20,7 +20,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import authApi from "@/api/auth"; // Import your auth API
+import authApi from "@/api/auth";
 
 export const RegisterForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -28,12 +28,13 @@ export const RegisterForm: React.FC = () => {
     password: "",
     firstName: "",
     lastName: "",
-    role: "admin", // Default role set to admin
+    role: "dealer",
     phone: "",
     company: "",
   });
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -166,11 +167,11 @@ export const RegisterForm: React.FC = () => {
                   <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">
+                  {/* <SelectItem value="admin">
                     <div className="flex flex-col">
                       <span className="font-medium">Admin</span>
                     </div>
-                  </SelectItem>
+                  </SelectItem> */}
                   <SelectItem value="dealer">
                     <div className="flex flex-col">
                       <span className="font-medium">Dealer</span>
@@ -243,15 +244,30 @@ export const RegisterForm: React.FC = () => {
 
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="luxury-input"
-                placeholder="Confirm your password"
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="luxury-input"
+                  placeholder="Confirm your password"
+                  required
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent hover:text-muted-foreground"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </div>
 
             <Button

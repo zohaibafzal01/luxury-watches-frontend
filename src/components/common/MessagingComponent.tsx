@@ -1,39 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Message, Conversation } from '@/types/messaging';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Send, 
-  Search, 
-  Plus, 
-  MessageCircle,
-  User,
-  Clock
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+import { Message, Conversation } from "@/types/messaging";
+import { Send, Search, Plus, MessageCircle, User } from "lucide-react";
+import { selectUserInfo } from "@/redux/selectors/userSelectors";
 
 export const MessagingComponent: React.FC = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectUserInfo);
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [selectedConversation, setSelectedConversation] = useState<
+    string | null
+  >(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [newMessage, setNewMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Mock data - replace with real API calls
   useEffect(() => {
     if (!user) return;
 
     const mockConversations: Conversation[] = [
       {
-        id: 'conv1',
-        participants: [user.id, 'dealer1'],
-        participantNames: ['John Dealer'],
-        lastMessage: 'Thanks for the update on the Rolex service.',
+        id: "conv1",
+        participants: [user.id, "dealer1"],
+        participantNames: ["John Dealer"],
+        lastMessage: "Thanks for the update on the Rolex service.",
         lastMessageTime: new Date().toISOString(),
         unreadCount: 2,
         isActive: true,
@@ -42,82 +44,86 @@ export const MessagingComponent: React.FC = () => {
         isGroup: false,
       },
       {
-        id: 'conv2',
-        participants: [user.id, 'consumer1'],
-        participantNames: ['Jane Consumer'],
-        lastMessage: 'When can I expect the watch to be ready?',
-        lastMessageTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        id: "conv2",
+        participants: [user.id, "consumer1"],
+        participantNames: ["Jane Consumer"],
+        lastMessage: "When can I expect the watch to be ready?",
+        lastMessageTime: new Date(
+          Date.now() - 2 * 60 * 60 * 1000
+        ).toISOString(),
         unreadCount: 0,
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         isGroup: false,
-      }
+      },
     ];
 
     const mockMessages: Message[] = [
       {
-        id: 'msg1',
-        conversationId: 'conv1',
-        senderId: 'dealer1',
+        id: "msg1",
+        conversationId: "conv1",
+        senderId: "dealer1",
         receiverId: user.id,
-        senderName: 'John Dealer',
-        content: 'Hello! I received your service request for the Rolex Submariner.',
+        senderName: "John Dealer",
+        content:
+          "Hello! I received your service request for the Rolex Submariner.",
         timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
         isRead: true,
-        messageType: 'text',
+        messageType: "text",
       },
       {
-        id: 'msg2',
-        conversationId: 'conv1',
+        id: "msg2",
+        conversationId: "conv1",
         senderId: user.id,
-        receiverId: 'dealer1',
+        receiverId: "dealer1",
         senderName: `${user.firstName} ${user.lastName}`,
-        content: 'Great! When can you start working on it?',
+        content: "Great! When can you start working on it?",
         timestamp: new Date(Date.now() - 20 * 60 * 60 * 1000).toISOString(),
         isRead: true,
-        messageType: 'text',
+        messageType: "text",
       },
       {
-        id: 'msg3',
-        conversationId: 'conv1',
-        senderId: 'dealer1',
+        id: "msg3",
+        conversationId: "conv1",
+        senderId: "dealer1",
         receiverId: user.id,
-        senderName: 'John Dealer',
-        content: 'I can start tomorrow. The estimated completion time is 7 days.',
+        senderName: "John Dealer",
+        content:
+          "I can start tomorrow. The estimated completion time is 7 days.",
         timestamp: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
         isRead: true,
-        messageType: 'text',
+        messageType: "text",
       },
       {
-        id: 'msg4',
-        conversationId: 'conv1',
-        senderId: 'dealer1',
+        id: "msg4",
+        conversationId: "conv1",
+        senderId: "dealer1",
         receiverId: user.id,
-        senderName: 'John Dealer',
-        content: 'Thanks for the update on the Rolex service.',
+        senderName: "John Dealer",
+        content: "Thanks for the update on the Rolex service.",
         timestamp: new Date().toISOString(),
         isRead: false,
-        messageType: 'text',
-      }
+        messageType: "text",
+      },
     ];
 
     setConversations(mockConversations);
     setMessages(mockMessages);
-    
+
     if (mockConversations.length > 0) {
       setSelectedConversation(mockConversations[0].id);
     }
   }, [user]);
 
-  const filteredConversations = conversations.filter(conv =>
-    conv.participantNames.some(name => 
+  const filteredConversations = conversations.filter((conv) =>
+    conv.participantNames.some((name) =>
       name.toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
 
-  const selectedMessages = messages.filter(msg => 
-    msg.conversationId === selectedConversation
+  const selectedMessages = messages.filter(
+    (msg) => msg.conversationId === selectedConversation
   );
 
   const handleSendMessage = () => {
@@ -127,27 +133,28 @@ export const MessagingComponent: React.FC = () => {
       id: `msg_${Date.now()}`,
       conversationId: selectedConversation,
       senderId: user.id,
-      receiverId: '',
+      receiverId: "",
       senderName: `${user.firstName} ${user.lastName}`,
       content: newMessage,
       timestamp: new Date().toISOString(),
       isRead: true,
-      messageType: 'text',
+      messageType: "text",
     };
 
-    setMessages(prev => [...prev, message]);
-    setNewMessage('');
+    setMessages((prev) => [...prev, message]);
+    setNewMessage("");
 
-    // Update conversation last message
-    setConversations(prev => prev.map(conv => 
-      conv.id === selectedConversation 
-        ? { 
-            ...conv, 
-            lastMessage: newMessage,
-            lastMessageTime: new Date().toISOString()
-          }
-        : conv
-    ));
+    setConversations((prev) =>
+      prev.map((conv) =>
+        conv.id === selectedConversation
+          ? {
+              ...conv,
+              lastMessage: newMessage,
+              lastMessageTime: new Date().toISOString(),
+            }
+          : conv
+      )
+    );
   };
 
   const formatTime = (timestamp: string) => {
@@ -157,15 +164,10 @@ export const MessagingComponent: React.FC = () => {
     const diffHours = diffMs / (1000 * 60 * 60);
     const diffDays = diffMs / (1000 * 60 * 60 * 24);
 
-    if (diffHours < 1) {
-      return 'Just now';
-    } else if (diffHours < 24) {
-      return `${Math.floor(diffHours)}h ago`;
-    } else if (diffDays < 7) {
-      return `${Math.floor(diffDays)}d ago`;
-    } else {
-      return messageTime.toLocaleDateString();
-    }
+    if (diffHours < 1) return "Just now";
+    if (diffHours < 24) return `${Math.floor(diffHours)}h ago`;
+    if (diffDays < 7) return `${Math.floor(diffDays)}d ago`;
+    return messageTime.toLocaleDateString();
   };
 
   return (
@@ -179,7 +181,7 @@ export const MessagingComponent: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[600px]">
-          {/* Conversations List */}
+          {/* Conversations */}
           <div className="lg:col-span-1">
             <Card className="luxury-card h-full">
               <CardHeader>
@@ -209,8 +211,8 @@ export const MessagingComponent: React.FC = () => {
                         onClick={() => setSelectedConversation(conversation.id)}
                         className={`p-3 rounded-lg cursor-pointer transition-colors ${
                           selectedConversation === conversation.id
-                            ? 'bg-primary/10 border border-primary/20'
-                            : 'hover:bg-muted/50'
+                            ? "bg-primary/10 border border-primary/20"
+                            : "hover:bg-muted/50"
                         }`}
                       >
                         <div className="flex items-start justify-between">
@@ -218,7 +220,7 @@ export const MessagingComponent: React.FC = () => {
                             <div className="flex items-center gap-2 mb-1">
                               <User className="w-4 h-4" />
                               <span className="font-medium">
-                                {conversation.participantNames.join(', ')}
+                                {conversation.participantNames.join(", ")}
                               </span>
                               {conversation.unreadCount > 0 && (
                                 <Badge className="bg-primary text-primary-foreground">
@@ -242,7 +244,7 @@ export const MessagingComponent: React.FC = () => {
             </Card>
           </div>
 
-          {/* Messages Panel */}
+          {/* Messages */}
           <div className="lg:col-span-2">
             <Card className="luxury-card h-full">
               {selectedConversation ? (
@@ -250,25 +252,28 @@ export const MessagingComponent: React.FC = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <MessageCircle className="w-5 h-5" />
-                      {conversations.find(c => c.id === selectedConversation)?.participantNames.join(', ')}
+                      {conversations
+                        .find((c) => c.id === selectedConversation)
+                        ?.participantNames.join(", ")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="flex flex-col h-[500px]">
-                    {/* Messages */}
                     <ScrollArea className="flex-1 pr-4">
                       <div className="space-y-4">
                         {selectedMessages.map((message) => (
                           <div
                             key={message.id}
                             className={`flex ${
-                              message.senderId === user?.id ? 'justify-end' : 'justify-start'
+                              message.senderId === user?.id
+                                ? "justify-end"
+                                : "justify-start"
                             }`}
                           >
                             <div
                               className={`max-w-[70%] p-3 rounded-lg ${
                                 message.senderId === user?.id
-                                  ? 'bg-primary text-primary-foreground'
-                                  : 'bg-muted'
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-muted"
                               }`}
                             >
                               <div className="flex items-center justify-between mb-1">
@@ -294,13 +299,13 @@ export const MessagingComponent: React.FC = () => {
                         onChange={(e) => setNewMessage(e.target.value)}
                         className="flex-1 min-h-[60px] luxury-input"
                         onKeyPress={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
+                          if (e.key === "Enter" && !e.shiftKey) {
                             e.preventDefault();
                             handleSendMessage();
                           }
                         }}
                       />
-                      <Button 
+                      <Button
                         onClick={handleSendMessage}
                         className="luxury-button self-end"
                         disabled={!newMessage.trim()}
@@ -314,7 +319,9 @@ export const MessagingComponent: React.FC = () => {
                 <CardContent className="flex items-center justify-center h-full">
                   <div className="text-center">
                     <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-medium mb-2">Select a conversation</h3>
+                    <h3 className="text-lg font-medium mb-2">
+                      Select a conversation
+                    </h3>
                     <p className="text-muted-foreground">
                       Choose a conversation from the list to start messaging
                     </p>
