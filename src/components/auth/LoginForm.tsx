@@ -11,38 +11,116 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/contexts/AuthContext";
-import { LoginCredentials } from "@/types/auth";
 import { Eye, EyeOff, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import authApi from "@/api/auth";
+import { useDispatch } from "react-redux";
+import { login } from "@/redux/slices/userSlice";
 
 export const LoginForm: React.FC = () => {
-  const [credentials, setCredentials] = useState<LoginCredentials>({
-    email: "",
-    password: "",
-  });
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
+    const { email, password } = credentials;
+
     try {
-      await login(credentials);
+      let response;
+
+      try {
+        response = await authApi.dealerLogin(email, password);
+      } catch {
+        try {
+          response = await authApi.consumerLogin(email, password);
+        } catch {
+          throw new Error("Invalid email or password.");
+        }
+      }
+
+      if (!response || !response.success) {
+        throw new Error("Login failed. Please try again.");
+      }
+
+      const { data: userData, accessToken, refreshToken } = response;
+      const accountType = userData?.accountType?.toLowerCase();
+      const status = userData?.status?.toUpperCase();
+
+      if (accountType === "admin") {
+        toast({
+          title: "Login Restricted",
+          description: "Please use the admin portal to sign in.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (status === "PENDING") {
+        toast({
+          title: "Account Pending",
+          description: "Please wait for admin approval.",
+        });
+        return;
+      }
+
+      if (status === "INACTIVE") {
+        toast({
+          title: "Account Suspended",
+          description: "Please contact support.",
+        });
+        return;
+      }
+
+      // Store tokens and user info
+      localStorage.setItem("authToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...userData,
+          role: userData?.accountType?.toLowerCase(),
+          token: accessToken,
+        })
+      );
+
+      dispatch(
+        login({
+          ...userData,
+          role: userData?.accountType?.toLowerCase(),
+          token: accessToken,
+        })
+      );
+
       toast({
         title: "Welcome back!",
-        description: "You have been successfully signed in.",
+        description: "Redirecting to your dashboard...",
       });
-      navigate("/dashboard");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+
+      setTimeout(() => {
+        if (accountType === "dealer") {
+          navigate("/dealer/dashboard");
+        } else {
+          navigate("/dashboard");
+        }
+      }, 1000);
+    } catch (err: any) {
+      const message = err?.message || "Login failed. Please try again.";
+      setError(message);
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +185,7 @@ export const LoginForm: React.FC = () => {
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent hover:text-muted-foreground"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -138,7 +216,7 @@ export const LoginForm: React.FC = () => {
 
             <div className="text-center">
               <span className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link
                   to="/register"
                   className="text-primary hover:underline font-medium"

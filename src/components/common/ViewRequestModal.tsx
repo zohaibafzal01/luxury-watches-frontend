@@ -1,10 +1,16 @@
-import React from 'react';
-import { ServiceRequest } from '@/types/service';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Calendar, Package, MapPin, DollarSign, Clock, MessageSquare } from 'lucide-react';
+import React from "react";
+import { ServiceRequest } from "@/types/service";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Calendar, Package, MapPin, MessageSquare, Image } from "lucide-react";
 
 interface ViewRequestModalProps {
   request: ServiceRequest | null;
@@ -21,14 +27,16 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
 
   const getStatusColor = (status: string) => {
     const colors = {
-      pending: 'bg-yellow-500/20 text-yellow-700',
-      bidding: 'bg-blue-500/20 text-blue-700',
-      accepted: 'bg-green-500/20 text-green-700',
-      'in-progress': 'bg-purple-500/20 text-purple-700',
-      completed: 'bg-gray-500/20 text-gray-700',
-      cancelled: 'bg-red-500/20 text-red-700',
+      pending: "bg-yellow-500/20 text-yellow-700",
+      bidding: "bg-blue-500/20 text-blue-700",
+      accepted: "bg-green-500/20 text-green-700",
+      "in-progress": "bg-purple-500/20 text-purple-700",
+      completed: "bg-gray-500/20 text-gray-700",
+      cancelled: "bg-red-500/20 text-red-700",
     };
-    return colors[status as keyof typeof colors] || 'bg-gray-500/20 text-gray-700';
+    return (
+      colors[status as keyof typeof colors] || "bg-gray-500/20 text-gray-700"
+    );
   };
 
   return (
@@ -36,80 +44,84 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {request.watchBrand} {request.watchModel}
-            <Badge className={getStatusColor(request.status)}>
-              {request.status}
+            {request?.watchBrand} {request?.watchModel}
+            <Badge className={getStatusColor(request?.status)}>
+              {request?.status}
             </Badge>
           </DialogTitle>
           <DialogDescription>
-            Service Request #{request.referenceId}
+            Reference ID: <strong>{request?.referenceId || request?.id}</strong>
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Request Details */}
+          {/* Basic Info */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm">
-                Created: {new Date(request.createdAt).toLocaleDateString()}
-              </span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Calendar className="w-4 h-4" />
+              Created on: {new Date(request?.createdAt).toLocaleDateString()}
             </div>
-            <div className="flex items-center gap-2">
-              <Package className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm capitalize">
-                Delivery: {request.deliveryPreference}
-              </span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Package className="w-4 h-4" />
+              Delivery: {request?.deliveryPreference}
             </div>
           </div>
+
+          {/* Location (optional) */}
+          {request?.location && request?.location?.address && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="w-4 h-4" />
+              Location: {request?.location?.address}
+            </div>
+          )}
 
           <Separator />
 
-          {/* Issue Description */}
+          {/* Description */}
           <div>
             <h3 className="font-semibold mb-2">Issue Description</h3>
-            <p className="text-sm text-muted-foreground">{request.description}</p>
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+              {request?.description}
+            </p>
           </div>
 
           {/* Photos */}
-          {request.photos && request.photos.length > 0 && (
+          {request?.photos && request?.photos.length > 0 && (
             <div>
-              <h3 className="font-semibold mb-2">Photos</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <Image className="w-4 h-4" /> Photos
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {request.photos.map((photo) => (
                   <img
-                    key={photo.id}
-                    src={photo.url}
-                    alt="Watch photo"
-                    className="w-full h-32 object-cover rounded-lg border"
+                    key={photo?.id}
+                    src={photo?.url}
+                    alt="Uploaded photo"
+                    className="w-full h-32 object-cover rounded-md border"
                   />
                 ))}
               </div>
             </div>
           )}
 
-          {/* Bids Section - For now showing bid count since bids are stored as IDs */}
-          {/* {request.bids && request.bids.length > 0 && (
+          {/* Bids */}
+          {request?.bids && request?.bids.length > 0 && (
             <div>
-              <h3 className="font-semibold mb-2">Bids ({request.bids.length})</h3>
-              <div className="p-3 border rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  This request has received {request.bids.length} bid{request.bids.length !== 1 ? 's' : ''}.
-                </p>
-              </div>
+              <h3 className="font-semibold mb-2">Bids Received</h3>
+              <p className="text-sm text-muted-foreground">
+                This request has received{" "}
+                <strong>{request?.bids.length}</strong> bid(s).
+              </p>
             </div>
-          )} */}
+          )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 pt-4">
-            {/* <Button variant="outline" className="flex-1">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Contact Dealer
-            </Button> */}
-            <Button className="ml-auto" variant="outline" onClick={onClose}>
+          <Separator />
+
+          {/* Close button */}
+          <div className="flex justify-end">
+            <Button onClick={onClose} variant="outline">
               Close
             </Button>
-
           </div>
         </div>
       </DialogContent>

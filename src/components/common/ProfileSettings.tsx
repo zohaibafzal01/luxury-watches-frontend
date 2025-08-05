@@ -1,53 +1,59 @@
-
-import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Building, Phone, Mail, Camera, Save, Eye, EyeOff } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { User, Building, Camera, Save, Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { selectUserInfo } from "@/redux/selectors/userSelectors";
 
 export const ProfileSettings: React.FC = () => {
-  const { user, updateProfile } = useAuth();
   const { toast } = useToast();
+  const user = useSelector(selectUserInfo);
+
   const [isLoading, setIsLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [profileData, setProfileData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    company: user?.company || '',
-    bio: user?.bio || '',
-    address: user?.address || '',
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    company: user?.company || "",
+    bio: user?.bio || "",
+    address: user?.address || "",
   });
 
   const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-  };
+  const getInitials = (firstName?: string, lastName?: string) =>
+    `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
 
   const getRoleColor = (role: string) => {
     const colors = {
-      admin: 'text-red-400',
-      dealer: 'text-blue-400',
-      wholesaler: 'text-green-400',
-      consumer: 'text-purple-400',
+      admin: "text-red-400",
+      dealer: "text-blue-400",
+      wholesaler: "text-green-400",
+      consumer: "text-purple-400",
     };
-    return colors[role as keyof typeof colors] || 'text-gray-400';
+    return colors[role as keyof typeof colors] || "text-gray-400";
   };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -55,7 +61,8 @@ export const ProfileSettings: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await updateProfile(profileData);
+      // Mock update logic — replace with real API logic if available
+      await new Promise((res) => setTimeout(res, 1000));
       toast({
         title: "Profile Updated",
         description: "Your profile has been successfully updated.",
@@ -73,7 +80,7 @@ export const ProfileSettings: React.FC = () => {
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast({
         title: "Error",
@@ -95,18 +102,15 @@ export const ProfileSettings: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Mock password change - replace with real API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((res) => setTimeout(res, 1000));
       toast({
         title: "Password Changed",
         description: "Your password has been successfully updated.",
       });
-      
       setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       });
     } catch (error) {
       toast({
@@ -137,7 +141,6 @@ export const ProfileSettings: React.FC = () => {
           </p>
         </div>
 
-        {/* Profile Header */}
         <Card className="luxury-card mb-8">
           <CardContent className="p-6">
             <div className="flex items-center gap-6">
@@ -157,7 +160,9 @@ export const ProfileSettings: React.FC = () => {
                 </Button>
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold">{user.firstName} {user.lastName}</h2>
+                <h2 className="text-2xl font-bold">
+                  {user.firstName} {user.lastName}
+                </h2>
                 <p className="text-muted-foreground">{user.email}</p>
                 <div className="flex items-center gap-2 mt-2">
                   <Badge className={`capitalize ${getRoleColor(user.role)}`}>
@@ -179,9 +184,9 @@ export const ProfileSettings: React.FC = () => {
           <TabsList className="grid w-full grid-cols-2 max-w-md">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
-            {/* <TabsTrigger value="preferences">Preferences</TabsTrigger> */}
           </TabsList>
 
+          {/* Profile Tab */}
           <TabsContent value="profile">
             <Card className="luxury-card">
               <CardHeader>
@@ -198,8 +203,12 @@ export const ProfileSettings: React.FC = () => {
                       <Input
                         id="firstName"
                         value={profileData.firstName}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
-                        placeholder="Enter your first name"
+                        onChange={(e) =>
+                          setProfileData((p) => ({
+                            ...p,
+                            firstName: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                     <div className="space-y-2">
@@ -207,8 +216,12 @@ export const ProfileSettings: React.FC = () => {
                       <Input
                         id="lastName"
                         value={profileData.lastName}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
-                        placeholder="Enter your last name"
+                        onChange={(e) =>
+                          setProfileData((p) => ({
+                            ...p,
+                            lastName: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                   </div>
@@ -219,8 +232,9 @@ export const ProfileSettings: React.FC = () => {
                       id="email"
                       type="email"
                       value={profileData.email}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="Enter your email"
+                      onChange={(e) =>
+                        setProfileData((p) => ({ ...p, email: e.target.value }))
+                      }
                     />
                   </div>
 
@@ -230,18 +244,26 @@ export const ProfileSettings: React.FC = () => {
                       <Input
                         id="phone"
                         value={profileData.phone}
-                        onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                        placeholder="Enter your phone number"
+                        onChange={(e) =>
+                          setProfileData((p) => ({
+                            ...p,
+                            phone: e.target.value,
+                          }))
+                        }
                       />
                     </div>
-                    {(user.role === 'dealer') && (
+                    {user.role === "dealer" && (
                       <div className="space-y-2">
                         <Label htmlFor="company">Company Name</Label>
                         <Input
                           id="company"
                           value={profileData.company}
-                          onChange={(e) => setProfileData(prev => ({ ...prev, company: e.target.value }))}
-                          placeholder="Enter your company name"
+                          onChange={(e) =>
+                            setProfileData((p) => ({
+                              ...p,
+                              company: e.target.value,
+                            }))
+                          }
                         />
                       </div>
                     )}
@@ -251,10 +273,14 @@ export const ProfileSettings: React.FC = () => {
                     <Label htmlFor="address">Address</Label>
                     <Textarea
                       id="address"
-                      value={profileData.address}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, address: e.target.value }))}
-                      placeholder="Enter your address"
                       rows={3}
+                      value={profileData.address}
+                      onChange={(e) =>
+                        setProfileData((p) => ({
+                          ...p,
+                          address: e.target.value,
+                        }))
+                      }
                     />
                   </div>
 
@@ -262,22 +288,28 @@ export const ProfileSettings: React.FC = () => {
                     <Label htmlFor="bio">Bio</Label>
                     <Textarea
                       id="bio"
-                      value={profileData.bio}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                      placeholder="Tell us about yourself"
                       rows={4}
+                      value={profileData.bio}
+                      onChange={(e) =>
+                        setProfileData((p) => ({ ...p, bio: e.target.value }))
+                      }
                     />
                   </div>
 
-                  <Button type="submit" disabled={isLoading} className="luxury-button">
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="luxury-button"
+                  >
                     <Save className="w-4 h-4 mr-2" />
-                    {isLoading ? 'Saving...' : 'Save Changes'}
+                    {isLoading ? "Saving..." : "Save Changes"}
                   </Button>
                 </form>
               </CardContent>
             </Card>
           </TabsContent>
 
+          {/* Security Tab */}
           <TabsContent value="security">
             <Card className="luxury-card">
               <CardHeader>
@@ -288,128 +320,68 @@ export const ProfileSettings: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handlePasswordChange} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="currentPassword">Current Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="currentPassword"
-                        type={showCurrentPassword ? "text" : "password"}
-                        value={passwordData.currentPassword}
-                        onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                        placeholder="Enter your current password"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                      >
-                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
+                  {[
+                    {
+                      label: "Current Password",
+                      field: "currentPassword",
+                      visible: showCurrentPassword,
+                      setVisible: setShowCurrentPassword,
+                    },
+                    {
+                      label: "New Password",
+                      field: "newPassword",
+                      visible: showNewPassword,
+                      setVisible: setShowNewPassword,
+                    },
+                    {
+                      label: "Confirm New Password",
+                      field: "confirmPassword",
+                      visible: showConfirmPassword,
+                      setVisible: setShowConfirmPassword,
+                    },
+                  ].map(({ label, field, visible, setVisible }) => (
+                    <div className="space-y-2" key={field}>
+                      <Label htmlFor={field}>{label}</Label>
+                      <div className="relative">
+                        <Input
+                          id={field}
+                          type={visible ? "text" : "password"}
+                          value={
+                            passwordData[field as keyof typeof passwordData]
+                          }
+                          onChange={(e) =>
+                            setPasswordData((p) => ({
+                              ...p,
+                              [field]: e.target.value,
+                            }))
+                          }
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                          onClick={() => setVisible(!visible)}
+                        >
+                          {visible ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
+                  ))}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="newPassword">New Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="newPassword"
-                        type={showNewPassword ? "text" : "password"}
-                        value={passwordData.newPassword}
-                        onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                        placeholder="Enter your new password"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                        onClick={() => setShowNewPassword(!showNewPassword)}
-                      >
-                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={passwordData.confirmPassword}
-                        onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        placeholder="Confirm your new password"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      >
-                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <Button type="submit" disabled={isLoading} className="luxury-button">
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="luxury-button"
+                  >
                     <Save className="w-4 h-4 mr-2" />
-                    {isLoading ? 'Changing...' : 'Change Password'}
+                    {isLoading ? "Changing..." : "Change Password"}
                   </Button>
                 </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="preferences">
-            <Card className="luxury-card">
-              <CardHeader>
-                <CardTitle>Preferences</CardTitle>
-                <CardDescription>
-                  Customize your experience and notification settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Notifications</h3>
-                    <div className="space-y-2">
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span>Email notifications for new messages</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span>SMS notifications for urgent updates</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" className="rounded" />
-                        <span>Marketing and promotional emails</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Privacy</h3>
-                    <div className="space-y-2">
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" defaultChecked className="rounded" />
-                        <span>Show my profile to other users</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input type="checkbox" className="rounded" />
-                        <span>Allow others to see my online status</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <Button className="luxury-button">
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Preferences
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>

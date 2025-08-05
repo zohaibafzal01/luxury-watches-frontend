@@ -11,11 +11,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/contexts/AuthContext";
 import { LoginCredentials } from "@/types/auth";
 import { Eye, EyeOff, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import authApi from "@/api/auth";
+import { useDispatch } from "react-redux";
+import { login } from "@/redux/slices/userSlice";
 
 export const AdminLogin: React.FC = () => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
@@ -28,6 +29,7 @@ export const AdminLogin: React.FC = () => {
 
   const navigate = useNavigate();
   const { toast } = useToast();
+  const dispatch = useDispatch();
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,19 +44,94 @@ export const AdminLogin: React.FC = () => {
         credentials.password
       );
 
-      if (response) {
-        // If login is successful, show a success message and navigate to the dashboard
+      if (response && response.success) {
+        const accessToken = response.accessToken;
+        const refreshToken = response.refreshToken;
+        const userData = response.data;
+
+        // Normalize account type to role (admin specific)
+        const normalizedRole = "admin";
+
+        // Check user status
+        const status = userData.status?.toUpperCase();
+
+        if (status === "PENDING") {
+          toast({
+            title: "Account Pending",
+            description: "Please wait for admin approval.",
+          });
+          return;
+        } else if (status === "INACTIVE") {
+          toast({
+            title: "Account Suspended",
+            description: "Please contact support.",
+          });
+          return;
+        }
+
+        // Store user & tokens in localStorage
+        localStorage.setItem("authToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            id: userData?.id,
+            firstName: userData?.firstName,
+            lastName: userData?.lastName,
+            email: userData?.email,
+            phoneNo: userData?.phoneNo,
+            accountType: userData?.accountType,
+            role: normalizedRole,
+            status: userData?.status,
+            createdAt: userData?.createdAt,
+            updatedAt: userData?.updatedAt,
+            lastLogin: userData?.lastLogin,
+            token: accessToken,
+          })
+        );
+
+        // Dispatch to Redux
+        dispatch(
+          login({
+            id: userData?.id,
+            firstName: userData?.firstName,
+            lastName: userData?.lastName,
+            email: userData?.email,
+            phoneNo: userData?.phoneNo,
+            accountType: userData?.accountType,
+            role: normalizedRole,
+            status: userData?.status,
+            createdAt: userData?.createdAt,
+            updatedAt: userData?.updatedAt,
+            lastLogin: userData?.lastLogin,
+            token: accessToken,
+          })
+        );
+
         toast({
           title: "Welcome back!",
-          description: "You have been successfully signed in.",
+          description: "Welcome, redirecting to admin dashboard...",
         });
-        navigate("/admin/dashboard"); // Navigate to the dashboard after login
+
+        // Navigate to admin dashboard
+        setTimeout(() => {
+          navigate("/admin/dashboard");
+        }, 1000);
       }
-    } catch (err) {
-      // If there's an error, display it
-      setError(err instanceof Error ? err.message : "Login failed");
+    } catch (error: any) {
+      // Handle errors
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Login failed. Please check your credentials.";
+      setError(message);
+      toast({
+        title: "Error",
+        description: message,
+      });
     } finally {
-      setIsLoading(false); // Stop the loading spinner
+      setIsLoading(false);
     }
   };
 
@@ -103,7 +180,7 @@ export const AdminLogin: React.FC = () => {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 ">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Input
@@ -132,14 +209,14 @@ export const AdminLogin: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            {/* <div className="flex items-center justify-between">
               <Link
                 to="/forgot-password"
                 className="text-sm text-primary hover:underline"
               >
                 Forgot password?
               </Link>
-            </div>
+            </div> */}
 
             <Button
               type="submit"
@@ -149,7 +226,7 @@ export const AdminLogin: React.FC = () => {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
 
-            <div className="text-center">
+            {/* <div className="text-center">
               <span className="text-sm text-muted-foreground">
                 Don't have an account?{" "}
                 <Link
@@ -159,7 +236,7 @@ export const AdminLogin: React.FC = () => {
                   Sign up
                 </Link>
               </span>
-            </div>
+            </div> */}
           </form>
         </CardContent>
       </Card>

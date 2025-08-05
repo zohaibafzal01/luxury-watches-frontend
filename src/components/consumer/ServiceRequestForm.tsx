@@ -1,22 +1,35 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Badge } from '@/components/ui/badge';
-import { CreateServiceRequestData } from '@/types/service';
-import { Camera, MapPin, Upload, X, CheckCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
+import { CreateServiceRequestData } from "@/types/service";
+import { Camera, MapPin, Upload, X, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import consumerApi from "@/api/consumer";
 
 export const ServiceRequestForm: React.FC = () => {
   const [formData, setFormData] = useState<CreateServiceRequestData>({
-    watchBrand: '',
-    watchModel: '',
-    description: '',
-    deliveryPreference: 'shipping',
+    watchBrand: "",
+    watchModel: "",
+    description: "",
+    deliveryPreference: "shipping",
     photos: [],
     location: undefined,
   });
@@ -25,36 +38,50 @@ export const ServiceRequestForm: React.FC = () => {
   const { toast } = useToast();
 
   const watchBrands = [
-    'Rolex', 'Patek Philippe', 'Audemars Piguet', 'Omega', 'Cartier',
-    'Breitling', 'TAG Heuer', 'IWC', 'Jaeger-LeCoultre', 'Vacheron Constantin',
-    'Tudor', 'Seiko', 'Citizen', 'Casio', 'Other'
+    "Rolex",
+    "Patek Philippe",
+    "Audemars Piguet",
+    "Omega",
+    "Cartier",
+    "Breitling",
+    "TAG Heuer",
+    "IWC",
+    "Jaeger-LeCoultre",
+    "Vacheron Constantin",
+    "Tudor",
+    "Seiko",
+    "Citizen",
+    "Casio",
+    "Other",
   ];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
 
   const handleBrandChange = (brand: string) => {
-    setFormData(prev => ({ ...prev, watchBrand: brand }));
+    setFormData((prev) => ({ ...prev, watchBrand: brand }));
   };
 
-  const handleDeliveryChange = (delivery: 'drop-off' | 'shipping') => {
-    setFormData(prev => ({ ...prev, deliveryPreference: delivery }));
+  const handleDeliveryChange = (delivery: "drop-off" | "shipping") => {
+    setFormData((prev) => ({ ...prev, deliveryPreference: delivery }));
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       photos: [...prev.photos, ...files].slice(0, 5), // Max 5 photos
     }));
   };
 
   const removePhoto = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       photos: prev.photos.filter((_, i) => i !== index),
     }));
@@ -64,24 +91,25 @@ export const ServiceRequestForm: React.FC = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             location: {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
-              address: 'Current Location', // In real app, reverse geocode this
+              address: "Current Location", // In real app, reverse geocode this
             },
           }));
           toast({
-            title: 'Location captured',
-            description: 'Your location has been added to the request.',
+            title: "Location captured",
+            description: "Your location has been added to the request.",
           });
         },
         (error) => {
           toast({
-            title: 'Location error',
-            description: 'Could not capture your location. Please enter manually.',
-            variant: 'destructive',
+            title: "Location error",
+            description:
+              "Could not capture your location. Please enter manually.",
+            variant: "destructive",
           });
         }
       );
@@ -93,21 +121,28 @@ export const ServiceRequestForm: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // Mock API call - replace with real implementation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const refId = `CR-${Date.now()}`;
+      const { watchBrand, watchModel, description, deliveryPreference } =
+        formData;
+
+      const response = await consumerApi.serviceRequest(
+        watchBrand,
+        watchModel,
+        description,
+        deliveryPreference.charAt(0).toUpperCase() + deliveryPreference.slice(1)
+      );
+
+      const refId = response?.data?.id || `CR-${Date.now()}`;
       setReferenceId(refId);
 
       toast({
-        title: 'Service request submitted!',
+        title: "Service request submitted!",
         description: `Your request ${refId} has been created and sent to dealers.`,
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
-        title: 'Submission failed',
-        description: 'Please try again or contact support.',
-        variant: 'destructive',
+        title: "Submission failed",
+        description: error?.message || "Please try again or contact support.",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -130,16 +165,17 @@ export const ServiceRequestForm: React.FC = () => {
               {referenceId}
             </Badge>
             <p className="text-sm text-muted-foreground mb-6">
-              You will receive notifications when dealers submit bids for your watch service.
+              You will receive notifications when dealers submit bids for your
+              watch service.
             </p>
             <Button
               onClick={() => {
                 setReferenceId(null);
                 setFormData({
-                  watchBrand: '',
-                  watchModel: '',
-                  description: '',
-                  deliveryPreference: 'shipping',
+                  watchBrand: "",
+                  watchModel: "",
+                  description: "",
+                  deliveryPreference: "shipping",
                   photos: [],
                   location: undefined,
                 });
@@ -161,7 +197,8 @@ export const ServiceRequestForm: React.FC = () => {
           <CardHeader>
             <CardTitle className="luxury-title">Service Request</CardTitle>
             <CardDescription>
-              Tell us about your watch and the service you need. Our network of certified dealers will provide competitive bids.
+              Tell us about your watch and the service you need. Our network of
+              certified dealers will provide competitive bids.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -169,15 +206,18 @@ export const ServiceRequestForm: React.FC = () => {
               {/* Watch Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Watch Information</h3>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="watchBrand">Brand</Label>
-                  <Select value={formData.watchBrand} onValueChange={handleBrandChange}>
+                  <Select
+                    value={formData.watchBrand}
+                    onValueChange={handleBrandChange}
+                  >
                     <SelectTrigger className="luxury-input">
                       <SelectValue placeholder="Select watch brand" />
                     </SelectTrigger>
                     <SelectContent>
-                      {watchBrands.map(brand => (
+                      {watchBrands.map((brand) => (
                         <SelectItem key={brand} value={brand}>
                           {brand}
                         </SelectItem>
@@ -290,11 +330,15 @@ export const ServiceRequestForm: React.FC = () => {
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="shipping" id="shipping" />
-                    <Label htmlFor="shipping">Shipping (send and receive via courier)</Label>
+                    <Label htmlFor="shipping">
+                      Shipping (send and receive via courier)
+                    </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="drop-off" id="drop-off" />
-                    <Label htmlFor="drop-off">Drop-off (visit dealer location)</Label>
+                    <Label htmlFor="drop-off">
+                      Drop-off (visit dealer location)
+                    </Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -324,7 +368,9 @@ export const ServiceRequestForm: React.FC = () => {
                 className="w-full luxury-button"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Submitting Request...' : 'Submit Service Request'}
+                {isSubmitting
+                  ? "Submitting Request..."
+                  : "Submit Service Request"}
               </Button>
             </form>
           </CardContent>
