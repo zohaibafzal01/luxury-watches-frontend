@@ -17,10 +17,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { User, Building, Camera, Save, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { selectUserInfo } from "@/redux/selectors/userSelectors";
+import userApi from "@/api/user";
+import { useDispatch } from "react-redux";
+import { login } from "@/redux/slices/userSlice";
+import authApi from "@/api/auth";
 
 export const ProfileSettings: React.FC = () => {
   const { toast } = useToast();
   const user = useSelector(selectUserInfo);
+  const dispatch = useDispatch();
 
   const [isLoading, setIsLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -31,8 +36,8 @@ export const ProfileSettings: React.FC = () => {
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     email: user?.email || "",
-    phone: user?.phone || "",
-    company: user?.company || "",
+    phone: user?.phoneNo || "",
+    company: user?.companyName || "",
     bio: user?.bio || "",
     address: user?.address || "",
   });
@@ -61,8 +66,33 @@ export const ProfileSettings: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Mock update logic — replace with real API logic if available
-      await new Promise((res) => setTimeout(res, 1000));
+      await userApi.userUpdate(
+        user?.id,
+        profileData?.firstName,
+        profileData?.lastName,
+        profileData?.email,
+        user?.accountType,
+        profileData?.phone,
+        user?.status,
+        profileData?.company,
+        profileData?.bio,
+        profileData?.address
+      );
+
+      const updatedUser = {
+        ...user,
+        firstName: profileData?.firstName,
+        lastName: profileData?.lastName,
+        email: profileData?.email,
+        phoneNo: profileData?.phone,
+        companyName: profileData?.company,
+        bio: profileData?.bio,
+        address: profileData?.address,
+      };
+
+      dispatch(login(updatedUser));
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
       toast({
         title: "Profile Updated",
         description: "Your profile has been successfully updated.",
@@ -81,7 +111,7 @@ export const ProfileSettings: React.FC = () => {
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
+    if (passwordData?.newPassword !== passwordData?.confirmPassword) {
       toast({
         title: "Error",
         description: "New passwords do not match.",
@@ -90,7 +120,7 @@ export const ProfileSettings: React.FC = () => {
       return;
     }
 
-    if (passwordData.newPassword.length < 6) {
+    if (passwordData?.newPassword?.length < 6) {
       toast({
         title: "Error",
         description: "Password must be at least 6 characters long.",
@@ -102,20 +132,30 @@ export const ProfileSettings: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await new Promise((res) => setTimeout(res, 1000));
+      await authApi.changePassword(
+        passwordData?.currentPassword,
+        passwordData?.newPassword
+      );
+
       toast({
         title: "Password Changed",
         description: "Your password has been successfully updated.",
       });
+
       setPasswordData({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
-    } catch (error) {
+    } catch (error: any) {
+      const errorMsg =
+        error?.response?.data?.errorMessage?.[0] ||
+        error?.response?.data?.message ||
+        "Failed to change password. Please try again.";
+
       toast({
         title: "Error",
-        description: "Failed to change password. Please try again.",
+        description: errorMsg,
         variant: "destructive",
       });
     } finally {

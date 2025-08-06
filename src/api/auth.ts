@@ -56,7 +56,7 @@ class AuthApi extends BaseApi {
   }
 
   async changePassword(oldPassword: string, newPassword: string) {
-    return await this.put(`${this.baseUrl}/change_password`, {
+    return await this.patch(`${this.baseUrl}/change-password`, {
       oldPassword,
       newPassword,
     });
