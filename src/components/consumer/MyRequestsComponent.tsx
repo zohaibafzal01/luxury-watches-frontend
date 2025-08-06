@@ -88,6 +88,10 @@ export const MyRequestsComponent: React.FC = () => {
     fetchRequests();
   }, [page, debouncedSearchTerm, statusFilter]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearchTerm, statusFilter]);
+
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       pending: "bg-yellow-500/20 text-yellow-700",
