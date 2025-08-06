@@ -1,18 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ServiceRequest, Bid } from '@/types/service';
-import { Package, Clock, DollarSign, TrendingUp, Eye, MessageSquare } from 'lucide-react';
-import { ViewRequestModal } from '@/components/common/ViewRequestModal';
-import { BidSubmissionModal } from './BidSubmissionModal';
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ServiceRequest, Bid } from "@/types/service";
+import {
+  Package,
+  Clock,
+  DollarSign,
+  TrendingUp,
+  Eye,
+  MessageSquare,
+} from "lucide-react";
+import { ViewRequestModal } from "@/components/common/ViewRequestModal";
+import { BidSubmissionModal } from "./BidSubmissionModal";
 
 export const DealerDashboard: React.FC = () => {
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
   const [myBids, setMyBids] = useState<Bid[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(
+    null
+  );
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
 
@@ -20,51 +35,53 @@ export const DealerDashboard: React.FC = () => {
   useEffect(() => {
     const mockRequests: ServiceRequest[] = [
       {
-        id: '1',
-        consumerId: 'c1',
-        watchBrand: 'Rolex',
-        watchModel: 'Submariner',
-        description: 'Crown is not screwing down properly and the watch is losing time.',
-        deliveryPreference: 'shipping',
+        id: "1",
+        consumerId: "c1",
+        watchBrand: "Rolex",
+        watchModel: "Submariner",
+        description:
+          "Crown is not screwing down properly and the watch is losing time.",
+        deliveryPreference: "shipping",
         photos: [
           // { id: '1', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
         ],
-        status: 'pending',
+        status: "pending",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         bids: [],
-        referenceId: 'CR-1001'
+        referenceId: "CR-1001",
       },
       {
-        id: '2',
-        consumerId: 'c2',
-        watchBrand: 'Omega',
-        watchModel: 'Speedmaster',
-        description: 'Chronograph function is not working, second hand gets stuck.',
-        deliveryPreference: 'drop-off',
+        id: "2",
+        consumerId: "c2",
+        watchBrand: "Omega",
+        watchModel: "Speedmaster",
+        description:
+          "Chronograph function is not working, second hand gets stuck.",
+        deliveryPreference: "drop-off",
         photos: [
           // { id: '2', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
         ],
-        status: 'bidding',
+        status: "bidding",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         bids: [],
-        referenceId: 'CR-1002'
-      }
+        referenceId: "CR-1002",
+      },
     ];
 
     const mockBids: Bid[] = [
       {
-        id: 'b1',
-        dealerId: 'dealer1',
-        serviceRequestId: '2',
+        id: "b1",
+        dealerId: "dealer1",
+        serviceRequestId: "2",
         estimatedPrice: 450,
         turnaroundTime: 7,
-        deliveryMethod: 'pickup',
-        status: 'submitted',
+        deliveryMethod: "pickup",
+        status: "submitted",
         submittedAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-      }
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      },
     ];
 
     setTimeout(() => {
@@ -86,24 +103,28 @@ export const DealerDashboard: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     const colors = {
-      pending: 'bg-yellow-500/20 text-yellow-700',
-      bidding: 'bg-blue-500/20 text-blue-700',
-      accepted: 'bg-green-500/20 text-green-700',
-      'in-progress': 'bg-purple-500/20 text-purple-700',
-      completed: 'bg-gray-500/20 text-gray-700',
-      cancelled: 'bg-red-500/20 text-red-700',
+      pending: "bg-yellow-500/20 text-yellow-700",
+      bidding: "bg-blue-500/20 text-blue-700",
+      accepted: "bg-green-500/20 text-green-700",
+      "in-progress": "bg-purple-500/20 text-purple-700",
+      completed: "bg-gray-500/20 text-gray-700",
+      cancelled: "bg-red-500/20 text-red-700",
     };
-    return colors[status as keyof typeof colors] || 'bg-gray-500/20 text-gray-700';
+    return (
+      colors[status as keyof typeof colors] || "bg-gray-500/20 text-gray-700"
+    );
   };
 
   const getBidStatusColor = (status: string) => {
     const colors = {
-      submitted: 'bg-blue-500/20 text-blue-700',
-      accepted: 'bg-green-500/20 text-green-700',
-      rejected: 'bg-red-500/20 text-red-700',
-      expired: 'bg-gray-500/20 text-gray-700',
+      submitted: "bg-blue-500/20 text-blue-700",
+      accepted: "bg-green-500/20 text-green-700",
+      rejected: "bg-red-500/20 text-red-700",
+      expired: "bg-gray-500/20 text-gray-700",
     };
-    return colors[status as keyof typeof colors] || 'bg-gray-500/20 text-gray-700';
+    return (
+      colors[status as keyof typeof colors] || "bg-gray-500/20 text-gray-700"
+    );
   };
 
   if (isLoading) {
@@ -122,7 +143,8 @@ export const DealerDashboard: React.FC = () => {
         <div className="mb-8">
           <h1 className="luxury-title text-3xl mb-2">Dashboard</h1>
           <p className="text-muted-foreground">
-            Manage service requests, track bids, and grow your watch service business
+            Manage service requests, track bids, and grow your watch service
+            business
           </p>
         </div>
 
@@ -132,26 +154,32 @@ export const DealerDashboard: React.FC = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Active Requests</p>
-                  <p className="text-2xl font-bold text-primary">{serviceRequests.length}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Active Requests
+                  </p>
+                  <p className="text-2xl font-bold text-primary">
+                    {serviceRequests.length}
+                  </p>
                 </div>
-                <Package className="w-8 h-8 text-primary" />
+                {/* <Package className="w-8 h-8 text-primary" /> */}
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Pending Bids</p>
-                  <p className="text-2xl font-bold text-blue-500">{myBids.filter(b => b.status === 'submitted').length}</p>
+                  <p className="text-2xl font-bold text-blue-500">
+                    {myBids.filter((b) => b.status === "submitted").length}
+                  </p>
                 </div>
-                <Clock className="w-8 h-8 text-blue-500" />
+                {/* <Clock className="w-8 h-8 text-blue-500" /> */}
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -161,11 +189,11 @@ export const DealerDashboard: React.FC = () => {
                     ${myBids.reduce((sum, bid) => sum + bid.estimatedPrice, 0)}
                   </p>
                 </div>
-                <DollarSign className="w-8 h-8 text-green-500" />
+                {/* <DollarSign className="w-8 h-8 text-green-500" /> */}
               </div>
             </CardContent>
           </Card>
-          
+
           {/* <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -199,11 +227,16 @@ export const DealerDashboard: React.FC = () => {
                           </Badge>
                         </CardTitle>
                         <CardDescription>
-                          Reference: {request.referenceId} • {new Date(request.createdAt).toLocaleDateString()}
+                          Reference: {request.referenceId} •{" "}
+                          {new Date(request.createdAt).toLocaleDateString()}
                         </CardDescription>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleViewDetails(request)}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewDetails(request)}
+                        >
                           <Eye className="w-4 h-4 mr-2" />
                           View Details
                         </Button>
@@ -225,7 +258,10 @@ export const DealerDashboard: React.FC = () => {
                           {request.bids.length} bids
                         </span>
                       </div>
-                      <Button className="luxury-button" onClick={() => handleSubmitBid(request)}>
+                      <Button
+                        className="luxury-button"
+                        onClick={() => handleSubmitBid(request)}
+                      >
                         Submit Bid
                       </Button>
                     </div>
@@ -238,7 +274,9 @@ export const DealerDashboard: React.FC = () => {
           <TabsContent value="bids" className="space-y-4">
             <div className="grid gap-4">
               {myBids.map((bid) => {
-                const request = serviceRequests.find(r => r.id === bid.serviceRequestId);
+                const request = serviceRequests.find(
+                  (r) => r.id === bid.serviceRequestId
+                );
                 return (
                   <Card key={bid.id} className="luxury-card">
                     <CardHeader>
@@ -251,7 +289,8 @@ export const DealerDashboard: React.FC = () => {
                             </Badge>
                           </CardTitle>
                           <CardDescription>
-                            Submitted: {new Date(bid.submittedAt).toLocaleDateString()}
+                            Submitted:{" "}
+                            {new Date(bid.submittedAt).toLocaleDateString()}
                           </CardDescription>
                         </div>
                       </div>
@@ -259,25 +298,39 @@ export const DealerDashboard: React.FC = () => {
                     <CardContent>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Estimated Price</p>
-                          <p className="font-semibold text-green-600">${bid.estimatedPrice}</p>
+                          <p className="text-muted-foreground">
+                            Estimated Price
+                          </p>
+                          <p className="font-semibold text-green-600">
+                            ${bid.estimatedPrice}
+                          </p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Turnaround</p>
-                          <p className="font-semibold">{bid.turnaroundTime} days</p>
+                          <p className="font-semibold">
+                            {bid.turnaroundTime} days
+                          </p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Delivery Method</p>
-                          <p className="font-semibold capitalize">{bid.deliveryMethod}</p>
+                          <p className="text-muted-foreground">
+                            Delivery Method
+                          </p>
+                          <p className="font-semibold capitalize">
+                            {bid.deliveryMethod}
+                          </p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Expires</p>
-                          <p className="font-semibold">{new Date(bid.expiresAt).toLocaleDateString()}</p>
+                          <p className="font-semibold">
+                            {new Date(bid.expiresAt).toLocaleDateString()}
+                          </p>
                         </div>
                       </div>
                       {bid.notes && (
                         <div className="mt-4">
-                          <p className="text-sm text-muted-foreground">Notes:</p>
+                          <p className="text-sm text-muted-foreground">
+                            Notes:
+                          </p>
                           <p className="text-sm">{bid.notes}</p>
                         </div>
                       )}
