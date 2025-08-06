@@ -24,6 +24,10 @@ import { AdminLogin } from "./components/auth/AdminLogin";
 import { selectUserInfo } from "./redux/selectors/userSelectors";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import WhyChooseUsPage from "./pages/WhyChooseUs";
+import WhyWeOfferPage from "./pages/WhyWeOffer";
+import TheProcessPage from "./pages/TheProcess";
+import FAQSectionPage from "./components/ui/faq";
 
 const queryClient = new QueryClient();
 
@@ -248,6 +252,13 @@ const AppRoutes = () => {
     </Routes>
   );
 };
+ <Routes>
+        <Route path="/why-choose-us" element={<WhyChooseUsPage />} />
+        <Route path="/WhyWeOfferPage" element={<WhyWeOfferPage />} />
+        <Route path="/the-process" element={<TheProcessPage />} />
+        <Route path="/faqs" element={<FAQSectionPage />} />
+        <Route path="*" element={<h1>Page Not Found</h1>} />
+      </Routes>
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
