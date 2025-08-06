@@ -231,10 +231,12 @@ export const ProfileSettings: React.FC = () => {
                     <Input
                       id="email"
                       type="email"
+                      readOnly={true}
                       value={profileData.email}
                       onChange={(e) =>
                         setProfileData((p) => ({ ...p, email: e.target.value }))
                       }
+                      className="cursor-not-allowed bg-gray-300/20"
                     />
                   </div>
 
