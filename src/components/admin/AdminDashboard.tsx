@@ -33,43 +33,43 @@ export const AdminDashboard: React.FC = () => {
   useEffect(() => {
     const mockUsers: User[] = [
       {
-        id: '1',
-        email: 'admin@chronobid.com',
-        role: 'admin',
-        firstName: 'Admin',
-        lastName: 'User',
+        id: "1",
+        email: "admin@wrstopia.com",
+        role: "admin",
+        firstName: "Admin",
+        lastName: "User",
         isEmailVerified: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
       {
-        id: '2',
-        email: 'dealer@chronobid.com',
-        role: 'dealer',
-        firstName: 'John',
-        lastName: 'Dealer',
-        company: 'Luxury Timepieces Inc.',
+        id: "2",
+        email: "dealer@wrstopia.com",
+        role: "dealer",
+        firstName: "John",
+        lastName: "Dealer",
+        company: "Luxury Timepieces Inc.",
         isEmailVerified: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
       {
-        id: '3',
-        email: 'consumer@chronobid.com',
-        role: 'consumer',
-        firstName: 'Jane',
-        lastName: 'Consumer',
+        id: "3",
+        email: "consumer@wrstopia.com",
+        role: "consumer",
+        firstName: "Jane",
+        lastName: "Consumer",
         isEmailVerified: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
       {
-        id: '4',
-        email: 'wholesaler@chronobid.com',
-        role: 'admin',
-        firstName: 'Mike',
-        lastName: 'Wholesaler',
-        company: 'Global Watch Supply',
+        id: "4",
+        email: "wholesaler@wrstopia.com",
+        role: "admin",
+        firstName: "Mike",
+        lastName: "Wholesaler",
+        company: "Global Watch Supply",
         isEmailVerified: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -128,7 +128,8 @@ export const AdminDashboard: React.FC = () => {
         <div className="mb-8">
           <h1 className="luxury-title text-3xl mb-2">Admin Dashboard</h1>
           <p className="text-muted-foreground">
-            Manage users, monitor platform activity, and oversee system operations
+            Manage users, monitor platform activity, and oversee system
+            operations
           </p>
         </div>
 
@@ -139,25 +140,31 @@ export const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total Users</p>
-                  <p className="text-2xl font-bold text-primary">{users.length}</p>
+                  <p className="text-2xl font-bold text-[#CC5500]">
+                    {users.length}
+                  </p>
                 </div>
-                <Users className="w-8 h-8 text-primary" />
+                <Users className="w-8 h-8 text-[#CC5500]" />
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Active Dealers</p>
-                  <p className="text-2xl font-bold text-blue-500">{users.filter(u => u.role === 'dealer').length}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Active Dealers
+                  </p>
+                  <p className="text-2xl font-bold text-blue-500">
+                    {users.filter((u) => u.role === "dealer").length}
+                  </p>
                 </div>
                 <Shield className="w-8 h-8 text-blue-500" />
               </div>
             </CardContent>
           </Card>
-          
+
           {/* <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -169,7 +176,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card> */}
-          
+
           {/* <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -239,11 +246,19 @@ export const AdminDashboard: React.FC = () => {
                         </CardDescription>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="hover:bg-[#CC5500]"
+                        >
                           <Eye className="w-4 h-4 mr-2" />
                           View
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="hover:bg-[#CC5500]"
+                        >
                           <Edit className="w-4 h-4 mr-2" />
                           Edit
                         </Button>
@@ -257,11 +272,19 @@ export const AdminDashboard: React.FC = () => {
                         {user.phone && <span>Phone: {user.phone}</span>}
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="text-green-600">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-green-600 hover:bg-[#CC5500]"
+                        >
                           <UserCheck className="w-4 h-4 mr-2" />
                           Activate
                         </Button>
-                        <Button variant="outline" size="sm" className="text-red-600">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600 hover:bg-[#CC5500]"
+                        >
                           <UserX className="w-4 h-4 mr-2" />
                           Suspend
                         </Button>
@@ -287,7 +310,8 @@ export const AdminDashboard: React.FC = () => {
                           </Badge>
                         </CardTitle>
                         <CardDescription>
-                          Reference: {request.referenceId} • Consumer ID: {request.consumerId}
+                          Reference: {request.referenceId} • Consumer ID:{" "}
+                          {request.consumerId}
                         </CardDescription>
                       </div>
                       <Button variant="outline" size="sm">
@@ -302,14 +326,21 @@ export const AdminDashboard: React.FC = () => {
                     </p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4 text-sm">
-                        <span>Created: {new Date(request.createdAt).toLocaleDateString()}</span>
+                        <span>
+                          Created:{" "}
+                          {new Date(request.createdAt).toLocaleDateString()}
+                        </span>
                         <span>Delivery: {request.deliveryPreference}</span>
                       </div>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm">
                           Monitor
                         </Button>
-                        <Button variant="outline" size="sm" className="text-red-600">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-red-600"
+                        >
                           <Trash2 className="w-4 h-4 mr-2" />
                           Remove
                         </Button>
@@ -353,9 +384,7 @@ export const AdminDashboard: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                <Button className="luxury-button">
-                  Save Settings
-                </Button>
+                <Button className="luxury-button">Save Settings</Button>
               </CardContent>
             </Card>
           </TabsContent>

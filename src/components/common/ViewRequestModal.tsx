@@ -27,7 +27,7 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
 
   const getStatusColor = (status: string) => {
     const colors = {
-      pending: "bg-yellow-500/20 text-yellow-700",
+      pending: "bg-[#CC5500]/20 text-[#CC5500]",
       bidding: "bg-blue-500/20 text-blue-700",
       accepted: "bg-green-500/20 text-green-700",
       "in-progress": "bg-purple-500/20 text-purple-700",
@@ -119,7 +119,7 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
 
           {/* Close button */}
           <div className="flex justify-end">
-            <Button onClick={onClose} variant="outline">
+            <Button onClick={onClose} variant="outline" className="hover:bg-[#CC5500]">
               Close
             </Button>
           </div>

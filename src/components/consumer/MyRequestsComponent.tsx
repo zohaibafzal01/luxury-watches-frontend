@@ -154,6 +154,7 @@ export const MyRequestsComponent: React.FC = () => {
                     </CardDescription>
                   </div>
                   <Button
+                    className=" hover:bg-[#CC5500]/90"
                     variant="outline"
                     size="sm"
                     onClick={() => {
@@ -180,6 +181,7 @@ export const MyRequestsComponent: React.FC = () => {
                     </span>
                   </div>
                   <Button
+                  className="bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
                     size="sm"
                     onClick={() => {
                       setSelectedRequest(request);

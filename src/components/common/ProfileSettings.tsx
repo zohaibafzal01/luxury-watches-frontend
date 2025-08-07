@@ -341,7 +341,7 @@ export const ProfileSettings: React.FC = () => {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="luxury-button"
+                    className="bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
                   >
                     <Save className="w-4 h-4 mr-2" />
                     {isLoading ? "Saving..." : "Save Changes"}
@@ -402,7 +402,7 @@ export const ProfileSettings: React.FC = () => {
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-[#CC5500]/90"
                           onClick={() => setVisible(!visible)}
                         >
                           {visible ? (
@@ -418,7 +418,7 @@ export const ProfileSettings: React.FC = () => {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="luxury-button"
+                    className="bg-[#CC5500] text-white hover:bg-[#CC5500]/90 luxury-button"
                   >
                     <Save className="w-4 h-4 mr-2" />
                     {isLoading ? "Changing..." : "Change Password"}

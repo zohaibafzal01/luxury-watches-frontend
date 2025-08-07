@@ -23,7 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
+import wrstopia from "../../public/icon.svg";
 
 const Dashboard = () => {
   const user = useSelector(selectUserInfo);
@@ -91,8 +91,8 @@ const Dashboard = () => {
             {/* Welcome Section */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-luxury-gradient rounded-full flex items-center justify-center">
-                  <Crown className="w-6 h-6 text-luxury-black" />
+                <div className=" bg-luxury-gradient rounded-full flex items-center justify-center">
+                  <img src={wrstopia} alt="" height={25} width={25} />
                 </div>
                 <div>
                   <h1 className="luxury-title text-2xl">
@@ -110,7 +110,7 @@ const Dashboard = () => {
               <Card className="luxury-card group hover:scale-105 transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Plus className="w-5 h-5 text-primary" />
+                    <Plus className="w-5 h-5 text-[#CC5500]" />
                     New Service Request
                   </CardTitle>
                   <CardDescription>
@@ -118,7 +118,10 @@ const Dashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button asChild className="w-full luxury-button">
+                  <Button
+                    asChild
+                    className="w-full luxury-button bg-[#CC5500] hover:bg-[#CC5500]/90"
+                  >
                     <Link to="/service-request">Create Request</Link>
                   </Button>
                 </CardContent>
@@ -135,7 +138,11 @@ const Dashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button asChild className="w-full" variant="outline">
+                  <Button
+                    asChild
+                    className="w-full hover:bg-[#CC5500]/90"
+                    variant="outline"
+                  >
                     <Link to="/my-requests">View Requests</Link>
                   </Button>
                 </CardContent>
@@ -168,13 +175,14 @@ const Dashboard = () => {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge className="bg-primary/10 text-primary">
+                          <Badge className="bg-[#CC5500]/10 text-[#CC5500]">
                             {req?.deliveryPreference}
                           </Badge>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => openModal(req)}
+                            className=" hover:bg-[#CC5500]/90"
                           >
                             View Details
                           </Button>

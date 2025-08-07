@@ -77,7 +77,7 @@ export const BidSubmissionModal: React.FC<BidSubmissionModalProps> = ({
               id="price"
               type="number"
               value={bidData.estimatedPrice}
-              onChange={(e) => handleChange('estimatedPrice', e.target.value)}
+              onChange={(e) => handleChange("estimatedPrice", e.target.value)}
               placeholder="450"
               required
             />
@@ -89,7 +89,7 @@ export const BidSubmissionModal: React.FC<BidSubmissionModalProps> = ({
               id="turnaround"
               type="number"
               value={bidData.turnaroundTime}
-              onChange={(e) => handleChange('turnaroundTime', e.target.value)}
+              onChange={(e) => handleChange("turnaroundTime", e.target.value)}
               placeholder="7"
               required
             />
@@ -97,7 +97,10 @@ export const BidSubmissionModal: React.FC<BidSubmissionModalProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor="delivery">Delivery Method</Label>
-            <Select value={bidData.deliveryMethod} onValueChange={(value) => handleChange('deliveryMethod', value)}>
+            <Select
+              value={bidData.deliveryMethod}
+              onValueChange={(value) => handleChange("deliveryMethod", value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select delivery method" />
               </SelectTrigger>
@@ -114,18 +117,27 @@ export const BidSubmissionModal: React.FC<BidSubmissionModalProps> = ({
             <Textarea
               id="notes"
               value={bidData.notes}
-              onChange={(e) => handleChange('notes', e.target.value)}
+              onChange={(e) => handleChange("notes", e.target.value)}
               placeholder="Any additional information about your service..."
               rows={3}
             />
           </div>
 
           <div className="flex gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="flex-1 hover:bg-[#CC5500]"
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="flex-1 luxury-button">
-              {isSubmitting ? 'Submitting...' : 'Submit Bid'}
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
+            >
+              {isSubmitting ? "Submitting..." : "Submit Bid"}
             </Button>
           </div>
         </form>

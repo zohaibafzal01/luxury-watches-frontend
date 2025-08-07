@@ -1,14 +1,21 @@
-import React from 'react';
+import React from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription
-} from '@/components/ui/dialog';
-import { DollarSign, Clock, Package, MessageSquare, CheckCircle, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ServiceRequest, Bid } from '@/types/service';
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  DollarSign,
+  Clock,
+  Package,
+  MessageSquare,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ServiceRequest, Bid } from "@/types/service";
 
 interface ViewBidsModalProps {
   isOpen: boolean;
@@ -17,7 +24,12 @@ interface ViewBidsModalProps {
   bids: Bid[];
 }
 
-export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({ isOpen, onClose, request, bids }) => {
+export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
+  isOpen,
+  onClose,
+  request,
+  bids,
+}) => {
   if (!request) return null;
 
   const requestBids = bids.filter((bid) => bid.serviceRequestId === request.id);
@@ -29,7 +41,9 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({ isOpen, onClose, r
           <DialogTitle>
             Bids for {request.watchBrand} {request.watchModel}
           </DialogTitle>
-          <DialogDescription>Reference ID: {request.referenceId}</DialogDescription>
+          <DialogDescription>
+            Reference ID: {request.referenceId}
+          </DialogDescription>
         </DialogHeader>
 
         {requestBids.length > 0 ? (
@@ -94,8 +108,8 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({ isOpen, onClose, r
         )}
 
         {/* Modal Close Button */}
-        <div className="flex justify-end mt-6">
-          <Button variant="outline" onClick={onClose}>
+        <div className="flex justify-end mt-6 ">
+          <Button variant="outline" onClick={onClose} className="hover:bg-[#CC5500]/90">
             Close
           </Button>
         </div>

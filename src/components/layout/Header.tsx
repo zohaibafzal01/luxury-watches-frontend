@@ -28,6 +28,8 @@ import { useSelector } from "react-redux";
 import { selectUserInfo } from "@/redux/selectors/userSelectors";
 import { useDispatch } from "react-redux";
 import { login, logout } from "@/redux/slices/userSlice";
+import wrstopia from "../../../public/wrstopia.svg";
+import wrstopiablack from "../../../public/wrstopiablack.svg";
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -166,8 +168,8 @@ export const Header: React.FC = () => {
     onItemClick?: () => void;
   }) => (
     <div
-      className={`flex ${
-        isMobile ? "flex-col space-y-2" : "items-center space-x-2"
+      className={`flex  ${
+        isMobile ? "flex-col space-y-2 " : "items-center space-x-2"
       }`}
     >
       {navigationItems.map((item) => {
@@ -177,7 +179,11 @@ export const Header: React.FC = () => {
             key={item.to}
             variant="ghost"
             asChild
-            className={isMobile ? "justify-start w-full" : ""}
+            className={
+              isMobile
+                ? "justify-start w-full "
+                : "hover:bg-[#CC5500]"
+            }
             onClick={onItemClick}
           >
             <Link to={item.to}>
@@ -193,7 +199,7 @@ export const Header: React.FC = () => {
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300  ${
-        isAuthenticated && user ? "bg-white" : "bg-black"
+        isAuthenticated && user ? "bg-white" : "bg-[#4A4A4A]"
       }`}
     >
       <div className="  px-2 sm:px-4 h-14 sm:h-20 flex items-center justify-between  sm:space-x-4">
@@ -203,7 +209,7 @@ export const Header: React.FC = () => {
             ref={sidebarRef}
           >
             <button
-              className="text-white hover:text-[#F59F0A] text-lg md:text-xl"
+              className="text-white hover:text-[#CC5500] text-lg md:text-xl"
               onClick={() => setMenuOpen(!menuOpen)}
             >
               {/* Always show burger icon */}
@@ -227,7 +233,7 @@ export const Header: React.FC = () => {
               <div className="fixed top-0 left-4 z-50">
                 {/* Backdrop */}
                 <div
-                  className="fixed inset-0 bg-black bg-opacity-50"
+                  className="fixed inset-0 bg-[#4A4A4A] bg-opacity-50"
                   onClick={() => setMenuOpen(false)}
                 />
 
@@ -246,7 +252,7 @@ export const Header: React.FC = () => {
                       key={href}
                       href={href}
                       onClick={() => setMenuOpen(false)}
-                      className="w-full px-3 py-2 text-sm rounded hover:bg-[#2C2C2C] hover:text-[#F59F0A] transition"
+                      className="w-full px-3 py-2 text-sm rounded hover:bg-[#2C2C2C] hover:text-[#CC5500] transition"
                     >
                       {label}
                     </a>
@@ -256,32 +262,14 @@ export const Header: React.FC = () => {
             )}
           </div>
         )}
-        <div className="flex items-center space-x-4">
-          <div className="flex flex-col items-center justify-center space-y-1 mx-auto">
-            <div className="flex items-center space-x-2 cursor-pointer xl:ml-[50px] md:ml-[100px] sm:ml-[300px]">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden flex items-center justify-center">
-                <Logo />
-              </div>
-              <span
-                className={`font-guyot text-lg sm:text-xl md:text-[24px] ${
-                  isAuthenticated && user ? "text-black" : "text-white"
-                }`}
-              >
-                <a
-                  href={isAuthenticated && user ? "/" : "#"}
-                  onClick={(e) => {
-                    if (isAuthenticated || user) {
-                      e.preventDefault();
-                    }
-                  }}
-                >
-                  <a href="/" className={`text-white text-lg font-bold ${isAuthenticated && user ? "text-white" : "-black"}`}>
-                    ChronoBid
-                  </a>
-                </a>
-              </span>
-            </div>
-          </div>
+        <div>
+          {isAuthenticated && user ? (
+            <img src={wrstopiablack} alt="" width={150} height={100} />
+          ) : (
+            <Link to="/">
+              <img src={wrstopia} alt="" width={150} height={100} />
+            </Link>
+          )}
         </div>
 
         {/* Right Section: Auth/User Navigation */}
@@ -300,17 +288,17 @@ export const Header: React.FC = () => {
                     variant="ghost"
                     className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full"
                   >
-                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-primary/20 hover:border-primary/40 transition-colors">
+                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-[#CC5500]/20 hover:border-[#CC5500]/40 transition-colors">
                       <AvatarImage
                         src={user?.profileImage}
                         alt={user?.firstName}
                       />
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white font-bold text-xs sm:text-sm">
+                      <AvatarFallback className="bg-[#4a4a4a] text-white font-bold text-xs sm:text-sm">
                         {getInitials(user.firstName, user.lastName)}
                       </AvatarFallback>
                     </Avatar>
                     {userRole === "admin" && (
-                      <Crown className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 fill-current" />
+                      <Crown className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 text-[#CC5500] fill-current" />
                     )}
                   </Button>
                 </DropdownMenuTrigger>
@@ -385,12 +373,7 @@ export const Header: React.FC = () => {
                     <div className="flex flex-col h-full">
                       <div className="flex items-center justify-between p-6 border-b border-gray-800 flex-shrink-0">
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
-                            <Logo />
-                          </div>
-                          <span className="font-bold text-xl text-white font-guyot">
-                            ChronoBid
-                          </span>
+                          <img src={wrstopia} alt="" width={150} height={100} />
                         </div>
                       </div>
                       <div className="flex-1 overflow-y-auto">
@@ -402,7 +385,7 @@ export const Header: React.FC = () => {
                                 placeholder="Search service"
                                 className="w-full rounded-full py-3 pl-12 pr-4 text-white placeholder:text-gray-400
                                          bg-gradient-to-br from-[#2c2c2e] via-[#2c2c2e] to-[#005670]/100
-                                         backdrop-blur-md border border-gray-700 outline-none focus:ring-2 focus:ring-[#F59F0A] transition-all"
+                                         backdrop-blur-md border border-gray-700 outline-none focus:ring-2 focus:ring-[#CC5500] transition-all"
                               />
                               <Search
                                 className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400"
@@ -418,7 +401,7 @@ export const Header: React.FC = () => {
                               </div>
                               <Button
                                 variant="ghost"
-                                className="w-full justify-start text-white hover:bg-gray-800 hover:text-[#F59F0A] py-3 px-3"
+                                className="w-full justify-start text-white hover:bg-gray-800 hover:text-[#CC5500] py-3 px-3"
                                 asChild
                               >
                                 <Link
@@ -426,43 +409,43 @@ export const Header: React.FC = () => {
                                   className="flex items-center "
                                   id="WhyChooseBid"
                                 >
-                                  <div className="w-2 h-2 bg-[#F59F0A] rounded-full mr-3"></div>
+                                  <div className="w-2 h-2 bg-[#CC5500] rounded-full mr-3"></div>
                                   Why choose us
                                 </Link>
                               </Button>
                               <Button
                                 variant="ghost"
-                                className="w-full justify-start text-white hover:bg-gray-800 hover:text-[#F59F0A] py-3 px-3"
+                                className="w-full justify-start text-white hover:bg-gray-800 hover:text-[#CC5500] py-3 px-3"
                                 asChild
                               >
                                 <Link
                                   to="/what-we-offer"
                                   className="flex items-center"
                                 >
-                                  <div className="w-2 h-2 bg-[#F59F0A] rounded-full mr-3"></div>
+                                  <div className="w-2 h-2 bg-[#CC5500] rounded-full mr-3"></div>
                                   What we offer
                                 </Link>
                               </Button>
                               <Button
                                 variant="ghost"
-                                className="w-full justify-start text-white hover:bg-gray-800 hover:text-[#F59F0A] py-3 px-3"
+                                className="w-full justify-start text-white hover:bg-gray-800 hover:text-[#CC5500] py-3 px-3"
                                 asChild
                               >
                                 <Link
                                   to="/the-process"
                                   className="flex items-center"
                                 >
-                                  <div className="w-2 h-2 bg-[#F59F0A] rounded-full mr-3"></div>
+                                  <div className="w-2 h-2 bg-[#CC5500] rounded-full mr-3"></div>
                                   The Process
                                 </Link>
                               </Button>
                               <Button
                                 variant="ghost"
-                                className="w-full justify-start text-white hover:bg-gray-800 hover:text-[#F59F0A] py-3 px-3"
+                                className="w-full justify-start text-white hover:bg-gray-800 hover:text-[#CC5500] py-3 px-3"
                                 asChild
                               >
                                 <Link to="/faqs" className="flex items-center">
-                                  <div className="w-2 h-2 bg-[#F59F0A] rounded-full mr-3"></div>
+                                  <div className="w-2 h-2 bg-[#CC5500] rounded-full mr-3"></div>
                                   FAQs
                                 </Link>
                               </Button>
@@ -473,19 +456,19 @@ export const Header: React.FC = () => {
                       <div className="border-t border-gray-800 p-6 space-y-3 flex-shrink-0">
                         <Button
                           asChild
-                          className="w-full bg-black border border-gray-700 hover:bg-[#F59F0A] text-white font-semibold py-3"
+                          className="w-full bg-black border border-gray-700 hover:bg-[#CC5500] text-white font-semibold py-3"
                         >
                           <Link to="/">Order Lookup</Link>
                         </Button>
                         <Button
                           asChild
-                          className="w-full bg-white text-[#F59F0A] hover:bg-[#F59F0A] hover:text-white font-semibold py-3"
+                          className="w-full bg-white text-[#CC5500] hover:bg-[#CC5500] hover:text-white font-semibold py-3"
                         >
                           <Link to="/">Contact Us</Link>
                         </Button>
                         <Button
                           asChild
-                          className="w-full bg-[#F59F0A] text-white hover:bg-[#e09000] font-semibold py-3"
+                          className="w-full bg-[#CC5500] text-white hover:bg-[#CC5500] font-semibold py-3"
                         >
                           <Link to="/login">Sign In</Link>
                         </Button>
@@ -494,13 +477,13 @@ export const Header: React.FC = () => {
                   </SheetContent>
                 </Sheet>
                 <div className="hidden md:flex items-center space-x-1 sm:space-x-2 ">
-                  <button className="text-white hover:text-[#F59F0A] p-1">
+                  <button className="text-white hover:text-[#CC5500] p-1">
                     <Link to="/">
                       <SrchIcon />
                     </Link>
                   </button>
 
-                  <button className="text-white hover:text-[#F59F0A] p-1">
+                  <button className="text-white hover:text-[#CC5500] p-1">
                     <Link to="/login">
                       <PersonIcon />
                     </Link>
