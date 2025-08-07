@@ -103,7 +103,7 @@ export const DealerDashboard: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     const colors = {
-      pending: "bg-yellow-500/20 text-yellow-700",
+      pending: "bg-[#CC5500]/20 text-[#CC5500]",
       bidding: "bg-blue-500/20 text-blue-700",
       accepted: "bg-green-500/20 text-green-700",
       "in-progress": "bg-purple-500/20 text-purple-700",
@@ -157,7 +157,7 @@ export const DealerDashboard: React.FC = () => {
                   <p className="text-sm text-muted-foreground">
                     Active Requests
                   </p>
-                  <p className="text-2xl font-bold text-primary">
+                  <p className="text-2xl font-bold text-[#CC5500]">
                     {serviceRequests.length}
                   </p>
                 </div>
@@ -236,6 +236,7 @@ export const DealerDashboard: React.FC = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => handleViewDetails(request)}
+                          className=" hover:bg-[#CC5500]"
                         >
                           <Eye className="w-4 h-4 mr-2" />
                           View Details
@@ -259,7 +260,7 @@ export const DealerDashboard: React.FC = () => {
                         </span>
                       </div>
                       <Button
-                        className="luxury-button"
+                        className="bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
                         onClick={() => handleSubmitBid(request)}
                       >
                         Submit Bid

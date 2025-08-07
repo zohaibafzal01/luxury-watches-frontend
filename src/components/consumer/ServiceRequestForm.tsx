@@ -180,7 +180,7 @@ export const ServiceRequestForm: React.FC = () => {
                   location: undefined,
                 });
               }}
-              className="luxury-button"
+              className="luxury-button bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
             >
               Submit Another Request
             </Button>
@@ -365,7 +365,7 @@ export const ServiceRequestForm: React.FC = () => {
 
               <Button
                 type="submit"
-                className="w-full luxury-button"
+                className="w-full luxury-button bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
                 disabled={isSubmitting}
               >
                 {isSubmitting

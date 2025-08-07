@@ -21,6 +21,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import authApi from "@/api/auth";
+import wrstopia from "../../../public/icon.svg";
 
 export const RegisterForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -72,7 +73,7 @@ export const RegisterForm: React.FC = () => {
       toast({
         title: "Account created!",
         description:
-          "Welcome to ChronoBid. Your account has been created successfully.",
+          "Welcome to Wrstopia. Your account has been created successfully.",
       });
 
       // Navigate to login or dashboard based on your app flow
@@ -103,12 +104,10 @@ export const RegisterForm: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
       <Card className="w-full max-w-md luxury-card">
         <CardHeader className="text-center">
-          <div className="w-16 h-16 bg-luxury-gradient rounded-full flex items-center justify-center mx-auto mb-4">
-            <Crown className="w-8 h-8 text-luxury-black" />
+          <div className="w-[24px] h-[16px] flex items-center justify-center mx-auto mb-4">
+            <img src={wrstopia} alt="" />
           </div>
-          <CardTitle className="luxury-title text-2xl">
-            Join ChronoBid
-          </CardTitle>
+          <CardTitle className="luxury-title text-2xl">Join Wrstopia</CardTitle>
           <CardDescription>
             Create your account and enter the world of luxury timepieces
           </CardDescription>
@@ -272,7 +271,7 @@ export const RegisterForm: React.FC = () => {
 
             <Button
               type="submit"
-              className="w-full luxury-button"
+              className="w-full bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
               disabled={isLoading}
             >
               {isLoading ? "Creating Account..." : "Create Account"}
@@ -283,7 +282,7 @@ export const RegisterForm: React.FC = () => {
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="text-primary hover:underline font-medium"
+                  className="text-[#CC5500] hover:underline font-medium"
                 >
                   Sign in
                 </Link>

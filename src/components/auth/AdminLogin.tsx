@@ -17,6 +17,8 @@ import { useToast } from "@/hooks/use-toast";
 import authApi from "@/api/auth";
 import { useDispatch } from "react-redux";
 import { login } from "@/redux/slices/userSlice";
+import wrstopia from "../../../public/icon.svg";
+
 
 export const AdminLogin: React.FC = () => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
@@ -147,14 +149,14 @@ export const AdminLogin: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
       <Card className="w-full max-w-md luxury-card">
         <CardHeader className="text-center">
-          <div className="w-16 h-16 bg-luxury-gradient rounded-full flex items-center justify-center mx-auto mb-4">
-            <Crown className="w-8 h-8 text-luxury-black" />
+          <div className="w-[24px] h-[16px] flex items-center justify-center mx-auto mb-4">
+            <img src={wrstopia} alt="" />
           </div>
           <CardTitle className="luxury-title text-2xl">
             Welcome Back Admin
           </CardTitle>
           <CardDescription>
-            Sign in to your ChronoBid account to continue your luxury watch
+            Sign in to your Wrstopia account to continue your luxury watch
             journey
           </CardDescription>
         </CardHeader>
@@ -220,7 +222,7 @@ export const AdminLogin: React.FC = () => {
 
             <Button
               type="submit"
-              className="w-full luxury-button"
+              className="w-full bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
