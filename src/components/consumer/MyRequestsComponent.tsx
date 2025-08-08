@@ -181,7 +181,7 @@ export const MyRequestsComponent: React.FC = () => {
                     </span>
                   </div>
                   <Button
-                  className="bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
+                    className="bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
                     size="sm"
                     onClick={() => {
                       setSelectedRequest(request);
@@ -208,6 +208,7 @@ export const MyRequestsComponent: React.FC = () => {
         {/* Pagination */}
         <div className="flex justify-center items-center gap-4 mt-6">
           <Button
+            className=" hover:bg-[#CC5500]/90"
             variant="outline"
             size="sm"
             disabled={page <= 1}
@@ -219,6 +220,7 @@ export const MyRequestsComponent: React.FC = () => {
             Page {page} of {totalPages}
           </span>
           <Button
+            className=" hover:bg-[#CC5500]/90"
             variant="outline"
             size="sm"
             disabled={page >= totalPages}

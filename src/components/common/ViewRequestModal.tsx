@@ -50,7 +50,7 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
             </Badge>
           </DialogTitle>
           <DialogDescription>
-            Reference ID: <strong>{request?.referenceId || request?.id}</strong>
+            Request ID: <strong>{request?.id}</strong>
           </DialogDescription>
         </DialogHeader>
 
@@ -119,7 +119,11 @@ export const ViewRequestModal: React.FC<ViewRequestModalProps> = ({
 
           {/* Close button */}
           <div className="flex justify-end">
-            <Button onClick={onClose} variant="outline" className="hover:bg-[#CC5500]">
+            <Button
+              onClick={onClose}
+              variant="outline"
+              className="hover:bg-[#CC5500]"
+            >
               Close
             </Button>
           </div>
