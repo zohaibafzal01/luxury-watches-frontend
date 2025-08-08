@@ -4,12 +4,12 @@ import Footer from '@/components/layout/Footer';
 
 const Login = () => {
   return (
-    <>
+    <div className='bg-white'>
   
   
   <LoginForm />
-  <Footer/>
-  </>
+  {/* <Footer/> */}
+  </div>
 
   )
 

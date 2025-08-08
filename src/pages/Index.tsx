@@ -83,16 +83,14 @@ const Index: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen ">
-      <section className="relative min-h-[90vh] bg-[#4A4A4A] text-white overflow-hidden pt-16 sm:pt-20">
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 flex flex-col justify-center min-h-[calc(100vh-4rem)] sm:min-h-[calc(90vh-5rem)] max-w-5xl">
+    <div>
+      <section className="relative bg-[#4A4A4A] text-white overflow-hidden pt-16 sm:pt-20 min-h-screen flex ">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 flex flex-col justify-center">
           {/* Main content */}
           <div className="text-center mb-12">
             {/* Main headline with enhanced typography */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-              <span className="block  ">
-                Reliable Service,
-              </span>
+              <span className="block  ">Reliable Service,</span>
               <span className="block text-[#CC5500] transform hover:scale-105 transition-transform duration-300">
                 Perfectly Matched
               </span>
@@ -162,22 +160,22 @@ const Index: React.FC = () => {
       {/* <BuildToLast /> */}
       {/* Features Section */}
 
-      <section id="why-choose-us">
+      {/* <section id="why-choose-us">
         <WhyChooseBid />
-      </section>
+      </section> */}
 
-      <section id="what-we-offer">
+      {/* <section id="what-we-offer">
         <WhatWeOffer />
-      </section>
+      </section> */}
 
-      <section id="the-process">
+      {/* <section id="the-process">
         <TheProcess />
-      </section>
-
+      </section> */}
+      {/* 
       <section id="faqs">
         <FAQSection />
       </section>
-      <Footer />
+      <Footer /> */}
       {/* CTA Section Design 1 */}
     </div>
   );
