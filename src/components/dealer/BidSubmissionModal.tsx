@@ -1,13 +1,25 @@
-
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ServiceRequest } from '@/types/service';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ServiceRequest } from "@/types/service";
+import { useToast } from "@/hooks/use-toast";
+import dealerApi from "@/api/dealer";
 
 interface BidSubmissionModalProps {
   request: ServiceRequest | null;
@@ -21,38 +33,57 @@ export const BidSubmissionModal: React.FC<BidSubmissionModalProps> = ({
   onClose,
 }) => {
   const [bidData, setBidData] = useState({
-    estimatedPrice: '',
-    turnaroundTime: '',
-    deliveryMethod: '',
-    notes: '',
+    estimatedPrice: "",
+    turnaroundTime: "",
+    deliveryMethod: "",
+    notes: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!request) return;
+
     setIsSubmitting(true);
+    try {
+      await dealerApi.submitBid(
+        request?.id,
+        parseFloat(bidData?.estimatedPrice),
+        parseInt(bidData?.turnaroundTime),
+        bidData?.deliveryMethod,
+        bidData?.notes,
+        "Submitted"
+      );
 
-    // Mock bid submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
+      toast({
+        title: "Bid Submitted Successfully",
+        description: `Your bid of $${bidData?.estimatedPrice} has been submitted for ${request?.watchBrand} ${request?.watchModel}.`,
+      });
 
-    toast({
-      title: 'Bid Submitted Successfully',
-      description: `Your bid of $${bidData.estimatedPrice} has been submitted for ${request?.watchBrand} ${request?.watchModel}.`,
-    });
-
-    setBidData({
-      estimatedPrice: '',
-      turnaroundTime: '',
-      deliveryMethod: '',
-      notes: '',
-    });
-    setIsSubmitting(false);
-    onClose();
+      setBidData({
+        estimatedPrice: "",
+        turnaroundTime: "",
+        deliveryMethod: "",
+        notes: "",
+      });
+      onClose();
+    } catch (error: any) {
+      console.error("Error submitting bid:", error);
+      toast({
+        title: "Submission Failed",
+        description:
+          error?.message || "An error occurred while submitting your bid.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (field: string, value: string) => {
-    setBidData(prev => ({
+    setBidData((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -105,9 +136,9 @@ export const BidSubmissionModal: React.FC<BidSubmissionModalProps> = ({
                 <SelectValue placeholder="Select delivery method" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pickup">Pickup</SelectItem>
-                <SelectItem value="shipping">Shipping</SelectItem>
-                <SelectItem value="drop-off">Drop-off</SelectItem>
+                <SelectItem value="Pickup">Pickup</SelectItem>
+                <SelectItem value="Shipping">Shipping</SelectItem>
+                <SelectItem value="Drop-off">Drop-off</SelectItem>
               </SelectContent>
             </Select>
           </div>

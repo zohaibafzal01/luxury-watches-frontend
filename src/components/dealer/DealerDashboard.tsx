@@ -20,76 +20,203 @@ import {
 } from "lucide-react";
 import { ViewRequestModal } from "@/components/common/ViewRequestModal";
 import { BidSubmissionModal } from "./BidSubmissionModal";
+import dealerApi from "@/api/dealer";
 
 export const DealerDashboard: React.FC = () => {
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
-  const [myBids, setMyBids] = useState<Bid[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(
     null
   );
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [biddingRequests, setBiddingRequests] = useState<ServiceRequest[]>([]);
+  const [biddingPage, setBiddingPage] = useState(1);
+  const [biddingTotalPages, setBiddingTotalPages] = useState(1);
+  const [activeTab, setActiveTab] = useState<"requests" | "bids">("requests");
 
-  // Mock data - replace with real API calls
   useEffect(() => {
-    const mockRequests: ServiceRequest[] = [
-      {
-        id: "1",
-        consumerId: "c1",
-        watchBrand: "Rolex",
-        watchModel: "Submariner",
-        description:
-          "Crown is not screwing down properly and the watch is losing time.",
-        deliveryPreference: "shipping",
-        photos: [
-          // { id: '1', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
-        ],
-        status: "pending",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        bids: [],
-        referenceId: "CR-1001",
-      },
-      {
-        id: "2",
-        consumerId: "c2",
-        watchBrand: "Omega",
-        watchModel: "Speedmaster",
-        description:
-          "Chronograph function is not working, second hand gets stuck.",
-        deliveryPreference: "drop-off",
-        photos: [
-          // { id: '2', url: '/api/placeholder/300/300', timestamp: new Date().toISOString() }
-        ],
-        status: "bidding",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        bids: [],
-        referenceId: "CR-1002",
-      },
-    ];
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const res = await dealerApi.serviceRequest(page, limit);
 
-    const mockBids: Bid[] = [
-      {
-        id: "b1",
-        dealerId: "dealer1",
-        serviceRequestId: "2",
-        estimatedPrice: 450,
-        turnaroundTime: 7,
-        deliveryMethod: "pickup",
-        status: "submitted",
-        submittedAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      },
-    ];
+        const formattedRequests: ServiceRequest[] = res.data.map(
+          (req: any) => ({
+            id: req?.id,
+            consumerId: req?.createdBy?.id || "",
+            watchBrand: req?.brand,
+            watchModel: req?.model,
+            description: req?.issueDescription,
+            deliveryPreference:
+              req?.deliveryPreference?.toLowerCase() || "shipping",
+            photos: req?.photos || [],
+            status: req?.status?.toLowerCase(),
+            createdAt: req?.createdAt,
+            updatedAt: req?.updatedAt,
+            bids: (req?.biddings || []).map((bid: any) => ({
+              id: bid?.id,
+              dealerId: bid?.dealerId,
+              serviceRequestId: bid?.serviceRequestId,
+              estimatedPrice: bid?.estimatedPrice,
+              turnaroundTime: bid?.turnaroundTime,
+              deliveryMethod: bid?.deliveryMethod,
+              status: bid?.status,
+              submittedAt: bid?.submittedAt,
+              expiresAt: bid?.expiresAt,
+              notes: bid?.notes,
+            })),
+            referenceId: req?.referenceId || "",
+            location: req?.location || undefined,
+          })
+        );
 
-    setTimeout(() => {
-      setServiceRequests(mockRequests);
-      setMyBids(mockBids);
+        setServiceRequests(formattedRequests);
+        setTotalPages(res.pagination?.totalPages || 1);
+      } catch (error) {
+        console.error("Failed to fetch service requests:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [page, limit]);
+
+  useEffect(() => {
+    const fetchBiddingData = async () => {
+      try {
+        const res = await dealerApi.serviceRequestBidding(biddingPage, limit);
+
+        const formattedBiddingRequests: ServiceRequest[] = res.data.map(
+          (req: any) => ({
+            id: req?.id,
+            consumerId: req?.createdBy?.id || "",
+            watchBrand: req?.brand,
+            watchModel: req?.model,
+            description: req?.issueDescription,
+            deliveryPreference:
+              req?.deliveryPreference?.toLowerCase() || "shipping",
+            photos: req?.photos || [],
+            status: req?.status?.toLowerCase(),
+            createdAt: req?.createdAt,
+            updatedAt: req?.updatedAt,
+            referenceId: req?.referenceId || "",
+            location: req?.location || undefined,
+            bids: (req?.biddings || []).map((bid: any) => ({
+              id: bid?.id,
+              dealerId: bid?.createdBy?.id,
+              serviceRequestId: bid?.serviceRequestId,
+              estimatedPrice: bid?.estimatedPrice,
+              turnaroundTime: bid?.turnAroundTime,
+              deliveryMethod: bid?.deliveryMethod,
+              status: bid?.status?.toLowerCase(),
+              submittedAt: bid?.createdAt,
+              expiresAt: "",
+              notes: bid?.notes,
+            })),
+          })
+        );
+
+        setBiddingRequests(formattedBiddingRequests);
+        setBiddingTotalPages(res.pagination?.totalPages || 1);
+      } catch (error) {
+        console.error("Failed to fetch bidding requests:", error);
+      }
+    };
+
+    fetchBiddingData();
+  }, [biddingPage, limit]);
+
+  const fetchServiceRequests = async () => {
+    setIsLoading(true);
+    try {
+      const res = await dealerApi.serviceRequest(page, limit);
+      const formattedRequests: ServiceRequest[] = res.data.map((req: any) => ({
+        id: req?.id,
+        consumerId: req?.createdBy?.id || "",
+        watchBrand: req?.brand,
+        watchModel: req?.model,
+        description: req?.issueDescription,
+        deliveryPreference:
+          req?.deliveryPreference?.toLowerCase() || "shipping",
+        photos: req?.photos || [],
+        status: req?.status?.toLowerCase(),
+        createdAt: req?.createdAt,
+        updatedAt: req?.updatedAt,
+        bids: (req?.biddings || []).map((bid: any) => ({
+          id: bid?.id,
+          dealerId: bid?.dealerId,
+          serviceRequestId: bid?.serviceRequestId,
+          estimatedPrice: bid?.estimatedPrice,
+          turnaroundTime: bid?.turnaroundTime,
+          deliveryMethod: bid?.deliveryMethod,
+          status: bid?.status,
+          submittedAt: bid?.submittedAt,
+          expiresAt: bid?.expiresAt,
+          notes: bid?.notes,
+        })),
+        referenceId: req?.referenceId || "",
+        location: req?.location || undefined,
+      }));
+
+      setServiceRequests(formattedRequests);
+      setTotalPages(res.pagination?.totalPages || 1);
+    } catch (error) {
+      console.error("Failed to fetch service requests:", error);
+    } finally {
       setIsLoading(false);
-    }, 1000);
-  }, []);
+    }
+  };
+
+  const fetchBiddingRequests = async () => {
+    try {
+      const res = await dealerApi.serviceRequestBidding(biddingPage, limit);
+      const formattedBids: ServiceRequest[] = res.data.map((req: any) => ({
+        id: req?.id,
+        consumerId: req?.createdBy?.id || "",
+        watchBrand: req?.brand,
+        watchModel: req?.model,
+        description: req?.issueDescription,
+        deliveryPreference:
+          req?.deliveryPreference?.toLowerCase() || "shipping",
+        photos: req?.photos || [],
+        status: req?.status?.toLowerCase(),
+        createdAt: req?.createdAt,
+        updatedAt: req?.updatedAt,
+        referenceId: req?.referenceId || "",
+        location: req?.location || undefined,
+        bids: (req?.biddings || []).map((bid: any) => ({
+          id: bid?.id,
+          dealerId: bid?.createdBy?.id,
+          serviceRequestId: bid?.serviceRequestId,
+          estimatedPrice: bid?.estimatedPrice,
+          turnaroundTime: bid?.turnAroundTime,
+          deliveryMethod: bid?.deliveryMethod,
+          status: bid?.status?.toLowerCase(),
+          submittedAt: bid?.createdAt,
+          expiresAt: "",
+          notes: bid?.notes,
+        })),
+      }));
+
+      setBiddingRequests(formattedBids);
+      setBiddingTotalPages(res.pagination?.totalPages || 1);
+    } catch (error) {
+      console.error("Failed to fetch bidding requests:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "requests") {
+      fetchServiceRequests();
+    } else if (activeTab === "bids") {
+      fetchBiddingRequests();
+    }
+  }, [activeTab]);
 
   const handleViewDetails = (request: ServiceRequest) => {
     setSelectedRequest(request);
@@ -172,7 +299,11 @@ export const DealerDashboard: React.FC = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Pending Bids</p>
                   <p className="text-2xl font-bold text-blue-500">
-                    {myBids.filter((b) => b.status === "submitted").length}
+                    {
+                      biddingRequests
+                        .flatMap((r) => r.bids)
+                        .filter((b) => b.status === "submitted").length
+                    }
                   </p>
                 </div>
                 {/* <Clock className="w-8 h-8 text-blue-500" /> */}
@@ -186,7 +317,10 @@ export const DealerDashboard: React.FC = () => {
                 <div>
                   <p className="text-sm text-muted-foreground">Total Revenue</p>
                   <p className="text-2xl font-bold text-green-500">
-                    ${myBids.reduce((sum, bid) => sum + bid.estimatedPrice, 0)}
+                    $
+                    {biddingRequests
+                      .flatMap((r) => r.bids)
+                      .reduce((sum, bid) => sum + bid.estimatedPrice, 0)}
                   </p>
                 </div>
                 {/* <DollarSign className="w-8 h-8 text-green-500" /> */}
@@ -207,139 +341,204 @@ export const DealerDashboard: React.FC = () => {
           </Card> */}
         </div>
 
-        <Tabs defaultValue="requests" className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={(val) => setActiveTab(val as "requests" | "bids")}
+          className="space-y-6"
+        >
           <TabsList className="grid w-full grid-cols-2 max-w-md">
             <TabsTrigger value="requests">Service Requests</TabsTrigger>
             <TabsTrigger value="bids">My Bids</TabsTrigger>
           </TabsList>
 
           <TabsContent value="requests" className="space-y-4">
-            <div className="grid gap-4">
-              {serviceRequests.map((request) => (
-                <Card key={request.id} className="luxury-card">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
-                          {request.watchBrand} {request.watchModel}
-                          <Badge className={getStatusColor(request.status)}>
-                            {request.status}
-                          </Badge>
-                        </CardTitle>
-                        <CardDescription>
-                          Reference: {request.referenceId} •{" "}
-                          {new Date(request.createdAt).toLocaleDateString()}
-                        </CardDescription>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewDetails(request)}
-                          className=" hover:bg-[#CC5500]"
-                        >
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {request.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="flex items-center gap-1">
-                          <Package className="w-4 h-4" />
-                          {request.deliveryPreference}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MessageSquare className="w-4 h-4" />
-                          {request.bids.length} bids
-                        </span>
-                      </div>
-                      <Button
-                        className="bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
-                        onClick={() => handleSubmitBid(request)}
-                      >
-                        Submit Bid
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="bids" className="space-y-4">
-            <div className="grid gap-4">
-              {myBids.map((bid) => {
-                const request = serviceRequests.find(
-                  (r) => r.id === bid.serviceRequestId
-                );
-                return (
-                  <Card key={bid.id} className="luxury-card">
+            {serviceRequests.length === 0 ? (
+              <p className="text-center text-muted-foreground">
+                No service requests found.
+              </p>
+            ) : (
+              <div className="grid gap-4">
+                {serviceRequests.map((request) => (
+                  <Card key={request.id} className="luxury-card">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div>
-                          <CardTitle className="flex items-center gap-2">
-                            Bid for {request?.watchBrand} {request?.watchModel}
-                            <Badge className={getBidStatusColor(bid.status)}>
-                              {bid.status}
+                          <CardTitle className="flex items-center gap-2 mb-3">
+                            {request.watchBrand} {request.watchModel}
+                            <Badge className={getStatusColor(request.status)}>
+                              {request.status}
                             </Badge>
                           </CardTitle>
                           <CardDescription>
-                            Submitted:{" "}
-                            {new Date(bid.submittedAt).toLocaleDateString()}
+                            Reference: {request.referenceId} •{" "}
+                            {new Date(request.createdAt).toLocaleDateString()}
                           </CardDescription>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewDetails(request)}
+                            className=" hover:bg-[#CC5500]"
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </Button>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <p className="text-muted-foreground">
-                            Estimated Price
-                          </p>
-                          <p className="font-semibold text-green-600">
-                            ${bid.estimatedPrice}
-                          </p>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        {request.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="flex items-center gap-1">
+                            <Package className="w-4 h-4" />
+                            {request.deliveryPreference}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MessageSquare className="w-4 h-4" />
+                            {request.bids.length} bids
+                          </span>
                         </div>
-                        <div>
-                          <p className="text-muted-foreground">Turnaround</p>
-                          <p className="font-semibold">
-                            {bid.turnaroundTime} days
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">
-                            Delivery Method
-                          </p>
-                          <p className="font-semibold capitalize">
-                            {bid.deliveryMethod}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Expires</p>
-                          <p className="font-semibold">
-                            {new Date(bid.expiresAt).toLocaleDateString()}
-                          </p>
-                        </div>
+                        <Button
+                          className="bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
+                          onClick={() => handleSubmitBid(request)}
+                        >
+                          Submit Bid
+                        </Button>
                       </div>
-                      {bid.notes && (
-                        <div className="mt-4">
-                          <p className="text-sm text-muted-foreground">
-                            Notes:
-                          </p>
-                          <p className="text-sm">{bid.notes}</p>
-                        </div>
-                      )}
                     </CardContent>
                   </Card>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
+            {/* Pagination */}
+            {serviceRequests.length > 0 && (
+              <div className="flex justify-center items-center gap-4 mt-6">
+                <Button
+                  className=" hover:bg-[#CC5500]/90"
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Page {page} of {totalPages}
+                </span>
+                <Button
+                  className=" hover:bg-[#CC5500]/90"
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="bids" className="space-y-4">
+            {biddingRequests.flatMap((r) => r.bids).length === 0 ? (
+              <p className="text-center text-muted-foreground">
+                No bids found.
+              </p>
+            ) : (
+              <div className="grid gap-4">
+                {biddingRequests.flatMap((request) =>
+                  request.bids.map((bid) => (
+                    <Card key={bid.id} className="luxury-card">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <CardTitle className="flex items-center gap-2">
+                              Bid for {request.watchBrand} {request.watchModel}
+                              <Badge className={getBidStatusColor(bid.status)}>
+                                {bid.status}
+                              </Badge>
+                            </CardTitle>
+                            <CardDescription>
+                              Submitted:{" "}
+                              {new Date(bid.submittedAt).toLocaleDateString()}
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">
+                              Estimated Price
+                            </p>
+                            <p className="font-semibold text-green-600">
+                              ${bid.estimatedPrice}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Turnaround</p>
+                            <p className="font-semibold">
+                              {bid.turnaroundTime} days
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">
+                              Delivery Method
+                            </p>
+                            <p className="font-semibold capitalize">
+                              {bid.deliveryMethod}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Request ID</p>
+                            <p className="font-semibold">{request.id}</p>
+                          </div>
+                        </div>
+                        {bid.notes && (
+                          <div className="mt-4">
+                            <p className="text-sm text-muted-foreground">
+                              Notes:
+                            </p>
+                            <p className="text-sm">{bid.notes}</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            )}
+            {/* Pagination for Bids */}
+            {biddingRequests.flatMap((r) => r.bids).length > 0 && (
+              <div className="flex justify-center items-center gap-4 mt-6">
+                <Button
+                  className="hover:bg-[#CC5500]/90"
+                  variant="outline"
+                  size="sm"
+                  disabled={biddingPage <= 1}
+                  onClick={() => setBiddingPage((p) => Math.max(1, p - 1))}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Page {biddingPage} of {biddingTotalPages}
+                </span>
+                <Button
+                  className="hover:bg-[#CC5500]/90"
+                  variant="outline"
+                  size="sm"
+                  disabled={biddingPage >= biddingTotalPages}
+                  onClick={() =>
+                    setBiddingPage((p) => Math.min(biddingTotalPages, p + 1))
+                  }
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

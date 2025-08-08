@@ -71,7 +71,7 @@ export const ProfileSettings: React.FC = () => {
         profileData?.firstName,
         profileData?.lastName,
         profileData?.email,
-        user?.accountType,
+        // user?.accountType,
         profileData?.phone,
         user?.status,
         profileData?.company,
