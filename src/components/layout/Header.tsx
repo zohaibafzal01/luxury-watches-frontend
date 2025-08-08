@@ -180,9 +180,7 @@ export const Header: React.FC = () => {
             variant="ghost"
             asChild
             className={
-              isMobile
-                ? "justify-start w-full "
-                : "hover:bg-[#CC5500]"
+              isMobile ? "justify-start w-full " : "hover:bg-[#CC5500]"
             }
             onClick={onItemClick}
           >
@@ -198,12 +196,12 @@ export const Header: React.FC = () => {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300  ${
+      className={`sticky top-0 z-50 w-full transition-all duration-300   ${
         isAuthenticated && user ? "bg-white" : "bg-[#4A4A4A]"
       }`}
     >
       <div className="  px-2 sm:px-4 h-14 sm:h-20 flex items-center justify-between  sm:space-x-4">
-        {!isAuthenticated && (
+        {/* {!isAuthenticated && (
           <div
             className="hidden  lg:block relative inline-block"
             ref={sidebarRef}
@@ -212,7 +210,6 @@ export const Header: React.FC = () => {
               className="text-white hover:text-[#CC5500] text-lg md:text-xl"
               onClick={() => setMenuOpen(!menuOpen)}
             >
-              {/* Always show burger icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
@@ -231,13 +228,11 @@ export const Header: React.FC = () => {
 
             {menuOpen && (
               <div className="fixed top-0 left-4 z-50">
-                {/* Backdrop */}
                 <div
                   className="fixed inset-0 bg-[#4A4A4A] bg-opacity-50"
                   onClick={() => setMenuOpen(false)}
                 />
 
-                {/* Sidebar container */}
                 <div
                   ref={sidebarRef}
                   className="relative bg-[#1A1A1A] text-white shadow-lg rounded-md px-6 py-6 mt-[72px] mr-4 min-w-[220px] max-w-xs flex flex-col space-y-3 transition-all duration-300"
@@ -261,7 +256,7 @@ export const Header: React.FC = () => {
               </div>
             )}
           </div>
-        )}
+        )} */}
         <div>
           {isAuthenticated && user ? (
             <img src={wrstopiablack} alt="" width={150} height={100} />

@@ -4,10 +4,10 @@ import Footer from '@/components/layout/Footer';
 
 const Register = () => {
   return (
-    <>
+    <div className='bg-white'>
     <RegisterForm />
-    <Footer/>
-    </>
+    {/* <Footer/> */}
+    </div>
   )
 };
 
