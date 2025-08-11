@@ -56,7 +56,7 @@ export const ProfileSettings: React.FC = () => {
       admin: "text-red-400",
       dealer: "text-blue-400",
       wholesaler: "text-green-400",
-      consumer: "text-purple-400",
+      consumer: "text-white",
     };
     return colors[role as keyof typeof colors] || "text-gray-400";
   };
@@ -111,6 +111,15 @@ export const ProfileSettings: React.FC = () => {
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (passwordData?.currentPassword?.length === 0) {
+      toast({
+        title: "Error",
+        description: "Current password cannot be empty.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (passwordData?.newPassword !== passwordData?.confirmPassword) {
       toast({
         title: "Error",
@@ -120,11 +129,11 @@ export const ProfileSettings: React.FC = () => {
       return;
     }
 
-    if (passwordData?.newPassword?.length < 6) {
+    if (passwordData?.newPassword?.length < 8) {
       toast({
-        title: "Error",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
+      title: "Error",
+      description: "Password must be at least 8 characters long.",
+      variant: "destructive",
       });
       return;
     }
@@ -205,7 +214,11 @@ export const ProfileSettings: React.FC = () => {
                 </h2>
                 <p className="text-muted-foreground">{user.email}</p>
                 <div className="flex items-center gap-2 mt-2">
-                  <Badge className={`capitalize ${getRoleColor(user.role)}`}>
+                  <Badge
+                    className={`capitalize bg-[#CC5500] ${getRoleColor(
+                      user.role
+                    )}`}
+                  >
                     {user.role}
                   </Badge>
                   {user.company && (
@@ -414,6 +427,10 @@ export const ProfileSettings: React.FC = () => {
                       </div>
                     </div>
                   ))}
+
+                  <p className="text-sm text-muted-foreground">
+                    Password must be at least 8 characters and include one uppercase letter, one number, and one special character.
+                  </p>
 
                   <Button
                     type="submit"

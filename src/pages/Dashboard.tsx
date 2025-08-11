@@ -167,10 +167,12 @@ const Dashboard = () => {
                       >
                         <div>
                           <h4 className="font-medium">
-                            {req?.brand} {req?.model} - {req?.issueDescription}
+                            {req?.brand} - {req?.model} -{" "}
+                            {req?.issueDescription}
                           </h4>
                           <p className="text-sm text-muted-foreground">
-                            Ref: {req?.id.slice(-5).toUpperCase()} •{" "}
+                            {/* Ref: {req?.id.slice(-5).toUpperCase()} •{" "} */}
+                            <strong> Updated at: </strong>{" "}
                             {dayjs(req?.updatedAt).fromNow()}
                           </p>
                         </div>
@@ -204,22 +206,25 @@ const Dashboard = () => {
             {selectedRequest && (
               <div className="space-y-3 text-sm text-muted-foreground">
                 <div>
-                  <strong>Brand:</strong> {selectedRequest.brand}
+                  <strong>Ref ID:</strong> {selectedRequest?.id}
                 </div>
                 <div>
-                  <strong>Model:</strong> {selectedRequest.model}
+                  <strong>Brand:</strong> {selectedRequest?.brand}
+                </div>
+                <div>
+                  <strong>Model:</strong> {selectedRequest?.model}
                 </div>
                 <div>
                   <strong>Description:</strong>{" "}
-                  {selectedRequest.issueDescription}
+                  {selectedRequest?.issueDescription}
                 </div>
                 <div>
                   <strong>Delivery:</strong>{" "}
-                  {selectedRequest.deliveryPreference}
+                  {selectedRequest?.deliveryPreference}
                 </div>
                 <div>
                   <strong>Created At:</strong>{" "}
-                  {new Date(selectedRequest.createdAt).toLocaleString()}
+                  {new Date(selectedRequest?.createdAt).toLocaleString()}
                 </div>
               </div>
             )}

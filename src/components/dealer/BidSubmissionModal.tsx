@@ -25,12 +25,14 @@ interface BidSubmissionModalProps {
   request: ServiceRequest | null;
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export const BidSubmissionModal: React.FC<BidSubmissionModalProps> = ({
   request,
   isOpen,
   onClose,
+  onSuccess,
 }) => {
   const [bidData, setBidData] = useState({
     estimatedPrice: "",
@@ -68,6 +70,7 @@ export const BidSubmissionModal: React.FC<BidSubmissionModalProps> = ({
         deliveryMethod: "",
         notes: "",
       });
+      onSuccess?.();
       onClose();
     } catch (error: any) {
       console.error("Error submitting bid:", error);
