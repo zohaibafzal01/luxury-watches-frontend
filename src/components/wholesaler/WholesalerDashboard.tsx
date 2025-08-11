@@ -121,8 +121,8 @@ export const WholesalerDashboard: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="luxury-shimmer p-8 rounded-lg">
-          <p className="text-center">Loading dashboard...</p>
+        <div className="bg-[#CC5500] p-8 rounded-lg">
+          <p className="text-center text-white">Loading dashboard...</p>
         </div>
       </div>
     );

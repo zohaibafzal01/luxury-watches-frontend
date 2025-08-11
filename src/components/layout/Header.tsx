@@ -173,22 +173,32 @@ export const Header: React.FC = () => {
       }`}
     >
       {navigationItems.map((item) => {
-        const Icon = item.icon;
+        const Icon = item?.icon;
         return (
-          <Button
-            key={item.to}
-            variant="ghost"
+            <Button
+            key={item?.to}
+            variant={location.pathname === item?.to ? "secondary" : "ghost"}
             asChild
             className={
-              isMobile ? "justify-start w-full " : "hover:bg-[#CC5500]"
+              isMobile
+              ? `justify-start w-full ${
+                location.pathname === item?.to
+                  ? "bg-[#CC5500] text-white hover:bg-[#CC5500] hover:text-white"
+                  : "hover:bg-[#CC5500] hover:text-white"
+                }`
+              : `${
+                location.pathname === item?.to
+                  ? "bg-[#CC5500] text-white hover:bg-[#CC5500] hover:text-white"
+                  : "hover:bg-[#CC5500] hover:text-white"
+                }`
             }
             onClick={onItemClick}
-          >
-            <Link to={item.to}>
+            >
+            <Link to={item?.to}>
               <Icon className="w-4 h-4 mr-2" />
-              {item.label}
+              {item?.label}
             </Link>
-          </Button>
+            </Button>
         );
       })}
     </div>
@@ -259,7 +269,9 @@ export const Header: React.FC = () => {
         )} */}
         <div>
           {isAuthenticated && user ? (
-            <img src={wrstopiablack} alt="" width={150} height={100} />
+            <Link to="/">
+              <img src={wrstopiablack} alt="" width={150} height={100} />
+            </Link>
           ) : (
             <Link to="/">
               <img src={wrstopia} alt="" width={150} height={100} />

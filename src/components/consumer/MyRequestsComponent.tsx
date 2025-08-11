@@ -140,7 +140,7 @@ export const MyRequestsComponent: React.FC = () => {
                 <div className="flex justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2">
-                      {request?.watchBrand || "Brand"}{" "}
+                      {request?.watchBrand || "Brand"} -{" "}
                       {request?.watchModel || "Model"}
                       {request?.status && (
                         <Badge className={getStatusColor(request.status)}>

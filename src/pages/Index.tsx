@@ -83,9 +83,9 @@ const Index: React.FC = () => {
   ];
 
   return (
-    <div>
-      <section className="relative bg-[#4A4A4A] text-white overflow-hidden pt-16 sm:pt-20 min-h-screen flex ">
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 flex flex-col justify-center">
+    <div className="">
+      <section className="  text-white overflow-hidden pt-16 sm:pt-20  flex items-center justify-center h-[90vh]">
+        <div className=" container  px-4 sm:px-6 lg:px-8 py-6 sm:py-12 flex flex-col justify-center">
           {/* Main content */}
           <div className="text-center mb-12">
             {/* Main headline with enhanced typography */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -172,35 +172,40 @@ export const DealerDashboard: React.FC = () => {
     }
   };
 
+  const handleBidSubmitted = useCallback(() => {
+    fetchServiceRequests();
+  }, [fetchServiceRequests]);
+
   const fetchBiddingRequests = async () => {
     try {
       const res = await dealerApi.serviceRequestBidding(biddingPage, limit);
-      const formattedBids: ServiceRequest[] = res.data.map((req: any) => ({
-        id: req?.id,
-        consumerId: req?.createdBy?.id || "",
-        watchBrand: req?.brand,
-        watchModel: req?.model,
-        description: req?.issueDescription,
-        deliveryPreference:
-          req?.deliveryPreference?.toLowerCase() || "shipping",
-        photos: req?.photos || [],
-        status: req?.status?.toLowerCase(),
-        createdAt: req?.createdAt,
-        updatedAt: req?.updatedAt,
-        referenceId: req?.referenceId || "",
-        location: req?.location || undefined,
-        bids: (req?.biddings || []).map((bid: any) => ({
-          id: bid?.id,
-          dealerId: bid?.createdBy?.id,
-          serviceRequestId: bid?.serviceRequestId,
-          estimatedPrice: bid?.estimatedPrice,
-          turnaroundTime: bid?.turnAroundTime,
-          deliveryMethod: bid?.deliveryMethod,
-          status: bid?.status?.toLowerCase(),
-          submittedAt: bid?.createdAt,
-          expiresAt: "",
-          notes: bid?.notes,
-        })),
+      const formattedBids: ServiceRequest[] = res.data.map((bid: any) => ({
+        id: bid?.serviceRequestId,
+        consumerId: bid?.createdBy?.id || "",
+        watchBrand: bid?.watchBrand || "",
+        watchModel: bid?.watchModel || "",
+        description: "",
+        deliveryPreference: (bid?.deliveryMethod || "shipping").toLowerCase(),
+        photos: [],
+        status: (bid?.status || "").toLowerCase(),
+        createdAt: bid?.createdAt,
+        updatedAt: bid?.updatedAt,
+        referenceId: bid?.referenceId || "",
+        location: undefined,
+        bids: [
+          {
+            id: bid?.id,
+            dealerId: bid?.createdBy?.id,
+            serviceRequestId: bid?.serviceRequestId,
+            estimatedPrice: bid?.estimatedPrice ?? 0,
+            turnaroundTime: bid?.turnAroundTime,
+            deliveryMethod: bid?.deliveryMethod,
+            status: (bid?.status || "").toLowerCase(),
+            submittedAt: bid?.createdAt,
+            expiresAt: "",
+            notes: bid?.notes,
+          },
+        ],
       }));
 
       setBiddingRequests(formattedBids);
@@ -257,8 +262,8 @@ export const DealerDashboard: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="luxury-shimmer p-8 rounded-lg">
-          <p className="text-center">Loading dashboard...</p>
+        <div className="bg-[#CC5500] p-8 rounded-lg">
+          <p className="text-center text-white">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -364,14 +369,14 @@ export const DealerDashboard: React.FC = () => {
                       <div className="flex items-start justify-between">
                         <div>
                           <CardTitle className="flex items-center gap-2 mb-3">
-                            {request.watchBrand} {request.watchModel}
-                            <Badge className={getStatusColor(request.status)}>
+                            {request.watchBrand} - {request.watchModel}
+                            <Badge className={`hover:bg-[#CC5500] ${getStatusColor(request.status)}`}>
                               {request.status}
                             </Badge>
                           </CardTitle>
                           <CardDescription>
-                            Reference: {request.referenceId} •{" "}
-                            {new Date(request.createdAt).toLocaleDateString()}
+                            {/* Reference: {request.referenceId} •{" "} */}
+                            <strong>Created at:</strong> {new Date(request.createdAt).toLocaleDateString()}
                           </CardDescription>
                         </div>
                         <div className="flex gap-2">
@@ -553,6 +558,7 @@ export const DealerDashboard: React.FC = () => {
         request={selectedRequest}
         isOpen={isBidModalOpen}
         onClose={() => setIsBidModalOpen(false)}
+        onSuccess={handleBidSubmitted}
       />
     </div>
   );
