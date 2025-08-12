@@ -48,7 +48,7 @@ export const AdminDashboard: React.FC = () => {
         role: "dealer",
         firstName: "John",
         lastName: "Dealer",
-        company: "Luxury Timepieces Inc.",
+        companyName: "Luxury Timepieces Inc.",
         isEmailVerified: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -69,7 +69,7 @@ export const AdminDashboard: React.FC = () => {
         role: "admin",
         firstName: "Mike",
         lastName: "Wholesaler",
-        company: "Global Watch Supply",
+        companyName: "Global Watch Supply",
         isEmailVerified: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -82,6 +82,8 @@ export const AdminDashboard: React.FC = () => {
         consumerId: '3',
         watchBrand: 'Rolex',
         watchModel: 'Submariner',
+        brand: 'Rolex',
+        model: 'Submariner',
         description: 'Crown not screwing properly',
         deliveryPreference: 'shipping',
         photos: [],
@@ -241,7 +243,7 @@ export const AdminDashboard: React.FC = () => {
                           )}
                         </CardTitle>
                         <CardDescription>
-                          {user.email} • {user.company && `${user.company} • `}
+                          {user.email} • {user.companyName && `${user.companyName} • `}
                           Joined {new Date(user.createdAt).toLocaleDateString()}
                         </CardDescription>
                       </div>
@@ -269,7 +271,7 @@ export const AdminDashboard: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4 text-sm">
                         <span>ID: {user.id}</span>
-                        {user.phone && <span>Phone: {user.phone}</span>}
+                        {user.phoneNo && <span>Phone: {user.phoneNo}</span>}
                       </div>
                       <div className="flex gap-2">
                         <Button

@@ -175,30 +175,30 @@ export const Header: React.FC = () => {
       {navigationItems.map((item) => {
         const Icon = item?.icon;
         return (
-            <Button
+          <Button
             key={item?.to}
             variant={location.pathname === item?.to ? "secondary" : "ghost"}
             asChild
             className={
               isMobile
-              ? `justify-start w-full ${
-                location.pathname === item?.to
-                  ? "bg-[#CC5500] text-white hover:bg-[#CC5500] hover:text-white"
-                  : "hover:bg-[#CC5500] hover:text-white"
-                }`
-              : `${
-                location.pathname === item?.to
-                  ? "bg-[#CC5500] text-white hover:bg-[#CC5500] hover:text-white"
-                  : "hover:bg-[#CC5500] hover:text-white"
-                }`
+                ? `justify-start w-full ${
+                    location.pathname === item?.to
+                      ? "bg-[#CC5500] text-white hover:bg-[#CC5500] hover:text-white"
+                      : "hover:bg-[#CC5500] hover:text-white"
+                  }`
+                : `${
+                    location.pathname === item?.to
+                      ? "bg-[#CC5500] text-white hover:bg-[#CC5500] hover:text-white"
+                      : "hover:bg-[#CC5500] hover:text-white"
+                  }`
             }
             onClick={onItemClick}
-            >
+          >
             <Link to={item?.to}>
               <Icon className="w-4 h-4 mr-2" />
               {item?.label}
             </Link>
-            </Button>
+          </Button>
         );
       })}
     </div>
@@ -301,7 +301,15 @@ export const Header: React.FC = () => {
                         alt={user?.firstName}
                       />
                       <AvatarFallback className="bg-[#4a4a4a] text-white font-bold text-xs sm:text-sm">
-                        {getInitials(user.firstName, user.lastName)}
+                        {user.profilePicture ? (
+                          <img
+                            src={`data:image/png;base64,${user?.profilePicture}`}
+                            alt={user?.firstName}
+                            className="w-full h-full object-cover rounded-full"
+                          />
+                        ) : (
+                          getInitials(user?.firstName, user?.lastName)
+                        )}
                       </AvatarFallback>
                     </Avatar>
                     {userRole === "admin" && (

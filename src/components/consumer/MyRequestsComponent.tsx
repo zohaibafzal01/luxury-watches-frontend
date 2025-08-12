@@ -177,7 +177,7 @@ export const MyRequestsComponent: React.FC = () => {
                     </span>
                     <span className="flex items-center gap-1">
                       <MessageSquare className="w-4 h-4" />
-                      {request?.bids?.length || 0} bids
+                      {request?.biddings?.length || 0} bids
                     </span>
                   </div>
                   <Button

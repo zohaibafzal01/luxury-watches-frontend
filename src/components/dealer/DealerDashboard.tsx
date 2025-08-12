@@ -234,6 +234,7 @@ export const DealerDashboard: React.FC = () => {
   useEffect(() => {
     if (activeTab === "requests") {
       fetchServiceRequests();
+      fetchBiddingRequests();
     } else if (activeTab === "bids") {
       fetchBiddingRequests();
     }
@@ -278,8 +279,10 @@ export const DealerDashboard: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-[#CC5500] p-8 rounded-lg">
-          <p className="text-center text-white">Loading dashboard...</p>
+        <div className=" p-8 rounded-lg">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-gray-300 border-t-primary mb-4"></div>
+          </div>
         </div>
       </div>
     );
