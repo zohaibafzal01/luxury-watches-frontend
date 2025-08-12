@@ -399,9 +399,6 @@ export const DealerDashboard: React.FC = () => {
                             </Badge>
                           </CardTitle>
                           <CardDescription>
-                            <strong>Created by:</strong>{" "}
-                            {request.createdBy?.firstName}{" "}
-                            {request.createdBy?.lastName} •
                             <strong> Created at:</strong>{" "}
                             {new Date(request.createdAt).toLocaleDateString()}
                           </CardDescription>
