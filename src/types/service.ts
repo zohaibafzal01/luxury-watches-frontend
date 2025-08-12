@@ -2,7 +2,9 @@ export interface ServiceRequest {
   id: string;
   consumerId: string;
   watchBrand: string;
+  brand: string; // Added for consistency
   watchModel: string;
+  model: string; // Added for consistency
   description: string; // Changed from issueDescription
   deliveryPreference: "drop-off" | "shipping" | "pickup";
   photos: ServicePhoto[];
@@ -24,6 +26,12 @@ export interface ServiceRequest {
   updatedAt: string;
   bids: Bid[];
   referenceId: string;
+  biddingCount?: number; // Number of bids from API
+  createdBy?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }
 
 export interface ServicePhoto {

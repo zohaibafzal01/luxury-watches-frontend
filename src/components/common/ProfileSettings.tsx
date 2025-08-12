@@ -54,7 +54,7 @@ export const ProfileSettings: React.FC = () => {
   const getRoleColor = (role: string) => {
     const colors = {
       admin: "text-red-400",
-      dealer: "text-blue-400",
+      dealer: "text-white",
       wholesaler: "text-green-400",
       consumer: "text-white",
     };
@@ -131,9 +131,9 @@ export const ProfileSettings: React.FC = () => {
 
     if (passwordData?.newPassword?.length < 8) {
       toast({
-      title: "Error",
-      description: "Password must be at least 8 characters long.",
-      variant: "destructive",
+        title: "Error",
+        description: "Password must be at least 8 characters long.",
+        variant: "destructive",
       });
       return;
     }
@@ -429,7 +429,8 @@ export const ProfileSettings: React.FC = () => {
                   ))}
 
                   <p className="text-sm text-muted-foreground">
-                    Password must be at least 8 characters and include one uppercase letter, one number, and one special character.
+                    Password must be at least 8 characters and include one
+                    uppercase letter, one number, and one special character.
                   </p>
 
                   <Button

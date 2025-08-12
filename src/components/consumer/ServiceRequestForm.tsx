@@ -128,7 +128,7 @@ export const ServiceRequestForm: React.FC = () => {
         watchBrand,
         watchModel,
         description,
-        deliveryPreference.charAt(0).toUpperCase() + deliveryPreference.slice(1)
+        deliveryPreference,
       );
 
       const refId = response?.data?.id || `CR-${Date.now()}`;

@@ -39,11 +39,9 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
       <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            Bids for {request.watchBrand} {request.watchModel}
+            Bids for {request?.brand} - {request?.model}
           </DialogTitle>
-          <DialogDescription>
-            Reference ID: {request.referenceId}
-          </DialogDescription>
+          <DialogDescription>Reference ID: {request?.id}</DialogDescription>
         </DialogHeader>
 
         {requestBids.length > 0 ? (
@@ -109,7 +107,11 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
 
         {/* Modal Close Button */}
         <div className="flex justify-end mt-6 ">
-          <Button variant="outline" onClick={onClose} className="hover:bg-[#CC5500]/90">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="hover:bg-[#CC5500]/90"
+          >
             Close
           </Button>
         </div>

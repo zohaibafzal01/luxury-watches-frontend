@@ -113,28 +113,29 @@ const Index: React.FC = () => {
           </div>
 
           {/* Enhanced email signup */}
-          <div className="max-w-md mx-auto mb-8">
+          <div className="max-w-lg mx-auto mb-8 px-4 sm:px-0">
             <div className="relative group">
               {/* Glowing border effect */}
-              <div className="absolute -inset-1 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-300"></div>
+              <div className="absolute -inset-1 rounded-2xl sm:rounded-full blur opacity-25 group-hover:opacity-50 transition duration-300"></div>
 
               {/* Input container */}
-              <div className="relative flex bg-white/95 backdrop-blur-sm rounded-full overflow-hidden shadow-2xl">
-                <div className="flex items-center pl-6 pr-4">
-                  <Mail className="w-5 h-5 text-gray-600" />
+              <div className="relative flex flex-col sm:flex-row bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-full overflow-hidden shadow-2xl gap-2 sm:gap-0 p-2 sm:p-0">
+                <div className="flex items-center flex-1">
+                  <div className="flex items-center pl-4 sm:pl-6 pr-2 sm:pr-4">
+                    <Mail className="w-5 h-5 text-gray-600" />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    className="flex-1 py-3 sm:py-4 px-2 bg-transparent text-gray-900 placeholder:text-gray-500 focus:outline-none text-base min-w-0"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
-
-                <input
-                  type="email"
-                  placeholder="you@example.com"
-                  className="flex-1 py-4 px-2 bg-transparent text-gray-900 placeholder:text-gray-500 focus:outline-none text-base"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
 
                 <button
                   onClick={handleJoinWaitlist}
-                  className="bg-[#CC5500] text-white px-8 py-4 rounded-full font-semibold hover:bg-[#CC5500] transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="bg-[#CC5500] text-white px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-full font-semibold hover:bg-[#b84a00] transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl whitespace-nowrap"
                 >
                   Join Waitlist
                 </button>
