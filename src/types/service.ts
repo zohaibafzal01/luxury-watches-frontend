@@ -25,6 +25,7 @@ export interface ServiceRequest {
   createdAt: string;
   updatedAt: string;
   bids: Bid[];
+  biddings?: Bid[]; // Optional, for backward compatibility
   referenceId: string;
   biddingCount?: number; // Number of bids from API
   createdBy?: {

@@ -57,8 +57,10 @@ const ProtectedRoute: React.FC<{
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="luxury-shimmer p-8 rounded-lg">
-          <p>Loading...</p>
+        <div className=" p-8 rounded-lg">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-gray-300 border-t-primary mb-4"></div>
+          </div>
         </div>
       </div>
     );
@@ -252,13 +254,13 @@ const AppRoutes = () => {
     </Routes>
   );
 };
- <Routes>
-        <Route path="/why-choose-us" element={<WhyChooseUsPage />} />
-        <Route path="/WhyWeOfferPage" element={<WhyWeOfferPage />} />
-        <Route path="/the-process" element={<TheProcessPage />} />
-        <Route path="/faqs" element={<FAQSectionPage />} />
-        <Route path="*" element={<h1>Page Not Found</h1>} />
-      </Routes>
+<Routes>
+  <Route path="/why-choose-us" element={<WhyChooseUsPage />} />
+  <Route path="/WhyWeOfferPage" element={<WhyWeOfferPage />} />
+  <Route path="/the-process" element={<TheProcessPage />} />
+  <Route path="/faqs" element={<FAQSectionPage />} />
+  <Route path="*" element={<h1>Page Not Found</h1>} />
+</Routes>;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

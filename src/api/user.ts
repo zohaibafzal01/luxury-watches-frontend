@@ -16,7 +16,8 @@ class UserApi extends BaseApi {
     status: string,
     companyName: string,
     bio: string,
-    address: string
+    address: string,
+    profilePicture?: string
   ) {
     const data = await this.patch(`${this.baseUrl}/${id}`, {
       firstName,
@@ -28,6 +29,7 @@ class UserApi extends BaseApi {
       companyName,
       bio,
       address,
+      ...(profilePicture && { profilePicture }),
     });
     return data;
   }

@@ -7,8 +7,8 @@ export interface User {
   role: UserRole;
   firstName: string;
   lastName: string;
-  phone?: string;
-  company?: string;
+  phoneNo?: string;
+  companyName?: string;
   bio?: string;
   address?: string;
   location?: {
@@ -16,7 +16,7 @@ export interface User {
     longitude: number;
     address: string;
   };
-  profileImage?: string;
+  profilePicture?: string;
   isEmailVerified: boolean;
   createdAt: string;
   updatedAt: string;
@@ -39,6 +39,6 @@ export interface RegisterData {
   firstName: string;
   lastName: string;
   role: UserRole;
-  phone?: string;
-  company?: string;
+  phoneNo?: string;
+  companyName?: string;
 }
