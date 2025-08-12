@@ -56,7 +56,7 @@ export const BidSubmissionModal: React.FC<BidSubmissionModalProps> = ({
         parseInt(bidData?.turnaroundTime),
         bidData?.deliveryMethod,
         bidData?.notes,
-        "Submitted"
+        "submitted"
       );
 
       toast({
@@ -139,9 +139,9 @@ export const BidSubmissionModal: React.FC<BidSubmissionModalProps> = ({
                 <SelectValue placeholder="Select delivery method" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Pickup">Pickup</SelectItem>
-                <SelectItem value="Shipping">Shipping</SelectItem>
-                <SelectItem value="Drop-off">Drop-off</SelectItem>
+                <SelectItem value="pickup">Pickup</SelectItem>
+                <SelectItem value="shipping">Shipping</SelectItem>
+                <SelectItem value="drop-off">Drop-off</SelectItem>
               </SelectContent>
             </Select>
           </div>

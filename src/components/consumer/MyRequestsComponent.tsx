@@ -122,12 +122,12 @@ export const MyRequestsComponent: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
+              {/* <SelectItem value="pending">Pending</SelectItem> */}
               <SelectItem value="bidding">Bidding</SelectItem>
               <SelectItem value="accepted">Accepted</SelectItem>
-              <SelectItem value="in-progress">In Progress</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
+              {/* <SelectItem value="in-progress">In Progress</SelectItem> */}
+              {/* <SelectItem value="cancelled">Cancelled</SelectItem> */}
             </SelectContent>
           </Select>
         </div>
@@ -206,29 +206,31 @@ export const MyRequestsComponent: React.FC = () => {
         )}
 
         {/* Pagination */}
-        <div className="flex justify-center items-center gap-4 mt-6">
-          <Button
-            className=" hover:bg-[#CC5500]/90"
-            variant="outline"
-            size="sm"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-          >
-            Previous
-          </Button>
-          <span className="text-sm text-muted-foreground">
-            Page {page} of {totalPages}
-          </span>
-          <Button
-            className=" hover:bg-[#CC5500]/90"
-            variant="outline"
-            size="sm"
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Next
-          </Button>
-        </div>
+        {requests.length > 0 && (
+          <div className="flex justify-center items-center gap-4 mt-6">
+            <Button
+              className=" hover:bg-[#CC5500]/90"
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              Previous
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Page {page} of {totalPages}
+            </span>
+            <Button
+              className=" hover:bg-[#CC5500]/90"
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Modals */}

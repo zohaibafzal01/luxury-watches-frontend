@@ -57,20 +57,28 @@ export const DealerDashboard: React.FC = () => {
             status: req?.status?.toLowerCase(),
             createdAt: req?.createdAt,
             updatedAt: req?.updatedAt,
-            bids: (req?.biddings || []).map((bid: any) => ({
-              id: bid?.id,
-              dealerId: bid?.dealerId,
-              serviceRequestId: bid?.serviceRequestId,
-              estimatedPrice: bid?.estimatedPrice,
-              turnaroundTime: bid?.turnaroundTime,
-              deliveryMethod: bid?.deliveryMethod,
-              status: bid?.status,
-              submittedAt: bid?.submittedAt,
-              expiresAt: bid?.expiresAt,
-              notes: bid?.notes,
-            })),
-            referenceId: req?.referenceId || "",
+            bids: Array.isArray(req?.biddings)
+              ? req.biddings.map((bid: any) => ({
+                  id: bid?.id,
+                  dealerId: bid?.dealerId,
+                  serviceRequestId: bid?.serviceRequestId,
+                  estimatedPrice: bid?.estimatedPrice,
+                  turnaroundTime: bid?.turnaroundTime,
+                  deliveryMethod: bid?.deliveryMethod,
+                  status: bid?.status,
+                  submittedAt: bid?.submittedAt,
+                  expiresAt: bid?.expiresAt,
+                  notes: bid?.notes,
+                }))
+              : [],
+            referenceId: req?.id || "",
             location: req?.location || undefined,
+            biddingCount: typeof req?.biddings === "number" ? req.biddings : 0,
+            createdBy: {
+              firstName: req?.createdBy?.firstName || "",
+              lastName: req?.createdBy?.lastName || "",
+              email: req?.createdBy?.email || "",
+            },
           })
         );
 
@@ -147,20 +155,28 @@ export const DealerDashboard: React.FC = () => {
         status: req?.status?.toLowerCase(),
         createdAt: req?.createdAt,
         updatedAt: req?.updatedAt,
-        bids: (req?.biddings || []).map((bid: any) => ({
-          id: bid?.id,
-          dealerId: bid?.dealerId,
-          serviceRequestId: bid?.serviceRequestId,
-          estimatedPrice: bid?.estimatedPrice,
-          turnaroundTime: bid?.turnaroundTime,
-          deliveryMethod: bid?.deliveryMethod,
-          status: bid?.status,
-          submittedAt: bid?.submittedAt,
-          expiresAt: bid?.expiresAt,
-          notes: bid?.notes,
-        })),
-        referenceId: req?.referenceId || "",
+        bids: Array.isArray(req?.biddings)
+          ? req.biddings.map((bid: any) => ({
+              id: bid?.id,
+              dealerId: bid?.dealerId,
+              serviceRequestId: bid?.serviceRequestId,
+              estimatedPrice: bid?.estimatedPrice,
+              turnaroundTime: bid?.turnaroundTime,
+              deliveryMethod: bid?.deliveryMethod,
+              status: bid?.status,
+              submittedAt: bid?.submittedAt,
+              expiresAt: bid?.expiresAt,
+              notes: bid?.notes,
+            }))
+          : [],
+        referenceId: req?.id || "",
         location: req?.location || undefined,
+        biddingCount: typeof req?.biddings === "number" ? req.biddings : 0,
+        createdBy: {
+          firstName: req?.createdBy?.firstName || "",
+          lastName: req?.createdBy?.lastName || "",
+          email: req?.createdBy?.email || "",
+        },
       }));
 
       setServiceRequests(formattedRequests);
@@ -370,13 +386,21 @@ export const DealerDashboard: React.FC = () => {
                         <div>
                           <CardTitle className="flex items-center gap-2 mb-3">
                             {request.watchBrand} - {request.watchModel}
-                            <Badge className={`hover:bg-[#CC5500] ${getStatusColor(request.status)}`}>
-                              {request.status}
+                            <Badge
+                              className={`hover:bg-[#CC5500] ${getStatusColor(
+                                request.status
+                              )}`}
+                            >
+                              {request.status.charAt(0).toUpperCase() +
+                                request.status.slice(1)}
                             </Badge>
                           </CardTitle>
                           <CardDescription>
-                            {/* Reference: {request.referenceId} •{" "} */}
-                            <strong>Created at:</strong> {new Date(request.createdAt).toLocaleDateString()}
+                            <strong>Created by:</strong>{" "}
+                            {request.createdBy?.firstName}{" "}
+                            {request.createdBy?.lastName} •
+                            <strong> Created at:</strong>{" "}
+                            {new Date(request.createdAt).toLocaleDateString()}
                           </CardDescription>
                         </div>
                         <div className="flex gap-2">
@@ -400,11 +424,14 @@ export const DealerDashboard: React.FC = () => {
                         <div className="flex items-center gap-4 text-sm">
                           <span className="flex items-center gap-1">
                             <Package className="w-4 h-4" />
-                            {request.deliveryPreference}
+                            {request.deliveryPreference
+                              .charAt(0)
+                              .toUpperCase() +
+                              request.deliveryPreference.slice(1)}
                           </span>
                           <span className="flex items-center gap-1">
                             <MessageSquare className="w-4 h-4" />
-                            {request.bids.length} bids
+                            {request.biddingCount || request.bids.length} bids
                           </span>
                         </div>
                         <Button
