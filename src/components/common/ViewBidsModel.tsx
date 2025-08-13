@@ -21,18 +21,29 @@ interface ViewBidsModalProps {
   isOpen: boolean;
   onClose: () => void;
   request: ServiceRequest | null;
-  bids: Bid[];
+  bids?: Bid[]; // Made optional since bids can come from request.biddings
 }
 
 export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
   isOpen,
   onClose,
   request,
-  bids,
+  bids = [],
 }) => {
   if (!request) return null;
 
-  const requestBids = bids.filter((bid) => bid.serviceRequestId === request.id);
+  // Use biddings from request if available, otherwise use bids prop
+  const requestBids =
+    request.biddings ||
+    bids.filter((bid) => bid.serviceRequestId === request.id);
+
+  // Debug logging
+  console.log("ViewBidsModal Debug:", {
+    requestId: request.id,
+    requestBiddings: request.biddings,
+    bidsFromProps: bids,
+    finalRequestBids: requestBids,
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -53,13 +64,16 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
               >
                 {/* Submitted Date - Top Right */}
                 <div className="absolute top-2 right-4 text-xs text-muted-foreground">
-                  Submitted: {new Date(bid.submittedAt).toLocaleDateString()}
+                  Submitted:{" "}
+                  {new Date(
+                    bid?.submittedAt || (bid as any).createdAt
+                  ).toLocaleDateString()}
                 </div>
 
                 {/* Notes (if any) */}
                 {bid.notes && (
                   <p className="text-sm text-muted-foreground italic mb-2">
-                    "{bid.notes}"
+                    "{bid?.notes}"
                   </p>
                 )}
 
@@ -67,31 +81,42 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
                 <div className="flex flex-wrap gap-4 items-center mb-3">
                   <span className="flex items-center gap-1 text-sm">
                     <DollarSign className="w-4 h-4 text-primary" />
-                    <span className="font-medium">${bid.estimatedPrice}</span>
+                    <span className="font-medium">${bid?.estimatedPrice}</span>
                   </span>
                   <span className="flex items-center gap-1 text-sm">
                     <Clock className="w-4 h-4 text-primary" />
-                    {bid.turnaroundTime} days
+                    {(bid as any).turnAroundTime || bid?.turnaroundTime} days
                   </span>
                   <span className="flex items-center gap-1 text-sm capitalize">
                     <Package className="w-4 h-4 text-primary" />
-                    {bid.deliveryMethod}
+                    {bid?.deliveryMethod}
                   </span>
                 </div>
 
                 {/* Action Buttons */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mt-3">
                   <div className="flex gap-2">
-                    <Button variant="outline" onClick={onClose}>
+                    <Button
+                      variant="outline"
+                      onClick={onClose}
+                      className="hover:bg-[#CC5500]/90"
+                    >
                       <CheckCircle className="w-4 h-4 mr-1 text-green-600" />
                       Accept
                     </Button>
-                    <Button variant="outline" onClick={onClose}>
+                    <Button
+                      variant="outline"
+                      onClick={onClose}
+                      className="hover:bg-[#CC5500]/90"
+                    >
                       <XCircle className="w-4 h-4 mr-1 text-red-600" />
                       Reject
                     </Button>
                   </div>
-                  <Button variant="outline" className="flex items-center">
+                  <Button
+                    variant="outline"
+                    className="flex items-center hover:bg-[#CC5500]/90"
+                  >
                     <MessageSquare className="w-4 h-4 mr-2" />
                     Contact
                   </Button>

@@ -19,7 +19,6 @@ import { useDispatch } from "react-redux";
 import { login } from "@/redux/slices/userSlice";
 import wrstopia from "../../../public/icon.svg";
 
-
 export const AdminLogin: React.FC = () => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: "",
