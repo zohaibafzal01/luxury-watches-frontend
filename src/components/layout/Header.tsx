@@ -224,7 +224,13 @@ export const Header: React.FC = () => {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300   `}
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        location.pathname === "/"
+          ? "bg-[#4A4A4A]"
+          : isAuthenticated && user
+          ? "bg-white"
+          : "bg-[#4A4A4A]"
+      } `}
     >
       <div className="  px-2 sm:px-4 h-14 sm:h-20 flex items-center justify-between  sm:space-x-4">
         {/* {!isAuthenticated && (
