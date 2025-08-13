@@ -22,6 +22,11 @@ import { ViewRequestModal } from "@/components/common/ViewRequestModal";
 import { BidSubmissionModal } from "./BidSubmissionModal";
 import dealerApi from "@/api/dealer";
 
+interface DashboardStats {
+  activeRequests: number;
+  pendingBiddings: number;
+  revenue: number;
+}
 export const DealerDashboard: React.FC = () => {
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,6 +42,38 @@ export const DealerDashboard: React.FC = () => {
   const [biddingPage, setBiddingPage] = useState(1);
   const [biddingTotalPages, setBiddingTotalPages] = useState(1);
   const [activeTab, setActiveTab] = useState<"requests" | "bids">("requests");
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
+    activeRequests: 0,
+    pendingBiddings: 0,
+    revenue: 0,
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  // Fetch dashboard stats
+  const fetchDashboardStats = async () => {
+    try {
+      setStatsLoading(true);
+      const response = await dealerApi.dealerDashboard();
+
+      if (response?.success && response?.data) {
+        setDashboardStats({
+          activeRequests: response.data.activeRequests || 0,
+          pendingBiddings: response.data.pendingBiddings || 0,
+          revenue: response.data.revenue || 0,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch dashboard stats:", error);
+      // Keep default values on error
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  // Fetch dashboard stats on component mount
+  useEffect(() => {
+    fetchDashboardStats();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -234,7 +271,6 @@ export const DealerDashboard: React.FC = () => {
   useEffect(() => {
     if (activeTab === "requests") {
       fetchServiceRequests();
-      fetchBiddingRequests();
     } else if (activeTab === "bids") {
       fetchBiddingRequests();
     }
@@ -308,9 +344,13 @@ export const DealerDashboard: React.FC = () => {
                   <p className="text-sm text-muted-foreground">
                     Active Requests
                   </p>
-                  <p className="text-2xl font-bold text-[#CC5500]">
-                    {serviceRequests.length}
-                  </p>
+                  {statsLoading ? (
+                    <div className="animate-pulse bg-gray-200 h-8 w-16 rounded mt-1"></div>
+                  ) : (
+                    <p className="text-2xl font-bold text-[#CC5500]">
+                      {dashboardStats?.activeRequests}
+                    </p>
+                  )}
                 </div>
                 {/* <Package className="w-8 h-8 text-primary" /> */}
               </div>
@@ -322,13 +362,13 @@ export const DealerDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Pending Bids</p>
-                  <p className="text-2xl font-bold text-blue-500">
-                    {
-                      biddingRequests
-                        .flatMap((r) => r.bids)
-                        .filter((b) => b.status === "submitted").length
-                    }
-                  </p>
+                  {statsLoading ? (
+                    <div className="animate-pulse bg-gray-200 h-8 w-16 rounded mt-1"></div>
+                  ) : (
+                    <p className="text-2xl font-bold text-blue-500">
+                      {dashboardStats?.pendingBiddings}
+                    </p>
+                  )}
                 </div>
                 {/* <Clock className="w-8 h-8 text-blue-500" /> */}
               </div>
@@ -340,12 +380,13 @@ export const DealerDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total Revenue</p>
-                  <p className="text-2xl font-bold text-green-500">
-                    $
-                    {biddingRequests
-                      .flatMap((r) => r.bids)
-                      .reduce((sum, bid) => sum + bid.estimatedPrice, 0)}
-                  </p>
+                  {statsLoading ? (
+                    <div className="animate-pulse bg-gray-200 h-8 w-20 rounded mt-1"></div>
+                  ) : (
+                    <p className="text-2xl font-bold text-green-500">
+                      ${dashboardStats?.revenue.toLocaleString()}
+                    </p>
+                  )}
                 </div>
                 {/* <DollarSign className="w-8 h-8 text-green-500" /> */}
               </div>
@@ -363,7 +404,7 @@ export const DealerDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card> */}
-        </div>
+        </div>  
 
         <Tabs
           value={activeTab}

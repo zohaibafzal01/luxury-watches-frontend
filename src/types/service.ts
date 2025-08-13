@@ -78,3 +78,10 @@ export interface CreateServiceRequestData {
     address: string;
   };
 }
+
+export enum BidStatus {
+  SUBMITTED = "submitted",
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
+  COMPLETED = "completed",
+}

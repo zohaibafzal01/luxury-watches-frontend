@@ -1,9 +1,14 @@
+import { BidStatus } from "@/types/service";
 import BaseApi from "./baseapi";
 
 class DealerApi extends BaseApi {
   baseUrl: string = "dealer";
   constructor() {
     super();
+  }
+
+  async dealerDashboard() {
+    return await this.get(`${this.baseUrl}/dashboard`);
   }
 
   async submitBid(
@@ -35,6 +40,12 @@ class DealerApi extends BaseApi {
     return await this.get(
       `${this.baseUrl}/service-request/biddings?page=${page}&limit=${limit}`
     );
+  }
+
+  async biddingStatusUpdate(id: string, status: BidStatus) {
+    return await this.patch(`${this.baseUrl}/bidding/${id}`, {
+      status,
+    });
   }
 }
 
