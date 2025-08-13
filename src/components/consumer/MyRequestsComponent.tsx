@@ -61,6 +61,7 @@ export const MyRequestsComponent: React.FC = () => {
         watchBrand: item.brand,
         watchModel: item.model,
         description: item.issueDescription,
+        status: item.status?.toLowerCase(), // Normalize status to lowercase
       }));
 
       const sorted = mapped.sort(
@@ -92,7 +93,21 @@ export const MyRequestsComponent: React.FC = () => {
     setPage(1);
   }, [debouncedSearchTerm, statusFilter]);
 
+  const formatStatusDisplay = (status: string) => {
+    const statusMap: Record<string, string> = {
+      pending: "Pending",
+      bidding: "Bidding",
+      accepted: "Accepted",
+      "in-progress": "In Progress",
+      completed: "Completed",
+      cancelled: "Cancelled",
+      rejected: "Rejected",
+    };
+    return statusMap[status.toLowerCase()] || status;
+  };
+
   const getStatusColor = (status: string) => {
+    const normalizedStatus = status.toLowerCase();
     const colors: Record<string, string> = {
       pending: "bg-yellow-500/20 text-yellow-700",
       bidding: "bg-blue-500/20 text-blue-700",
@@ -100,8 +115,9 @@ export const MyRequestsComponent: React.FC = () => {
       "in-progress": "bg-purple-500/20 text-purple-700",
       completed: "bg-gray-500/20 text-gray-700",
       cancelled: "bg-red-500/20 text-red-700",
+      rejected: "bg-red-500/20 text-red-700",
     };
-    return colors[status] || "bg-gray-500/20 text-gray-700";
+    return colors[normalizedStatus] || "bg-gray-500/20 text-gray-700";
   };
 
   return (
@@ -122,12 +138,13 @@ export const MyRequestsComponent: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
-              {/* <SelectItem value="pending">Pending</SelectItem> */}
+              <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="bidding">Bidding</SelectItem>
               <SelectItem value="accepted">Accepted</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
-              {/* <SelectItem value="in-progress">In Progress</SelectItem> */}
-              {/* <SelectItem value="cancelled">Cancelled</SelectItem> */}
+              <SelectItem value="in-progress">In Progress</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -144,7 +161,7 @@ export const MyRequestsComponent: React.FC = () => {
                       {request?.watchModel || "Model"}
                       {request?.status && (
                         <Badge className={getStatusColor(request.status)}>
-                          {request.status}
+                          {formatStatusDisplay(request.status)}
                         </Badge>
                       )}
                     </CardTitle>
