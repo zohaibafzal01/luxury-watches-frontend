@@ -14,6 +14,7 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ServiceRequest, Bid } from "@/types/service";
@@ -97,6 +98,43 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
     handleBidAction(bidId, "reject");
   };
 
+  const handleCompleteBid = async (bidId: string) => {
+    if (!bidId) {
+      console.error("Bid ID is required");
+      return;
+    }
+
+    setProcessingBids((prev) => new Set([...prev, bidId]));
+
+    try {
+      const response = await dealerApi.biddingStatusUpdate(
+        bidId,
+        BidStatus.COMPLETED
+      );
+
+      if (response?.success) {
+        setBidStatuses((prev) => ({
+          ...prev,
+          [bidId]: BidStatus.COMPLETED,
+        }));
+
+        if (onBidStatusUpdate) {
+          onBidStatusUpdate(bidId, BidStatus.COMPLETED);
+        }
+
+        console.log("Bid completed successfully:", response);
+      }
+    } catch (error) {
+      console.error("Error completing bid:", error);
+    } finally {
+      setProcessingBids((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(bidId);
+        return newSet;
+      });
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
@@ -160,7 +198,9 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
                             ? "bg-green-100 text-green-800 border border-green-200"
                             : currentStatus === "rejected"
                             ? "bg-red-100 text-red-800 border border-red-200"
-                            : "bg-blue-100 text-blue-800 border border-blue-200"
+                            : currentStatus === "completed"
+                            ? "bg-blue-100 text-blue-800 border border-blue-200"
+                            : "bg-gray-100 text-gray-800 border border-gray-200"
                         }`}
                       >
                         {currentStatus === "accepted" && (
@@ -168,6 +208,9 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
                         )}
                         {currentStatus === "rejected" && (
                           <XCircle className="w-3 h-3 mr-1" />
+                        )}
+                        {currentStatus === "completed" && (
+                          <Check className="w-3 h-3 mr-1" />
                         )}
                         {currentStatus?.charAt(0).toUpperCase() +
                           currentStatus?.slice(1)}
@@ -205,6 +248,22 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
                             <XCircle className="w-4 h-4 mr-1 text-red-600" />
                           )}
                           Reject
+                        </Button>
+                      </div>
+                    ) : currentStatus === "accepted" ? (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => handleCompleteBid(bid?.id)}
+                          disabled={isProcessing}
+                          className="hover:bg-[#CC5500]/90 disabled:opacity-50"
+                        >
+                          {isProcessing ? (
+                            <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                          ) : (
+                            <Check className="w-4 h-4 mr-1 text-blue-600" />
+                          )}
+                          Complete
                         </Button>
                       </div>
                     ) : (
