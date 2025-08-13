@@ -1,13 +1,14 @@
 export interface ServiceRequest {
   id: string;
-  consumerId: string;
-  watchBrand: string;
+  consumerId?: string;
+  watchBrand?: string;
   brand: string; // Added for consistency
-  watchModel: string;
+  watchModel?: string;
   model: string; // Added for consistency
-  description: string; // Changed from issueDescription
+  description?: string; // Changed from issueDescription
+  issueDescription?: string; // Alternative from API
   deliveryPreference: "drop-off" | "shipping" | "pickup";
-  photos: ServicePhoto[];
+  photos?: ServicePhoto[];
   location?: {
     latitude: number;
     longitude: number;
@@ -24,14 +25,15 @@ export interface ServiceRequest {
     | "cancelled";
   createdAt: string;
   updatedAt: string;
-  bids: Bid[];
-  biddings?: Bid[]; // Optional, for backward compatibility
-  referenceId: string;
+  bids?: Bid[];
+  biddings?: Bid[]; // From API response
+  referenceId?: string;
   biddingCount?: number; // Number of bids from API
   createdBy?: {
     firstName: string;
     lastName: string;
     email: string;
+    id: string;
   };
 }
 
@@ -44,15 +46,24 @@ export interface ServicePhoto {
 
 export interface Bid {
   id: string;
-  dealerId: string;
+  dealerId?: string;
   serviceRequestId: string;
   estimatedPrice: number;
-  turnaroundTime: number; // in days
+  turnaroundTime?: number; // in days
+  turnAroundTime?: number; // Alternative naming from API
   deliveryMethod: "pickup" | "shipping" | "drop-off";
   notes?: string;
   status: "submitted" | "accepted" | "rejected" | "expired";
-  submittedAt: string;
-  expiresAt: string;
+  submittedAt?: string;
+  createdAt?: string; // Alternative from API
+  expiresAt?: string;
+  createdBy?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    id: string;
+  };
+  updatedAt?: string;
 }
 
 export interface CreateServiceRequestData {
