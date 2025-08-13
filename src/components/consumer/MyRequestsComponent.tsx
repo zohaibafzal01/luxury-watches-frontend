@@ -138,13 +138,13 @@ export const MyRequestsComponent: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
+              {/* <SelectItem value="pending">Pending</SelectItem> */}
               <SelectItem value="bidding">Bidding</SelectItem>
               <SelectItem value="accepted">Accepted</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="in-progress">In Progress</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
+              {/* <SelectItem value="in-progress">In Progress</SelectItem> */}
+              {/* <SelectItem value="rejected">Rejected</SelectItem> */}
+              {/* <SelectItem value="cancelled">Cancelled</SelectItem> */}
             </SelectContent>
           </Select>
         </div>

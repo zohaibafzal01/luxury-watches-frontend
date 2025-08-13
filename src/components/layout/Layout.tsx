@@ -1,7 +1,7 @@
 import React from "react";
 import { Header } from "./Header";
 import Footer from "./Footer";
-import { User } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { selectUserInfo } from "@/redux/selectors/userSelectors";
 
@@ -10,12 +10,18 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const isAuthenticated = !!User;
+  const location = useLocation();
   const user = useSelector(selectUserInfo);
+  const isAuthenticated = !!user;
+
   return (
     <div
       className={`min-h-screen   ${
-        isAuthenticated && user ? "bg-white" : "bg-[#4A4A4A]"
+        location.pathname === "/"
+          ? "bg-[#4A4A4A]"
+          : isAuthenticated && user
+          ? "bg-white"
+          : "bg-[#4A4A4A]"
       }`}
     >
       <Header />

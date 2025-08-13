@@ -40,6 +40,7 @@ export const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const user = useSelector(selectUserInfo);
   const isAuthenticated = !!user;
+
   const dispatch = useDispatch();
 
   // Detect scroll
@@ -134,11 +135,21 @@ export const Header: React.FC = () => {
       ],
       wholesaler: [
         { to: "/wholesaler/dashboard", label: "Dashboard", icon: Home },
-        { to: "/bid-listing", label: "Browse Inventory", icon: ShoppingCart },
+        ...(location.pathname !== "/"
+          ? [
+              {
+                to: "/bid-listing",
+                label: "Browse Inventory",
+                icon: ShoppingCart,
+              },
+            ]
+          : []),
       ],
       consumer: [
         { to: "/dashboard", label: "Dashboard", icon: Home },
-        { to: "/my-requests", label: "My Requests", icon: FileText },
+        ...(location.pathname !== "/"
+          ? [{ to: "/my-requests", label: "My Requests", icon: FileText }]
+          : []),
       ],
     };
 
@@ -194,10 +205,17 @@ export const Header: React.FC = () => {
             }
             onClick={onItemClick}
           >
-            <Link to={item?.to}>
-              <Icon className="w-4 h-4 mr-2" />
-              {item?.label}
-            </Link>
+            {location.pathname === "/" ? (
+              <Link to={item?.to} className="text-white">
+                <Icon className="w-4 h-4 mr-2" />
+                {item?.label}
+              </Link>
+            ) : (
+              <Link to={item?.to}>
+                <Icon className="w-4 h-4 mr-2" />
+                {item?.label}
+              </Link>
+            )}
           </Button>
         );
       })}
@@ -206,9 +224,7 @@ export const Header: React.FC = () => {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300   ${
-        isAuthenticated && user ? "bg-white" : "bg-[#4A4A4A]"
-      }`}
+      className={`sticky top-0 z-50 w-full transition-all duration-300   `}
     >
       <div className="  px-2 sm:px-4 h-14 sm:h-20 flex items-center justify-between  sm:space-x-4">
         {/* {!isAuthenticated && (
@@ -268,7 +284,11 @@ export const Header: React.FC = () => {
           </div>
         )} */}
         <div>
-          {isAuthenticated && user ? (
+          {location.pathname === "/" ? (
+            <Link to="/">
+              <img src={wrstopia} alt="" width={150} height={100} />
+            </Link>
+          ) : isAuthenticated && user ? (
             <Link to="/">
               <img src={wrstopiablack} alt="" width={150} height={100} />
             </Link>
@@ -289,81 +309,83 @@ export const Header: React.FC = () => {
               </nav>
 
               {/* User Avatar & Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full"
+              {location.pathname !== "/" && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full"
+                    >
+                      <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-[#CC5500]/20 hover:border-[#CC5500]/40 transition-colors">
+                        <AvatarImage
+                          src={user?.profileImage}
+                          alt={user?.firstName}
+                        />
+                        <AvatarFallback className="bg-[#4a4a4a] text-white font-bold text-xs sm:text-sm">
+                          {user.profilePicture ? (
+                            <img
+                              src={`data:image/png;base64,${user?.profilePicture}`}
+                              alt={user?.firstName}
+                              className="w-full h-full object-cover rounded-full"
+                            />
+                          ) : (
+                            getInitials(user?.firstName, user?.lastName)
+                          )}
+                        </AvatarFallback>
+                      </Avatar>
+                      {userRole === "admin" && (
+                        <Crown className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 text-[#CC5500] fill-current" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-56 sm:w-64"
+                    align="end"
+                    forceMount
                   >
-                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-[#CC5500]/20 hover:border-[#CC5500]/40 transition-colors">
-                      <AvatarImage
-                        src={user?.profileImage}
-                        alt={user?.firstName}
-                      />
-                      <AvatarFallback className="bg-[#4a4a4a] text-white font-bold text-xs sm:text-sm">
-                        {user.profilePicture ? (
-                          <img
-                            src={`data:image/png;base64,${user?.profilePicture}`}
-                            alt={user?.firstName}
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          getInitials(user?.firstName, user?.lastName)
-                        )}
-                      </AvatarFallback>
-                    </Avatar>
-                    {userRole === "admin" && (
-                      <Crown className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 text-[#CC5500] fill-current" />
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-56 sm:w-64"
-                  align="end"
-                  forceMount
-                >
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <p className="text-sm font-semibold truncate">
-                          {user.firstName} {user.lastName}
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <p className="text-sm font-semibold truncate">
+                            {user.firstName} {user.lastName}
+                          </p>
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full border font-medium capitalize ${getRoleBadgeColor(
+                              user.role
+                            )}`}
+                          >
+                            {userRole}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {user.email}
                         </p>
-                        <span
-                          className={`text-xs px-2 py-1 rounded-full border font-medium capitalize ${getRoleBadgeColor(
-                            user.role
-                          )}`}
-                        >
-                          {userRole}
-                        </span>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {user.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile-settings" className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      Profile Settings
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    {/* <Link to="/settings" className="cursor-pointer">
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile-settings" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        Profile Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      {/* <Link to="/settings" className="cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
                       Settings
                     </Link> */}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="cursor-pointer"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="cursor-pointer"
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </>
           ) : (
             <>
@@ -492,11 +514,11 @@ export const Header: React.FC = () => {
                   </SheetContent>
                 </Sheet>
                 <div className="hidden md:flex items-center space-x-1 sm:space-x-2 ">
-                  <button className="text-white hover:text-[#CC5500] p-1">
+                  {/* <button className="text-white hover:text-[#CC5500] p-1">
                     <Link to="/">
                       <SrchIcon />
                     </Link>
-                  </button>
+                  </button> */}
 
                   <button className="text-white hover:text-[#CC5500] p-1">
                     <Link to="/login">
