@@ -198,7 +198,7 @@ export default class BaseApi {
   }
 
   async patch<T = any>(url: string, body: any, config?: any): Promise<T> {
-    const response = await this.axiosInstance.patch<T>(url, config);
+    const response = await this.axiosInstance.patch<T>(url, body, config);
     return response.data;
   }
 

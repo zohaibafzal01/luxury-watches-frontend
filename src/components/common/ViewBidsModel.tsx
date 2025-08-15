@@ -14,11 +14,11 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
-  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ServiceRequest, Bid } from "@/types/service";
 import dealerApi from "@/api/dealer";
+import { useToast } from "@/hooks/use-toast";
 
 export enum BidStatus {
   SUBMITTED = "submitted",
@@ -44,6 +44,7 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
 }) => {
   const [processingBids, setProcessingBids] = useState<Set<string>>(new Set());
   const [bidStatuses, setBidStatuses] = useState<Record<string, string>>({});
+  const { toast } = useToast();
 
   if (!request) return null;
 
@@ -57,6 +58,11 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
   ) => {
     if (!bidId) {
       console.error("Bid ID is required");
+      toast({
+        title: "Error",
+        description: "Bid ID is required",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -77,10 +83,26 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
           onBidStatusUpdate(bidId, status);
         }
 
+        toast({
+          title: "Success",
+          description: `Bid ${action}ed successfully`,
+        });
+
         console.log(`Bid ${action}ed successfully:`, response);
+      } else {
+        toast({
+          title: "Error",
+          description: `Failed to ${action} bid`,
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error(`Error ${action}ing bid:`, error);
+      toast({
+        title: "Error",
+        description: `Error ${action}ing bid. Please try again.`,
+        variant: "destructive",
+      });
     } finally {
       setProcessingBids((prev) => {
         const newSet = new Set(prev);
@@ -96,43 +118,6 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
 
   const handleRejectBid = (bidId: string) => {
     handleBidAction(bidId, "reject");
-  };
-
-  const handleCompleteBid = async (bidId: string) => {
-    if (!bidId) {
-      console.error("Bid ID is required");
-      return;
-    }
-
-    setProcessingBids((prev) => new Set([...prev, bidId]));
-
-    try {
-      const response = await dealerApi.biddingStatusUpdate(
-        bidId,
-        BidStatus.COMPLETED
-      );
-
-      if (response?.success) {
-        setBidStatuses((prev) => ({
-          ...prev,
-          [bidId]: BidStatus.COMPLETED,
-        }));
-
-        if (onBidStatusUpdate) {
-          onBidStatusUpdate(bidId, BidStatus.COMPLETED);
-        }
-
-        console.log("Bid completed successfully:", response);
-      }
-    } catch (error) {
-      console.error("Error completing bid:", error);
-    } finally {
-      setProcessingBids((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(bidId);
-        return newSet;
-      });
-    }
   };
 
   return (
@@ -176,7 +161,7 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
                     <span className="flex items-center gap-1 text-sm">
                       <DollarSign className="w-4 h-4 text-primary" />
                       <span className="font-medium">
-                        ${bid?.estimatedPrice}
+                        {bid?.estimatedPrice}
                       </span>
                     </span>
                     <span className="flex items-center gap-1 text-sm">
@@ -198,8 +183,6 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
                             ? "bg-green-100 text-green-800 border border-green-200"
                             : currentStatus === "rejected"
                             ? "bg-red-100 text-red-800 border border-red-200"
-                            : currentStatus === "completed"
-                            ? "bg-blue-100 text-blue-800 border border-blue-200"
                             : "bg-gray-100 text-gray-800 border border-gray-200"
                         }`}
                       >
@@ -208,9 +191,6 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
                         )}
                         {currentStatus === "rejected" && (
                           <XCircle className="w-3 h-3 mr-1" />
-                        )}
-                        {currentStatus === "completed" && (
-                          <Check className="w-3 h-3 mr-1" />
                         )}
                         {currentStatus?.charAt(0).toUpperCase() +
                           currentStatus?.slice(1)}
@@ -250,36 +230,20 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
                           Reject
                         </Button>
                       </div>
-                    ) : currentStatus === "accepted" ? (
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => handleCompleteBid(bid?.id)}
-                          disabled={isProcessing}
-                          className="hover:bg-[#CC5500]/90 disabled:opacity-50"
-                        >
-                          {isProcessing ? (
-                            <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-                          ) : (
-                            <Check className="w-4 h-4 mr-1 text-blue-600" />
-                          )}
-                          Complete
-                        </Button>
-                      </div>
                     ) : (
                       <div className="text-sm text-muted-foreground">
                         This bid has been {currentStatus}
                       </div>
                     )}
 
-                    <Button
+                    {/* <Button
                       variant="outline"
                       className="flex items-center hover:bg-[#CC5500]/90"
                       disabled={isProcessing}
                     >
                       <MessageSquare className="w-4 h-4 mr-2" />
                       Contact
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               );
