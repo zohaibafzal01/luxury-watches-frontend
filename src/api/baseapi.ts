@@ -14,73 +14,127 @@ const isTokenExpired = (token: string): boolean => {
 };
 
 const handleAutoLogout = () => {
+  const state = store.getState();
+  const user = selectUserInfo(state);
+
   showToast("Session Expired", "Your session has expired. Please login again.");
 
   localStorage.removeItem("user");
   localStorage.removeItem("isAuthenticated");
-
   store.dispatch(login(null));
 
-  const state = store.getState();
-  const user = selectUserInfo(state);
+  const redirectUrl =
+    user?.accountType === "admin" || user?.role === "admin"
+      ? "/admin/login"
+      : "/login";
 
   setTimeout(() => {
-    if (user?.accountType === "admin") {
-      window.location.href = "/admin/login";
-    } else {
-      window.location.href = "/login";
-    }
+    window.location.href = redirectUrl;
   }, 3000);
 };
 
-const showToast = (title: string, message: string) => {
-  const toast = document.createElement("div");
-  toast.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #ef4444;
-    color: white;
-    padding: 16px 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 10000;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    max-width: 350px;
-    animation: slideIn 0.3s ease-out;
-  `;
+export const checkTokenExpiration = () => {
+  const state = store.getState();
+  const userFromRedux = selectUserInfo(state);
+  const userFromStorage = localStorage.getItem("user");
+  const isAuthenticatedFromStorage =
+    localStorage.getItem("isAuthenticated") === "true";
 
-  toast.innerHTML = `
-    <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
-    <div style="font-size: 14px; opacity: 0.9;">${message}</div>
-  `;
+  if (!userFromStorage && !isAuthenticatedFromStorage && userFromRedux) {
+    showToast(
+      "Session Cleared",
+      "Your session was cleared. Redirecting to login..."
+    );
+    store.dispatch(login(null));
 
-  if (!document.querySelector("#toast-styles")) {
-    const style = document.createElement("style");
-    style.id = "toast-styles";
-    style.textContent = `
-      @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-      }
-    `;
-    document.head.appendChild(style);
+    setTimeout(() => {
+      const redirectUrl =
+        userFromRedux?.accountType === "admin" ||
+        userFromRedux?.role === "admin"
+          ? "/admin/login"
+          : "/login";
+      window.location.href = redirectUrl;
+    }, 2000);
+    return false;
   }
 
-  document.body.appendChild(toast);
+  if (!userFromRedux && !userFromStorage) {
+    return true;
+  }
 
-  setTimeout(() => {
-    toast.style.animation = "slideOut 0.3s ease-in";
+  const token = userFromRedux?.token;
+  if (token && isTokenExpired(token)) {
+    handleAutoLogout();
+    return false;
+  }
+
+  return true;
+};
+
+const showToast = (title: string, message: string): boolean => {
+  try {
+    // Remove any existing toasts
+    document
+      .querySelectorAll('[data-toast="session-expired"]')
+      .forEach((toast) => toast.remove());
+
+    const toast = document.createElement("div");
+    toast.setAttribute("data-toast", "session-expired");
+    toast.style.cssText = `
+      position: fixed !important;
+      top: 20px !important;
+      right: 20px !important;
+      background: #ff5757 !important;
+      color: white !important;
+      padding: 16px 20px !important;
+      border-radius: 8px !important;
+      box-shadow: 0 4px 12px rgba(255, 87, 87, 0.3) !important;
+      z-index: 999999 !important;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      width: 300px !important;
+      transform: translateX(320px) !important;
+      transition: all 0.3s ease-out !important;
+    `;
+
+    toast.innerHTML = `
+      <div style="
+        font-weight: 600; 
+        font-size: 14px; 
+        color: white; 
+        margin-bottom: 4px;
+      ">${title}</div>
+      <div style="
+        font-size: 13px; 
+        color: rgba(255, 255, 255, 0.9); 
+        line-height: 1.4;
+      ">${message}</div>
+    `;
+
+    // Add simple styles
+    if (!document.querySelector("#simple-toast-styles")) {
+      const style = document.createElement("style");
+      style.id = "simple-toast-styles";
+      style.textContent = `
+        @keyframes slideInSimple {
+          from { transform: translateX(320px) !important; }
+          to { transform: translateX(0) !important; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    document.body.appendChild(toast);
+
+    // Simple slide-in animation
     setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 300);
-  }, 2700);
+      toast.style.animation = "slideInSimple 0.3s ease-out";
+      toast.style.transform = "translateX(0)";
+    }, 10);
+
+    return true;
+  } catch (error) {
+    return false;
+  }
 };
 
 export default class BaseApi {
@@ -144,7 +198,7 @@ export default class BaseApi {
   }
 
   async patch<T = any>(url: string, body: any, config?: any): Promise<T> {
-    const response = await this.axiosInstance.patch<T>(url, body, config);
+    const response = await this.axiosInstance.patch<T>(url, config);
     return response.data;
   }
 

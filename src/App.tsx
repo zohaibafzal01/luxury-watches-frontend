@@ -28,6 +28,7 @@ import WhyChooseUsPage from "./pages/WhyChooseUs";
 import WhyWeOfferPage from "./pages/WhyWeOffer";
 import TheProcessPage from "./pages/TheProcess";
 import FAQSectionPage from "./components/ui/faq";
+import { checkTokenExpiration } from "@/api/baseapi";
 
 const queryClient = new QueryClient();
 
@@ -262,6 +263,19 @@ const AppRoutes = () => {
   <Route path="*" element={<h1>Page Not Found</h1>} />
 </Routes>;
 
+const TokenExpirationChecker = () => {
+  useEffect(() => {
+    checkTokenExpiration();
+
+    const interval = setInterval(() => {
+      checkTokenExpiration();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return null;
+};
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <Provider store={store}>
@@ -271,6 +285,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <TokenExpirationChecker />
           <Layout>
             <AppRoutes />
           </Layout>
