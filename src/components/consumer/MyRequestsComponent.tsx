@@ -36,6 +36,7 @@ export const MyRequestsComponent: React.FC = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [bids] = useState<Bid[]>([]);
+  const [isRefetching, setIsRefetching] = useState(false);
   const { toast } = useToast();
 
   // Debounce search input
@@ -46,8 +47,12 @@ export const MyRequestsComponent: React.FC = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (showLoader = false) => {
     try {
+      if (showLoader) {
+        setIsRefetching(true);
+      }
+
       const response = await consumerApi.getServiceRequest(
         page,
         10,
@@ -61,7 +66,7 @@ export const MyRequestsComponent: React.FC = () => {
         watchBrand: item.brand,
         watchModel: item.model,
         description: item.issueDescription,
-        status: item.status?.toLowerCase(), // Normalize status to lowercase
+        status: item.status?.toLowerCase(),
       }));
 
       const sorted = mapped.sort(
@@ -71,6 +76,15 @@ export const MyRequestsComponent: React.FC = () => {
 
       setRequests(sorted);
       setTotalPages(response?.pagination?.totalPages || 1);
+
+      if (selectedRequest) {
+        const updatedSelectedRequest = sorted.find(
+          (req: any) => req.id === selectedRequest.id
+        );
+        if (updatedSelectedRequest) {
+          setSelectedRequest(updatedSelectedRequest);
+        }
+      }
     } catch (error: any) {
       if (error?.response?.status === 404) {
         setRequests([]);
@@ -82,6 +96,10 @@ export const MyRequestsComponent: React.FC = () => {
           variant: "destructive",
         });
       }
+    } finally {
+      if (showLoader) {
+        setIsRefetching(false);
+      }
     }
   };
 
@@ -92,6 +110,15 @@ export const MyRequestsComponent: React.FC = () => {
   useEffect(() => {
     setPage(1);
   }, [debouncedSearchTerm, statusFilter]);
+
+  const handleBidStatusUpdate = async (bidId: string, newStatus: string) => {
+    toast({
+      title: "Bid status updated",
+      description: `Bid has been ${newStatus.toLowerCase()} successfully.`,
+    });
+
+    await fetchRequests(true);
+  };
 
   const formatStatusDisplay = (status: string) => {
     const statusMap: Record<string, string> = {
@@ -119,6 +146,18 @@ export const MyRequestsComponent: React.FC = () => {
     };
     return colors[normalizedStatus] || "bg-gray-500/20 text-gray-700";
   };
+
+  if (isRefetching) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className=" p-8 rounded-lg">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-gray-300 border-t-primary mb-4"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen p-4">
@@ -261,6 +300,7 @@ export const MyRequestsComponent: React.FC = () => {
         isOpen={isViewBidsModalOpen}
         onClose={() => setIsViewBidsModalOpen(false)}
         bids={bids}
+        onBidStatusUpdate={handleBidStatusUpdate}
       />
     </div>
   );
