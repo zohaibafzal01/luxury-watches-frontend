@@ -235,8 +235,8 @@ export const DealerDashboard: React.FC = () => {
       const formattedBids: ServiceRequest[] = res.data.map((bid: any) => ({
         id: bid?.serviceRequestId,
         consumerId: bid?.createdBy?.id || "",
-        watchBrand: bid?.watchBrand || "",
-        watchModel: bid?.watchModel || "",
+        watchBrand: bid?.brand || "",
+        watchModel: bid?.model || "",
         description: "",
         deliveryPreference: (bid?.deliveryMethod || "shipping").toLowerCase(),
         photos: [],
@@ -531,7 +531,7 @@ export const DealerDashboard: React.FC = () => {
                             <CardTitle className="flex items-center gap-2">
                               Bid for{" "}
                               {request?.watchBrand || request?.watchModel
-                                ? `${request?.watchBrand || ""} ${
+                                ? `${request?.watchBrand || ""} - ${
                                     request?.watchModel || ""
                                   }`.trim()
                                 : "N/A"}
