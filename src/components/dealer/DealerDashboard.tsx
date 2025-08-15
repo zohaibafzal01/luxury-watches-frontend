@@ -404,7 +404,7 @@ export const DealerDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card> */}
-        </div>  
+        </div>
 
         <Tabs
           value={activeTab}
@@ -523,20 +523,25 @@ export const DealerDashboard: React.FC = () => {
             ) : (
               <div className="grid gap-4">
                 {biddingRequests.flatMap((request) =>
-                  request.bids.map((bid) => (
+                  request?.bids.map((bid) => (
                     <Card key={bid.id} className="luxury-card">
                       <CardHeader>
                         <div className="flex items-start justify-between">
                           <div>
                             <CardTitle className="flex items-center gap-2">
-                              Bid for {request.watchBrand} {request.watchModel}
-                              <Badge className={getBidStatusColor(bid.status)}>
-                                {bid.status}
+                              Bid for{" "}
+                              {request?.watchBrand || request?.watchModel
+                                ? `${request?.watchBrand || ""} ${
+                                    request?.watchModel || ""
+                                  }`.trim()
+                                : "N/A"}
+                              <Badge className={getBidStatusColor(bid?.status)}>
+                                {bid?.status}
                               </Badge>
                             </CardTitle>
                             <CardDescription>
                               Submitted:{" "}
-                              {new Date(bid.submittedAt).toLocaleDateString()}
+                              {new Date(bid?.submittedAt).toLocaleDateString()}
                             </CardDescription>
                           </div>
                         </div>
@@ -548,13 +553,13 @@ export const DealerDashboard: React.FC = () => {
                               Estimated Price
                             </p>
                             <p className="font-semibold text-green-600">
-                              ${bid.estimatedPrice}
+                              ${bid?.estimatedPrice}
                             </p>
                           </div>
                           <div>
                             <p className="text-muted-foreground">Turnaround</p>
                             <p className="font-semibold">
-                              {bid.turnaroundTime} days
+                              {bid?.turnaroundTime} days
                             </p>
                           </div>
                           <div>
@@ -562,20 +567,20 @@ export const DealerDashboard: React.FC = () => {
                               Delivery Method
                             </p>
                             <p className="font-semibold capitalize">
-                              {bid.deliveryMethod}
+                              {bid?.deliveryMethod}
                             </p>
                           </div>
                           <div>
                             <p className="text-muted-foreground">Request ID</p>
-                            <p className="font-semibold">{request.id}</p>
+                            <p className="font-semibold">{request?.id}</p>
                           </div>
                         </div>
-                        {bid.notes && (
+                        {bid?.notes && (
                           <div className="mt-4">
                             <p className="text-sm text-muted-foreground">
                               Notes:
                             </p>
-                            <p className="text-sm">{bid.notes}</p>
+                            <p className="text-sm">{bid?.notes}</p>
                           </div>
                         )}
                       </CardContent>
