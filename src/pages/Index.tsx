@@ -29,6 +29,8 @@ import WhatWeOffer from "@/components/ui/whatweoffer";
 import WhyChooseBid from "@/components/ui/whychoosebid";
 import BuildToLast from "@/components/ui/buildtolast";
 import Footer from "@/components/layout/Footer";
+import waitingListApi from "@/api/waitingList";
+import { useToast } from "@/hooks/use-toast";
 
 // Helper function to check authentication from localStorage
 const checkAuthFromStorage = () => {
@@ -44,17 +46,22 @@ const bgimage = "/assests/images/bgimage.png";
 const smallimage = "/assests/images/herosectionwatch.png";
 
 const Index: React.FC = () => {
+  const { toast } = useToast();
   const userInfo = useSelector(selectUserInfo);
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<null | {
+    type: "success" | "error";
+    text: string;
+  }>(null);
+
+  const isValidEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 
   // Fallback to localStorage if Redux state is not available
   const authState = checkAuthFromStorage();
   const user = userInfo || authState.user;
   const isAuthenticated = Boolean(userInfo) || authState.isAuthenticated;
-
-  const handleJoinWaitlist = () => {
-    console.log("Email:", email);
-  };
 
   const location = useLocation();
 
@@ -68,6 +75,41 @@ const Index: React.FC = () => {
       }
     }
   }, [location]);
+
+  const handleJoinWaitlist = async () => {
+    const trimmed = email.trim().toLowerCase();
+
+    if (!isValidEmail(trimmed)) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const res = await waitingListApi.createWaitingList(trimmed);
+
+      if (res?.success) {
+        toast({
+          title: "Success 🎉",
+          description: res.message || "You’ve joined the waitlist!",
+        });
+        setEmail("");
+      }
+    } catch (err: any) {
+      toast({
+        title: "Something went wrong",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+      console.error("Join waitlist failed:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const brands = [
     "Rolex",
@@ -130,14 +172,29 @@ const Index: React.FC = () => {
                     className="flex-1 py-3 sm:py-4 px-2 bg-transparent text-gray-900 placeholder:text-gray-500 focus:outline-none text-base min-w-0"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (
+                        e.key === "Enter" &&
+                        isValidEmail(email) &&
+                        !isSubmitting
+                      ) {
+                        handleJoinWaitlist();
+                      }
+                    }}
                   />
                 </div>
 
                 <button
                   onClick={handleJoinWaitlist}
-                  className="bg-[#CC5500] text-white px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-full font-semibold hover:bg-[#b84a00] transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl whitespace-nowrap"
+                  disabled={!isValidEmail(email) || isSubmitting}
+                  className={`bg-[#CC5500] text-white px-6 py-3 sm:px-8 sm:py-4 rounded-xl sm:rounded-full font-semibold transform transition-all duration-200 shadow-lg whitespace-nowrap
+      ${
+        !isValidEmail(email) || isSubmitting
+          ? "opacity-60 cursor-not-allowed"
+          : "hover:bg-[#b84a00] hover:scale-105 hover:shadow-xl"
+      }`}
                 >
-                  Join Waitlist
+                  {isSubmitting ? "Joining..." : "Join Waitlist"}
                 </button>
               </div>
             </div>
