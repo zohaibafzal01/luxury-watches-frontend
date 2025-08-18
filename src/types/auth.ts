@@ -1,4 +1,3 @@
-
 export type UserRole = "admin" | "dealer" | "consumer";
 
 export interface User {
@@ -20,6 +19,8 @@ export interface User {
   isEmailVerified: boolean;
   createdAt: string;
   updatedAt: string;
+  lastLogin?: string;
+  status?: string;
 }
 
 export interface AuthState {
