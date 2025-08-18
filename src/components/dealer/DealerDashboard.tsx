@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ServiceRequest, Bid } from "@/types/service";
+import { ServiceRequest, Bid, BidStatus } from "@/types/service";
 import {
   Package,
   Clock,
@@ -17,6 +17,7 @@ import {
   TrendingUp,
   Eye,
   MessageSquare,
+  CheckCircle,
 } from "lucide-react";
 import { ViewRequestModal } from "@/components/common/ViewRequestModal";
 import { BidSubmissionModal } from "./BidSubmissionModal";
@@ -275,6 +276,15 @@ export const DealerDashboard: React.FC = () => {
       fetchBiddingRequests();
     }
   }, [activeTab]);
+
+  const handleCompleteBid = async (bidId: string, status: BidStatus) => {
+    try {
+      await dealerApi.biddingStatusUpdate(bidId, status);
+      fetchBiddingRequests();
+    } catch (error) {
+      console.error("Failed to complete bid:", error);
+    }
+  };
 
   const handleViewDetails = (request: ServiceRequest) => {
     setSelectedRequest(request);
@@ -544,6 +554,24 @@ export const DealerDashboard: React.FC = () => {
                               {new Date(bid?.submittedAt).toLocaleDateString()}
                             </CardDescription>
                           </div>
+                          {bid?.status === "accepted" && (
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  handleCompleteBid(
+                                    bid?.id,
+                                    "completed" as BidStatus
+                                  )
+                                }
+                                className=" hover:bg-[#CC5500]"
+                              >
+                                <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
+                                Complete
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </CardHeader>
                       <CardContent>
