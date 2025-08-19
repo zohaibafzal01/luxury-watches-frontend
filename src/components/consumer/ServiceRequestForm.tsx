@@ -19,8 +19,21 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { CreateServiceRequestData } from "@/types/service";
-import { Camera, MapPin, Upload, X, CheckCircle } from "lucide-react";
+import {
+  Camera,
+  MapPin,
+  Upload,
+  X,
+  CheckCircle,
+  ChevronDown,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import consumerApi from "@/api/consumer";
 
@@ -33,8 +46,16 @@ export const ServiceRequestForm: React.FC = () => {
     photos: [],
     location: undefined,
   });
+  const [dealerData, setDealerData] = useState({
+    businessName: "",
+    phoneNo: "",
+    address: "",
+    email: "",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [referenceId, setReferenceId] = useState<string | null>(null);
+  const [selectedAction, setSelectedAction] =
+    useState<string>("ServiceRequestType");
   const { toast } = useToast();
 
   const watchBrands = [
@@ -70,6 +91,17 @@ export const ServiceRequestForm: React.FC = () => {
 
   const handleDeliveryChange = (delivery: "drop-off" | "shipping") => {
     setFormData((prev) => ({ ...prev, deliveryPreference: delivery }));
+  };
+
+  const handleDealerDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDealerData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleActionSelect = (action: string) => {
+    setSelectedAction(action);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,17 +150,61 @@ export const ServiceRequestForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate that user has selected an action
+    if (selectedAction === "ServiceRequestType") {
+      toast({
+        title: "Action Required",
+        description: "Please select an action from the dropdown menu.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const { watchBrand, watchModel, description, deliveryPreference } =
         formData;
 
+      let payload;
+
+      if (selectedAction === "request-bid") {
+        // Send payload wrapped in serviceRequest object for request-bid
+        payload = {
+          serviceRequest: {
+            brand: watchBrand,
+            model: watchModel,
+            issueDescription: description,
+            deliveryPreference,
+            serviceRequestType: selectedAction,
+          },
+        };
+      } else if (selectedAction === "dealer") {
+        // For dealer selection, send two separate objects
+        payload = {
+          serviceRequest: {
+            brand: watchBrand,
+            serviceRequestType: selectedAction,
+            model: watchModel,
+            issueDescription: description,
+            deliveryPreference,
+          },
+          dealer: {
+            businessName: dealerData.businessName,
+            phoneNo: dealerData.phoneNo,
+            address: dealerData.address,
+            email: dealerData.email,
+          },
+        };
+      }
+
       const response = await consumerApi.serviceRequest(
         watchBrand,
         watchModel,
         description,
         deliveryPreference,
+        payload
       );
 
       const refId = response?.data?.id || `CR-${Date.now()}`;
@@ -171,6 +247,7 @@ export const ServiceRequestForm: React.FC = () => {
             <Button
               onClick={() => {
                 setReferenceId(null);
+                setSelectedAction("ServiceRequestType");
                 setFormData({
                   watchBrand: "",
                   watchModel: "",
@@ -178,6 +255,12 @@ export const ServiceRequestForm: React.FC = () => {
                   deliveryPreference: "shipping",
                   photos: [],
                   location: undefined,
+                });
+                setDealerData({
+                  businessName: "",
+                  phoneNo: "",
+                  address: "",
+                  email: "",
                 });
               }}
               className="luxury-button bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
@@ -205,7 +288,91 @@ export const ServiceRequestForm: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Watch Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Watch Information</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Watch Information</h3>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="flex items-center gap-2 hover:bg-[#CC5500]"
+                      >
+                        {selectedAction}
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => handleActionSelect("dealer")}
+                      >
+                        Dealer
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleActionSelect("request-bid")}
+                      >
+                        Request Bid
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* Dealer-specific fields - only show when dealer option is selected */}
+                {selectedAction === "dealer" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="businessName">Business Name</Label>
+                      <Input
+                        id="businessName"
+                        name="businessName"
+                        value={dealerData.businessName}
+                        onChange={handleDealerDataChange}
+                        className="luxury-input"
+                        placeholder="e.g., John Doe Watch Repair"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phoneNo">Phone Number</Label>
+                      <Input
+                        id="phoneNo"
+                        name="phoneNo"
+                        value={dealerData.phoneNo}
+                        onChange={handleDealerDataChange}
+                        className="luxury-input"
+                        placeholder="e.g., +1234567890"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Address</Label>
+                      <Input
+                        id="address"
+                        name="address"
+                        value={dealerData.address}
+                        onChange={handleDealerDataChange}
+                        className="luxury-input"
+                        placeholder="e.g., 123 Main St, Anytown, USA"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={dealerData.email}
+                        onChange={handleDealerDataChange}
+                        className="luxury-input"
+                        placeholder="e.g., john.doe@example.com"
+                        required
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="watchBrand">Brand</Label>
