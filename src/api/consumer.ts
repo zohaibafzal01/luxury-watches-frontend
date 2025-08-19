@@ -10,14 +10,18 @@ class ConsumerApi extends BaseApi {
     brand: string,
     model: string,
     issueDescription: string,
-    deliveryPreference: string
+    deliveryPreference: string,
+    payload?: any
   ) {
-    const data = await this.post(`${this.baseUrl}/service-request`, {
-      brand,
-      model,
-      issueDescription,
-      deliveryPreference,
-    });
+    const data = await this.post(
+      `${this.baseUrl}/service-request`,
+      payload || {
+        brand,
+        model,
+        issueDescription,
+        deliveryPreference,
+      }
+    );
     return data;
   }
 
