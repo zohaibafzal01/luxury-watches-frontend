@@ -17,6 +17,11 @@ class WaitingListApi extends BaseApi {
     const data = await this.get(`${this.baseUrl}?page=${page}&limit=${limit}`);
     return data;
   }
+
+  async deleteWaitingList(id: string) {
+    const data = await this.delete(`${this.baseUrl}/${id}`);
+    return data;
+  }
 }
 
 export const waitingListApi = new WaitingListApi();

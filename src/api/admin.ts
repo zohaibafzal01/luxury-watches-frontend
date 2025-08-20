@@ -1,3 +1,4 @@
+import { User } from "@/types/auth";
 import BaseApi from "./baseapi";
 
 class AdminApi extends BaseApi {
@@ -11,6 +12,24 @@ class AdminApi extends BaseApi {
       `${this.baseUrl}/user?page=${page}&limit=${limit}`
     );
     return data;
+  }
+
+  async activateUser(email: string) {
+    return await this.patch(`${this.baseUrl}/activate-user`, {
+      email,
+    });
+  }
+
+  async deactivateUser(email: string) {
+    return await this.patch(`${this.baseUrl}/deactivate-user`, {
+      email,
+    });
+  }
+
+  async updateUser(id: string, data: Partial<User>) {
+    return await this.patch(`${this.baseUrl}/user/${id}`, {
+      ...data,
+    });
   }
 }
 
