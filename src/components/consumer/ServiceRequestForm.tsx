@@ -58,6 +58,7 @@ export const ServiceRequestForm: React.FC = () => {
   const [selectedAction, setSelectedAction] =
     useState<string>("ServiceRequestType");
   const [dealerSearchResults, setDealerSearchResults] = useState<any[]>([]);
+  const [isUserExists, setIsUserExists] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState({
     businessName: false,
@@ -101,6 +102,16 @@ export const ServiceRequestForm: React.FC = () => {
   const handleDeliveryChange = (delivery: "drop-off" | "shipping") => {
     setFormData((prev) => ({ ...prev, deliveryPreference: delivery }));
   };
+
+  // Check if all dealer fields are empty and reset isUserExists accordingly
+  useEffect(() => {
+    const { businessName, phoneNo, address, email } = dealerData;
+    const allFieldsEmpty = !businessName && !phoneNo && !address && !email;
+
+    if (allFieldsEmpty) {
+      setIsUserExists(false);
+    }
+  }, [dealerData]);
 
   const handleDealerDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e?.target || {};
@@ -199,6 +210,10 @@ export const ServiceRequestForm: React.FC = () => {
       address: dealer?.address ?? "",
       email: dealer?.email ?? "",
     });
+
+    // Set isUserExists to true when user selects from search suggestions
+    setIsUserExists(true);
+
     setShowSuggestions({
       businessName: false,
       phoneNo: false,
@@ -299,6 +314,7 @@ export const ServiceRequestForm: React.FC = () => {
             phoneNo: dealerData?.phoneNo ?? "",
             address: dealerData?.address ?? "",
             email: dealerData?.email ?? "",
+            isUserExists: isUserExists,
           },
         };
       }
@@ -366,6 +382,7 @@ export const ServiceRequestForm: React.FC = () => {
                   address: "",
                   email: "",
                 });
+                setIsUserExists(false);
                 setDealerSearchResults([]);
                 setShowSuggestions({
                   businessName: false,

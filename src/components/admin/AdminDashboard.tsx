@@ -13,6 +13,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -75,25 +83,22 @@ export const AdminDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
 
-  // Users pagination
   const [page, setPage] = useState(1);
-  const [limit] = useState(5); // 5 users per page
+  const [limit] = useState(5); 
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [usersLoading, setUsersLoading] = useState(false);
 
   const [waitlist, setWaitlist] = useState<WaitlistItem[]>([]);
   const [wlPage, setWlPage] = useState(1);
-  const [wlLimit] = useState(10); // default 10 per page
+  const [wlLimit] = useState(10); 
   const [wlTotalPages, setWlTotalPages] = useState(1);
   const [wlTotal, setWlTotal] = useState(0);
   const [wlLoading, setWlLoading] = useState(false);
 
-  // Modal state
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  // Edit user modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editFormData, setEditFormData] = useState({
@@ -108,7 +113,6 @@ export const AdminDashboard: React.FC = () => {
     profilePicture: "",
   });
 
-  // Confirmation modal state
   const [showActivateConfirm, setShowActivateConfirm] = useState(false);
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [userToAction, setUserToAction] = useState<User | null>(null);
@@ -140,9 +144,9 @@ export const AdminDashboard: React.FC = () => {
           firstName: user?.firstName,
           lastName: user?.lastName,
           email: user?.email,
-          role: user?.accountType, // API uses 'accountType' instead of 'role'
-          accountType: user?.accountType, // Keep original accountType for compatibility
-          isEmailVerified: user?.status === "active", // Assuming active status means verified
+          role: user?.accountType, 
+          accountType: user?.accountType, 
+          isEmailVerified: user?.status === "active", 
           createdAt: user?.createdAt,
           updatedAt: user?.updatedAt,
           phoneNo: user?.phoneNo,
@@ -213,23 +217,21 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  // load on mount + when wlPage changes
   useEffect(() => {
     fetchUsers();
-    fetchWaitlist();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wlPage, page]);
+  }, [page]);
 
-  // Helper functions for image handling
+  useEffect(() => {
+    fetchWaitlist();
+  }, [wlPage]);
+
   const formatProfileImageUrl = (imageData?: string) => {
     if (!imageData) return undefined;
 
-    // If it's already a data URL, return as is
     if (imageData.startsWith("data:image/") || imageData.startsWith("http")) {
       return imageData;
     }
 
-    // If it's just a base64 string, convert to data URL
     return `data:image/jpeg;base64,${imageData}`;
   };
 
@@ -244,7 +246,7 @@ export const AdminDashboard: React.FC = () => {
     setProfileImagePreview(null);
     setEditFormData((prev) => ({
       ...prev,
-      profilePicture: "REMOVE", // Special marker to indicate removal
+      profilePicture: "REMOVE", 
     }));
 
     toast({
@@ -253,16 +255,14 @@ export const AdminDashboard: React.FC = () => {
     });
   };
 
-  // Handle opening user details modal
   const handleViewUser = (user: User) => {
     setSelectedUser(user);
     setIsUserModalOpen(true);
   };
 
-  // Handle opening edit user modal
   const handleEditUser = (user: User) => {
     setEditingUser(user);
-    setProfileImagePreview(null); // Clear any previous preview
+    setProfileImagePreview(null); 
     setEditFormData({
       firstName: user.firstName || "",
       lastName: user.lastName || "",
@@ -285,14 +285,12 @@ export const AdminDashboard: React.FC = () => {
     }));
   };
 
-  // Handle profile picture file selection
   const handleProfilePictureChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type - only allow JPG and PNG
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
     if (!allowedTypes.includes(file.type.toLowerCase())) {
       toast({
@@ -300,14 +298,12 @@ export const AdminDashboard: React.FC = () => {
         description: "Please select only JPG or PNG image files.",
         variant: "destructive",
       });
-      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
       return;
     }
 
-    // Validate file size (10MB limit)
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
       toast({
@@ -411,7 +407,7 @@ export const AdminDashboard: React.FC = () => {
       // Close modal and clear state
       setIsEditModalOpen(false);
       setEditingUser(null);
-      setProfileImagePreview(null); // Clear image preview
+      setProfileImagePreview(null); 
       setEditFormData({
         firstName: "",
         lastName: "",
@@ -875,8 +871,8 @@ export const AdminDashboard: React.FC = () => {
               </Button>
             </div>
 
-            {/* Waitlist Items */}
-            <div className="grid gap-4">
+            {/* Waitlist Items Table */}
+            <div className="space-y-4">
               {wlLoading ? (
                 <div className="min-h-screen flex items-center justify-center">
                   <div className=" p-8 rounded-lg">
@@ -898,70 +894,99 @@ export const AdminDashboard: React.FC = () => {
                   </CardContent>
                 </Card>
               ) : (
-                waitlist?.map((item) => (
-                  <Card key={item?.id} className="luxury-card">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 space-y-2">
-                          <CardTitle className="flex items-center gap-2">
-                            <Mail className="w-5 h-5" />
-                            {item?.email || "N/A"}
-                            <Badge className="bg-blue-500/20 text-blue-700">
-                              Waiting
-                            </Badge>
-                          </CardTitle>
-                          <CardDescription>
-                            ID: {item?.id || "N/A"}
-                          </CardDescription>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="hover:bg-green-500 hover:text-white"
+                <Card className="luxury-card">
+                  <CardContent className="p-0">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-b border-gray-200">
+                          <TableHead className="font-semibold text-gray-700 px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <Mail className="w-4 h-4" />
+                              Email
+                            </div>
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700 px-6 py-4">
+                            Join Date
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700 px-6 py-4 text-right">
+                            Actions
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {waitlist?.map((item, index) => (
+                          <TableRow
+                            key={item?.id}
+                            className={`border-b border-gray-100 hover:bg-gray-50/50 transition-colors ${
+                              index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                            }`}
                           >
-                            <UserCheck className="w-4 h-4 mr-2" />
-                            Invite
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="hover:bg-red-500 hover:text-white"
-                            onClick={() => showDeleteWaitlistConfirmation(item)}
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Remove
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-4">
-                          <span className="text-muted-foreground">
-                            <strong>Joined:</strong>{" "}
-                            {item?.createdAt
-                              ? new Date(item.createdAt).toLocaleDateString()
-                              : "N/A"}
-                          </span>
-                          <span className="text-muted-foreground">
-                            <strong>Updated:</strong>{" "}
-                            {item?.updatedAt
-                              ? new Date(item.updatedAt).toLocaleDateString()
-                              : "N/A"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>
-                            {item?.createdAt
-                              ? new Date(item.createdAt).toLocaleTimeString()
-                              : "N/A"}
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )) || []
+                            <TableCell className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#CC5500] to-[#CC5500]/80 flex items-center justify-center text-white text-sm font-bold">
+                                  {item?.email?.charAt(0)?.toUpperCase() || "U"}
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-900">
+                                    {item?.email || "N/A"}
+                                  </p>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {item?.createdAt
+                                    ? new Date(
+                                        item.createdAt
+                                      ).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                      })
+                                    : "N/A"}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {item?.createdAt
+                                    ? new Date(
+                                        item.createdAt
+                                      ).toLocaleTimeString("en-US", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })
+                                    : "N/A"}
+                                </p>
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-6 py-4 text-right">
+                              <div className="flex gap-2 justify-end">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="hover:bg-green-500 hover:text-white border-green-500 text-green-600"
+                                >
+                                  <UserCheck className="w-4 h-4 mr-2" />
+                                  Invite
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="hover:bg-red-500 hover:text-white border-red-500 text-red-600"
+                                  onClick={() =>
+                                    showDeleteWaitlistConfirmation(item)
+                                  }
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Remove
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )) || []}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
               )}
             </div>
 
