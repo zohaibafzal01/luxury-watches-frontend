@@ -11,6 +11,17 @@ class DealerApi extends BaseApi {
     return await this.get(`${this.baseUrl}/dashboard`);
   }
 
+  async dealerSearch(
+    businessName: string,
+    phoneNo: string,
+    address: string,
+    email: string
+  ) {
+    return await this.get(`${this.baseUrl}/search`, {
+      params: { businessName, phoneNo, address, email },
+    });
+  }
+
   async submitBid(
     serviceRequestId: string,
     estimatedPrice: number,
