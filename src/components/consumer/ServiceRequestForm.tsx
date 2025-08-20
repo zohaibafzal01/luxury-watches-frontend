@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import consumerApi from "@/api/consumer";
+import dealerApi from "@/api/dealer";
 
 export const ServiceRequestForm: React.FC = () => {
   const [formData, setFormData] = useState<CreateServiceRequestData>({
@@ -56,6 +57,14 @@ export const ServiceRequestForm: React.FC = () => {
   const [referenceId, setReferenceId] = useState<string | null>(null);
   const [selectedAction, setSelectedAction] =
     useState<string>("ServiceRequestType");
+  const [dealerSearchResults, setDealerSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState({
+    businessName: false,
+    phoneNo: false,
+    address: false,
+    email: false,
+  });
   const { toast } = useToast();
 
   const watchBrands = [
@@ -81,7 +90,7 @@ export const ServiceRequestForm: React.FC = () => {
   ) => {
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [e?.target?.name ?? ""]: e?.target?.value ?? "",
     }));
   };
 
@@ -94,40 +103,135 @@ export const ServiceRequestForm: React.FC = () => {
   };
 
   const handleDealerDataChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e?.target || {};
     setDealerData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name ?? ""]: value ?? "",
     }));
+
+    // Trigger search for the current field
+    if (name && value) {
+      debouncedSearch(value, name);
+    } else {
+      setShowSuggestions((prev) => ({ ...prev, [name ?? ""]: false }));
+    }
   };
 
   const handleActionSelect = (action: string) => {
     setSelectedAction(action);
   };
 
+  // Ref to store the timeout ID
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounced search function
+  const searchDealers = useCallback(
+    async (searchQuery: string, field: string) => {
+      if (!searchQuery.trim()) {
+        setDealerSearchResults([]);
+        setShowSuggestions((prev) => ({ ...prev, [field]: false }));
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const searchParams = {
+          businessName: field === "businessName" ? searchQuery : "",
+          phoneNo: field === "phoneNo" ? searchQuery : "",
+          address: field === "address" ? searchQuery : "",
+          email: field === "email" ? searchQuery : "",
+        };
+
+        const response = await dealerApi.dealerSearch(
+          searchParams.businessName,
+          searchParams.phoneNo,
+          searchParams.address,
+          searchParams.email
+        );
+
+        const results = response?.data || [];
+        setDealerSearchResults(results);
+        setShowSuggestions((prev) => ({
+          ...prev,
+          [field]: results.length > 0,
+        }));
+      } catch (error) {
+        console.error("Dealer search error:", error);
+        setDealerSearchResults([]);
+        setShowSuggestions((prev) => ({ ...prev, [field]: false }));
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    []
+  );
+
+  // Debounced search with proper cleanup
+  const debouncedSearch = useCallback(
+    (searchQuery: string, field: string) => {
+      // Clear existing timeout
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+
+      // Set new timeout
+      searchTimeoutRef.current = setTimeout(() => {
+        searchDealers(searchQuery, field);
+      }, 300);
+    },
+    [searchDealers]
+  );
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Handle dealer selection from dropdown
+  const handleDealerSelect = (dealer: any) => {
+    setDealerData({
+      businessName: dealer?.companyName ?? dealer?.businessName ?? "",
+      phoneNo: dealer?.phoneNo ?? "",
+      address: dealer?.address ?? "",
+      email: dealer?.email ?? "",
+    });
+    setShowSuggestions({
+      businessName: false,
+      phoneNo: false,
+      address: false,
+      email: false,
+    });
+    setDealerSearchResults([]);
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const files = Array.from(e?.target?.files || []);
     setFormData((prev) => ({
       ...prev,
-      photos: [...prev.photos, ...files].slice(0, 5), // Max 5 photos
+      photos: [...(prev?.photos ?? []), ...files].slice(0, 5), // Max 5 photos
     }));
   };
 
   const removePhoto = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      photos: prev.photos.filter((_, i) => i !== index),
+      photos: (prev?.photos ?? []).filter((_, i) => i !== index),
     }));
   };
 
   const captureLocation = () => {
-    if (navigator.geolocation) {
+    if (navigator?.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setFormData((prev) => ({
             ...prev,
             location: {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
+              latitude: position?.coords?.latitude ?? 0,
+              longitude: position?.coords?.longitude ?? 0,
               address: "Current Location", // In real app, reverse geocode this
             },
           }));
@@ -165,7 +269,7 @@ export const ServiceRequestForm: React.FC = () => {
 
     try {
       const { watchBrand, watchModel, description, deliveryPreference } =
-        formData;
+        formData ?? {};
 
       let payload;
 
@@ -173,10 +277,10 @@ export const ServiceRequestForm: React.FC = () => {
         // Send payload wrapped in serviceRequest object for request-bid
         payload = {
           serviceRequest: {
-            brand: watchBrand,
-            model: watchModel,
-            issueDescription: description,
-            deliveryPreference,
+            brand: watchBrand ?? "",
+            model: watchModel ?? "",
+            issueDescription: description ?? "",
+            deliveryPreference: deliveryPreference ?? "shipping",
             serviceRequestType: selectedAction,
           },
         };
@@ -184,26 +288,26 @@ export const ServiceRequestForm: React.FC = () => {
         // For dealer selection, send two separate objects
         payload = {
           serviceRequest: {
-            brand: watchBrand,
+            brand: watchBrand ?? "",
             serviceRequestType: selectedAction,
-            model: watchModel,
-            issueDescription: description,
-            deliveryPreference,
+            model: watchModel ?? "",
+            issueDescription: description ?? "",
+            deliveryPreference: deliveryPreference ?? "shipping",
           },
           dealer: {
-            businessName: dealerData.businessName,
-            phoneNo: dealerData.phoneNo,
-            address: dealerData.address,
-            email: dealerData.email,
+            businessName: dealerData?.businessName ?? "",
+            phoneNo: dealerData?.phoneNo ?? "",
+            address: dealerData?.address ?? "",
+            email: dealerData?.email ?? "",
           },
         };
       }
 
       const response = await consumerApi.serviceRequest(
-        watchBrand,
-        watchModel,
-        description,
-        deliveryPreference,
+        watchBrand ?? "",
+        watchModel ?? "",
+        description ?? "",
+        deliveryPreference ?? "shipping",
         payload
       );
 
@@ -262,6 +366,13 @@ export const ServiceRequestForm: React.FC = () => {
                   address: "",
                   email: "",
                 });
+                setDealerSearchResults([]);
+                setShowSuggestions({
+                  businessName: false,
+                  phoneNo: false,
+                  address: false,
+                  email: false,
+                });
               }}
               className="luxury-button bg-[#CC5500] text-white hover:bg-[#CC5500]/90"
             >
@@ -319,57 +430,258 @@ export const ServiceRequestForm: React.FC = () => {
                 {/* Dealer-specific fields - only show when dealer option is selected */}
                 {selectedAction === "dealer" && (
                   <>
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative">
                       <Label htmlFor="businessName">Business Name</Label>
                       <Input
                         id="businessName"
                         name="businessName"
-                        value={dealerData.businessName}
+                        value={dealerData?.businessName ?? ""}
                         onChange={handleDealerDataChange}
+                        onFocus={() =>
+                          setShowSuggestions((prev) => ({
+                            ...prev,
+                            businessName:
+                              (dealerSearchResults?.length ?? 0) > 0,
+                          }))
+                        }
+                        onBlur={() =>
+                          setTimeout(
+                            () =>
+                              setShowSuggestions((prev) => ({
+                                ...prev,
+                                businessName: false,
+                              })),
+                            200
+                          )
+                        }
                         className="luxury-input"
                         placeholder="e.g., John Doe Watch Repair"
                         required
                       />
+                      {showSuggestions.businessName && (
+                        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                          {isSearching ? (
+                            <div className="p-2 text-center text-gray-500">
+                              Searching dealers...
+                            </div>
+                          ) : dealerSearchResults.length > 0 ? (
+                            dealerSearchResults.map((dealer, index) => (
+                              <div
+                                key={index}
+                                className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                onClick={() => handleDealerSelect(dealer)}
+                              >
+                                <div className="font-medium">
+                                  {dealer?.companyName ??
+                                    dealer?.businessName ??
+                                    "N/A"}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {dealer?.email ?? "N/A"}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {dealer?.phoneNo ?? "N/A"} •{" "}
+                                  {dealer?.address ?? "N/A"}
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-2 text-center text-gray-500">
+                              No dealers found. You can create a new entry.
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative">
                       <Label htmlFor="phoneNo">Phone Number</Label>
                       <Input
                         id="phoneNo"
                         name="phoneNo"
-                        value={dealerData.phoneNo}
+                        value={dealerData?.phoneNo ?? ""}
                         onChange={handleDealerDataChange}
+                        onFocus={() =>
+                          setShowSuggestions((prev) => ({
+                            ...prev,
+                            phoneNo: dealerSearchResults.length > 0,
+                          }))
+                        }
+                        onBlur={() =>
+                          setTimeout(
+                            () =>
+                              setShowSuggestions((prev) => ({
+                                ...prev,
+                                phoneNo: false,
+                              })),
+                            200
+                          )
+                        }
                         className="luxury-input"
                         placeholder="e.g., +1234567890"
                         required
                       />
+                      {showSuggestions.phoneNo && (
+                        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                          {isSearching ? (
+                            <div className="p-2 text-center text-gray-500">
+                              Searching dealers...
+                            </div>
+                          ) : dealerSearchResults.length > 0 ? (
+                            dealerSearchResults.map((dealer, index) => (
+                              <div
+                                key={index}
+                                className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                onClick={() => handleDealerSelect(dealer)}
+                              >
+                                <div className="font-medium">
+                                  {dealer?.companyName ??
+                                    dealer?.businessName ??
+                                    "N/A"}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {dealer?.email ?? "N/A"}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {dealer?.phoneNo ?? "N/A"} •{" "}
+                                  {dealer?.address ?? "N/A"}
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-2 text-center text-gray-500">
+                              No dealers found. You can create a new entry.
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative">
                       <Label htmlFor="address">Address</Label>
                       <Input
                         id="address"
                         name="address"
-                        value={dealerData.address}
+                        value={dealerData?.address ?? ""}
                         onChange={handleDealerDataChange}
+                        onFocus={() =>
+                          setShowSuggestions((prev) => ({
+                            ...prev,
+                            address: dealerSearchResults.length > 0,
+                          }))
+                        }
+                        onBlur={() =>
+                          setTimeout(
+                            () =>
+                              setShowSuggestions((prev) => ({
+                                ...prev,
+                                address: false,
+                              })),
+                            200
+                          )
+                        }
                         className="luxury-input"
                         placeholder="e.g., 123 Main St, Anytown, USA"
                         required
                       />
+                      {showSuggestions.address && (
+                        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                          {isSearching ? (
+                            <div className="p-2 text-center text-gray-500">
+                              Searching dealers...
+                            </div>
+                          ) : dealerSearchResults.length > 0 ? (
+                            dealerSearchResults.map((dealer, index) => (
+                              <div
+                                key={index}
+                                className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                onClick={() => handleDealerSelect(dealer)}
+                              >
+                                <div className="font-medium">
+                                  {dealer?.companyName ??
+                                    dealer?.businessName ??
+                                    "N/A"}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {dealer?.email ?? "N/A"}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {dealer?.phoneNo ?? "N/A"} •{" "}
+                                  {dealer?.address ?? "N/A"}
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-2 text-center text-gray-500">
+                              No dealers found. You can create a new entry.
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative">
                       <Label htmlFor="email">Email</Label>
                       <Input
                         id="email"
                         name="email"
                         type="email"
-                        value={dealerData.email}
+                        value={dealerData?.email ?? ""}
                         onChange={handleDealerDataChange}
+                        onFocus={() =>
+                          setShowSuggestions((prev) => ({
+                            ...prev,
+                            email: dealerSearchResults.length > 0,
+                          }))
+                        }
+                        onBlur={() =>
+                          setTimeout(
+                            () =>
+                              setShowSuggestions((prev) => ({
+                                ...prev,
+                                email: false,
+                              })),
+                            200
+                          )
+                        }
                         className="luxury-input"
                         placeholder="e.g., john.doe@example.com"
                         required
                       />
+                      {showSuggestions.email && (
+                        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                          {isSearching ? (
+                            <div className="p-2 text-center text-gray-500">
+                              Searching dealers...
+                            </div>
+                          ) : dealerSearchResults.length > 0 ? (
+                            dealerSearchResults.map((dealer, index) => (
+                              <div
+                                key={index}
+                                className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                onClick={() => handleDealerSelect(dealer)}
+                              >
+                                <div className="font-medium">
+                                  {dealer?.companyName ??
+                                    dealer?.businessName ??
+                                    "N/A"}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  {dealer?.email ?? "N/A"}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {dealer?.phoneNo ?? "N/A"} •{" "}
+                                  {dealer?.address ?? "N/A"}
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-2 text-center text-gray-500">
+                              No dealers found. You can create a new entry.
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
@@ -377,18 +689,18 @@ export const ServiceRequestForm: React.FC = () => {
                 <div className="space-y-2">
                   <Label htmlFor="watchBrand">Brand</Label>
                   <Select
-                    value={formData.watchBrand}
+                    value={formData?.watchBrand ?? ""}
                     onValueChange={handleBrandChange}
                   >
                     <SelectTrigger className="luxury-input">
                       <SelectValue placeholder="Select watch brand" />
                     </SelectTrigger>
                     <SelectContent>
-                      {watchBrands.map((brand) => (
+                      {watchBrands?.map((brand) => (
                         <SelectItem key={brand} value={brand}>
                           {brand}
                         </SelectItem>
-                      ))}
+                      )) ?? []}
                     </SelectContent>
                   </Select>
                 </div>
@@ -398,7 +710,7 @@ export const ServiceRequestForm: React.FC = () => {
                   <Input
                     id="watchModel"
                     name="watchModel"
-                    value={formData.watchModel}
+                    value={formData?.watchModel ?? ""}
                     onChange={handleInputChange}
                     className="luxury-input"
                     placeholder="e.g., Submariner, Speedmaster, Daytona"
@@ -411,7 +723,7 @@ export const ServiceRequestForm: React.FC = () => {
                   <Textarea
                     id="description"
                     name="description"
-                    value={formData.description}
+                    value={formData?.description ?? ""}
                     onChange={handleInputChange}
                     className="luxury-input min-h-[100px]"
                     placeholder="Describe the issue with your watch in detail..."
@@ -428,7 +740,7 @@ export const ServiceRequestForm: React.FC = () => {
                 </p>
                 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {formData.photos.map((photo, index) => (
+                  {(formData?.photos ?? []).map((photo, index) => (
                     <div key={index} className="relative">
                       <img
                         src={URL.createObjectURL(photo)}
@@ -453,7 +765,7 @@ export const ServiceRequestForm: React.FC = () => {
                     type="button"
                     variant="outline"
                     onClick={() => document.getElementById('photo-upload')?.click()}
-                    disabled={formData.photos.length >= 5}
+                    disabled={(formData?.photos?.length ?? 0) >= 5}
                   >
                     <Upload className="w-4 h-4 mr-2" />
                     Upload Photos
@@ -462,7 +774,7 @@ export const ServiceRequestForm: React.FC = () => {
                     type="button"
                     variant="outline"
                     onClick={() => document.getElementById('camera-upload')?.click()}
-                    disabled={formData.photos.length >= 5}
+                    disabled={(formData?.photos?.length ?? 0) >= 5}
                   >
                     <Camera className="w-4 h-4 mr-2" />
                     Take Photo
@@ -491,7 +803,7 @@ export const ServiceRequestForm: React.FC = () => {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Delivery Preference</h3>
                 <RadioGroup
-                  value={formData.deliveryPreference}
+                  value={formData?.deliveryPreference ?? "shipping"}
                   onValueChange={handleDeliveryChange}
                   className="space-y-2"
                 >
