@@ -1,3 +1,4 @@
+import { BidStatus } from "@/types/service";
 import BaseApi from "./baseapi";
 
 class ConsumerApi extends BaseApi {
@@ -42,6 +43,12 @@ class ConsumerApi extends BaseApi {
     return await this.get(
       `${this.baseUrl}/service-request?${query.toString()}`
     );
+  }
+
+  async consumerStatusUpdate(id: string, status: BidStatus) {
+    return await this.patch(`${this.baseUrl}/service-request/${id}`, {
+      status,
+    });
   }
 }
 

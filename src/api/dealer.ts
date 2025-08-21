@@ -58,6 +58,12 @@ class DealerApi extends BaseApi {
       status,
     });
   }
+
+  async getRequestDealer(page: number = 1, limit: number = 10) {
+    return await this.get(
+      `${this.baseUrl}/request-dealer?page=${page}&limit=${limit}`
+    );
+  }
 }
 
 export const dealerApi = new DealerApi();
