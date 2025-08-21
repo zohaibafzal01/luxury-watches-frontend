@@ -42,7 +42,12 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
   bids = [],
   onBidStatusUpdate,
 }) => {
-  const [processingBids, setProcessingBids] = useState<Set<string>>(new Set());
+  const [processingAccept, setProcessingAccept] = useState<Set<string>>(
+    new Set()
+  );
+  const [processingReject, setProcessingReject] = useState<Set<string>>(
+    new Set()
+  );
   const [bidStatuses, setBidStatuses] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
@@ -66,7 +71,12 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
       return;
     }
 
-    setProcessingBids((prev) => new Set([...prev, bidId]));
+    // Set the appropriate processing state based on action
+    if (action === "accept") {
+      setProcessingAccept((prev) => new Set([...prev, bidId]));
+    } else {
+      setProcessingReject((prev) => new Set([...prev, bidId]));
+    }
 
     try {
       const status =
@@ -104,11 +114,20 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
         variant: "destructive",
       });
     } finally {
-      setProcessingBids((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(bidId);
-        return newSet;
-      });
+      // Clear the appropriate processing state based on action
+      if (action === "accept") {
+        setProcessingAccept((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(bidId);
+          return newSet;
+        });
+      } else {
+        setProcessingReject((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(bidId);
+          return newSet;
+        });
+      }
     }
   };
 
@@ -133,7 +152,8 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
         {requestBids?.length > 0 ? (
           <div className="space-y-4 mt-2">
             {requestBids.map((bid) => {
-              const isProcessing = processingBids.has(bid?.id);
+              const isAccepting = processingAccept.has(bid?.id);
+              const isRejecting = processingReject.has(bid?.id);
               const currentStatus = bidStatuses[bid?.id] || bid?.status;
 
               return (
@@ -160,9 +180,7 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
                   <div className="flex flex-wrap gap-4 items-center mb-3">
                     <span className="flex items-center gap-1 text-sm">
                       <DollarSign className="w-4 h-4 text-primary" />
-                      <span className="font-medium">
-                        {bid?.estimatedPrice}
-                      </span>
+                      <span className="font-medium">{bid?.estimatedPrice}</span>
                     </span>
                     <span className="flex items-center gap-1 text-sm">
                       <Clock className="w-4 h-4 text-primary" />
@@ -206,10 +224,10 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
                         <Button
                           variant="outline"
                           onClick={() => handleAcceptBid(bid?.id)}
-                          disabled={isProcessing}
+                          disabled={isAccepting || isRejecting}
                           className="hover:bg-[#CC5500]/90 disabled:opacity-50"
                         >
-                          {isProcessing ? (
+                          {isAccepting ? (
                             <Loader2 className="w-4 h-4 mr-1 animate-spin" />
                           ) : (
                             <CheckCircle className="w-4 h-4 mr-1 text-green-600" />
@@ -219,10 +237,10 @@ export const ViewBidsModal: React.FC<ViewBidsModalProps> = ({
                         <Button
                           variant="outline"
                           onClick={() => handleRejectBid(bid?.id)}
-                          disabled={isProcessing}
+                          disabled={isAccepting || isRejecting}
                           className="hover:bg-[#CC5500]/90 disabled:opacity-50"
                         >
-                          {isProcessing ? (
+                          {isRejecting ? (
                             <Loader2 className="w-4 h-4 mr-1 animate-spin" />
                           ) : (
                             <XCircle className="w-4 h-4 mr-1 text-red-600" />

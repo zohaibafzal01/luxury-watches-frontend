@@ -69,6 +69,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import waitingListApi from "@/api/waitingList";
 import adminApi from "@/api/admin";
+import dealerApi from "@/api/dealer";
 
 export const AdminDashboard: React.FC = () => {
   type WaitlistItem = {
@@ -84,14 +85,14 @@ export const AdminDashboard: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState("all");
 
   const [page, setPage] = useState(1);
-  const [limit] = useState(5); 
+  const [limit] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [usersLoading, setUsersLoading] = useState(false);
 
   const [waitlist, setWaitlist] = useState<WaitlistItem[]>([]);
   const [wlPage, setWlPage] = useState(1);
-  const [wlLimit] = useState(10); 
+  const [wlLimit] = useState(10);
   const [wlTotalPages, setWlTotalPages] = useState(1);
   const [wlTotal, setWlTotal] = useState(0);
   const [wlLoading, setWlLoading] = useState(false);
@@ -124,6 +125,40 @@ export const AdminDashboard: React.FC = () => {
   const [waitlistItemToDelete, setWaitlistItemToDelete] =
     useState<WaitlistItem | null>(null);
 
+  // Request Dealer states
+  type RequestDealerItem = {
+    id: string;
+    businessName: string;
+    phoneNo: string;
+    address: string;
+    email: string;
+    createdBy: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      id: string;
+    };
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+
+  const [requestDealers, setRequestDealers] = useState<RequestDealerItem[]>([]);
+  const [rdPage, setRdPage] = useState(1);
+  const [rdLimit] = useState(10);
+  const [rdTotalPages, setRdTotalPages] = useState(1);
+  const [rdTotal, setRdTotal] = useState(0);
+  const [rdLoading, setRdLoading] = useState(false);
+
+  // Dashboard cards data state
+  const [dashboardData, setDashboardData] = useState({
+    activeUsers: 0,
+    dealers: 0,
+    consumers: 0,
+    serviceRequests: 0,
+  });
+  const [dashboardLoading, setDashboardLoading] = useState(false);
+
   // Image handling state and ref
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -144,9 +179,9 @@ export const AdminDashboard: React.FC = () => {
           firstName: user?.firstName,
           lastName: user?.lastName,
           email: user?.email,
-          role: user?.accountType, 
-          accountType: user?.accountType, 
-          isEmailVerified: user?.status === "active", 
+          role: user?.accountType,
+          accountType: user?.accountType,
+          isEmailVerified: user?.status === "active",
           createdAt: user?.createdAt,
           updatedAt: user?.updatedAt,
           phoneNo: user?.phoneNo,
@@ -217,6 +252,59 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  // Fetch request dealers from API
+  const fetchRequestDealers = async () => {
+    try {
+      setRdLoading(true);
+      const response = await dealerApi.getRequestDealer(rdPage, rdLimit);
+
+      if (response?.success && Array.isArray(response?.data)) {
+        setRequestDealers(response.data);
+        setRdTotal(response?.pagination?.total ?? response.data.length);
+        setRdTotalPages(response?.pagination?.totalPages ?? 1);
+      } else {
+        setRequestDealers([]);
+        setRdTotal(0);
+        setRdTotalPages(1);
+      }
+    } catch (err) {
+      console.error("Error fetching request dealers:", err);
+      toast({
+        title: "Error",
+        description: "Failed to fetch request dealers. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setRdLoading(false);
+    }
+  };
+
+  // Fetch dashboard cards data from API
+  const fetchDashboardData = async () => {
+    try {
+      setDashboardLoading(true);
+      const response = await adminApi.getDashboardCardsData();
+
+      if (response?.success && response?.data) {
+        setDashboardData({
+          activeUsers: response.data.activeUsers || 0,
+          dealers: response.data.dealers || 0,
+          consumers: response.data.consumers || 0,
+          serviceRequests: response.data.serviceRequests || 0,
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+      toast({
+        title: "Error",
+        description: "Failed to fetch dashboard data. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDashboardLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
   }, [page]);
@@ -224,6 +312,14 @@ export const AdminDashboard: React.FC = () => {
   useEffect(() => {
     fetchWaitlist();
   }, [wlPage]);
+
+  useEffect(() => {
+    fetchRequestDealers();
+  }, [rdPage]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
   const formatProfileImageUrl = (imageData?: string) => {
     if (!imageData) return undefined;
@@ -246,7 +342,7 @@ export const AdminDashboard: React.FC = () => {
     setProfileImagePreview(null);
     setEditFormData((prev) => ({
       ...prev,
-      profilePicture: "REMOVE", 
+      profilePicture: "REMOVE",
     }));
 
     toast({
@@ -262,7 +358,7 @@ export const AdminDashboard: React.FC = () => {
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
-    setProfileImagePreview(null); 
+    setProfileImagePreview(null);
     setEditFormData({
       firstName: user.firstName || "",
       lastName: user.lastName || "",
@@ -407,7 +503,7 @@ export const AdminDashboard: React.FC = () => {
       // Close modal and clear state
       setIsEditModalOpen(false);
       setEditingUser(null);
-      setProfileImagePreview(null); 
+      setProfileImagePreview(null);
       setEditFormData({
         firstName: "",
         lastName: "",
@@ -586,26 +682,50 @@ export const AdminDashboard: React.FC = () => {
     );
   };
 
+  // Global refresh function to refresh all dashboard data
+  const refreshAllData = async () => {
+    await Promise.all([
+      fetchDashboardData(),
+      fetchUsers(),
+      fetchWaitlist(),
+      fetchRequestDealers(),
+    ]);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-4">
       <div className="container mx-auto">
-        <div className="mb-8">
-          <h1 className="luxury-title text-3xl mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">
-            Manage users, monitor platform activity, and oversee system
-            operations
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="luxury-title text-3xl mb-2">Admin Dashboard</h1>
+            <p className="text-muted-foreground">
+              Manage users, monitor platform activity, and oversee system
+              operations
+            </p>
+          </div>
+          <Button
+            onClick={refreshAllData}
+            disabled={
+              dashboardLoading || usersLoading || wlLoading || rdLoading
+            }
+            className="luxury-button bg-[#CC5500] hover:bg-[#b84a00]/90"
+          >
+            {dashboardLoading || usersLoading || wlLoading || rdLoading
+              ? "Refreshing..."
+              : "Refresh All"}
+          </Button>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {/* Active Users Card - From API */}
           <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Users</p>
+                  <p className="text-sm text-muted-foreground">Active Users</p>
                   <p className="text-2xl font-bold text-[#CC5500]">
-                    {users?.length || 0}
+                    {dashboardLoading ? "..." : dashboardData.activeUsers}
                   </p>
                 </div>
                 <Users className="w-8 h-8 text-[#CC5500]" />
@@ -613,15 +733,14 @@ export const AdminDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
+          {/* Dealers Card - From API */}
           <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">
-                    Active Dealers
-                  </p>
+                  <p className="text-sm text-muted-foreground">Dealers</p>
                   <p className="text-2xl font-bold text-blue-500">
-                    {users?.filter((u) => u?.role === "dealer")?.length || 0}
+                    {dashboardLoading ? "..." : dashboardData.dealers}
                   </p>
                 </div>
                 <Shield className="w-8 h-8 text-blue-500" />
@@ -629,6 +748,39 @@ export const AdminDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
+          {/* Consumers Card - From API */}
+          <Card className="luxury-card">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Consumers</p>
+                  <p className="text-2xl font-bold text-green-500">
+                    {dashboardLoading ? "..." : dashboardData.consumers}
+                  </p>
+                </div>
+                <Users className="w-8 h-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Service Requests Card - From API */}
+          <Card className="luxury-card">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Service Requests
+                  </p>
+                  <p className="text-2xl font-bold text-indigo-500">
+                    {dashboardLoading ? "..." : dashboardData.serviceRequests}
+                  </p>
+                </div>
+                <Activity className="w-8 h-8 text-indigo-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Waiting List Card - Keep Same */}
           <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -643,37 +795,30 @@ export const AdminDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* <Card className="luxury-card">
+          {/* Dealer Requests Card - Keep Same */}
+          <Card className="luxury-card">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Service Requests</p>
-                  <p className="text-2xl font-bold text-green-500">{serviceRequests.length}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Dealer Requests
+                  </p>
+                  <p className="text-2xl font-bold text-orange-500">
+                    {rdTotal || 0}
+                  </p>
                 </div>
-                <Activity className="w-8 h-8 text-green-500" />
+                <Shield className="w-8 h-8 text-orange-500" />
               </div>
             </CardContent>
-          </Card> */}
-
-          {/* <Card className="luxury-card">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Platform Growth</p>
-                  <p className="text-2xl font-bold text-purple-500">+12%</p>
-                </div>
-                <TrendingUp className="w-8 h-8 text-purple-500" />
-              </div>
-            </CardContent>
-          </Card> */}
+          </Card>
         </div>
 
         <Tabs defaultValue="users" className="space-y-6 ">
-          <TabsList className=" grid grid-cols-2 max-w-[30%]">
+          <TabsList className=" grid grid-cols-3 max-w-[35%]">
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="waitlist">Waiting List</TabsTrigger>
-            {/* <TabsTrigger value="requests">Service Requests</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger> */}
+            <TabsTrigger value="request">Request Dealer</TabsTrigger>
+            {/* <TabsTrigger value="settings">Settings</TabsTrigger> */}
           </TabsList>
 
           <TabsContent value="users" className="space-y-4">
@@ -1011,6 +1156,220 @@ export const AdminDashboard: React.FC = () => {
                   size="sm"
                   disabled={wlPage >= (wlTotalPages || 1)}
                   onClick={() => setWlPage((p) => p + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="request" className="space-y-4">
+            {/* Request Dealers Header */}
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h3 className="text-lg font-semibold">Request Dealers</h3>
+                <p className="text-sm text-muted-foreground">
+                  Manage dealer registration requests
+                </p>
+              </div>
+              <Button
+                onClick={fetchRequestDealers}
+                disabled={rdLoading}
+                className="luxury-button bg-[#CC5500] hover:bg-[#b84a00]/90"
+              >
+                {rdLoading ? "Loading..." : "Refresh"}
+              </Button>
+            </div>
+
+            {/* Request Dealers Table */}
+            <div className="space-y-4">
+              {rdLoading ? (
+                <div className="min-h-screen flex items-center justify-center">
+                  <div className=" p-8 rounded-lg">
+                    <div className="flex flex-col items-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-gray-300 border-t-primary mb-4"></div>
+                    </div>
+                  </div>
+                </div>
+              ) : (requestDealers?.length || 0) === 0 ? (
+                <Card className="luxury-card">
+                  <CardContent className="p-8 text-center">
+                    <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">
+                      No dealer requests
+                    </h3>
+                    <p className="text-muted-foreground">
+                      No dealer registration requests found.
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="luxury-card">
+                  <CardContent className="p-0">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="border-b border-gray-200">
+                          <TableHead className="font-semibold text-gray-700 px-6 py-4">
+                            Business Name
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700 px-6 py-4">
+                            Contact Info
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700 px-6 py-4">
+                            Address
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700 px-6 py-4">
+                            Created By
+                          </TableHead>
+
+                          <TableHead className="font-semibold text-gray-700 px-6 py-4">
+                            Request Date
+                          </TableHead>
+                          <TableHead className="font-semibold text-gray-700 px-6 py-4 text-right">
+                            Status
+                          </TableHead>
+                          {/* <TableHead className="font-semibold text-gray-700 px-6 py-4 text-right">
+                            Actions
+                          </TableHead> */}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {requestDealers?.map((item, index) => (
+                          <TableRow
+                            key={item?.id}
+                            className={`border-b border-gray-100 hover:bg-gray-50/50 transition-colors ${
+                              index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                            }`}
+                          >
+                            <TableCell className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                <div>
+                                  <p className="font-medium text-gray-900">
+                                    {item?.businessName || "N/A"}
+                                  </p>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {item?.email || "N/A"}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {item?.phoneNo || "N/A"}
+                                </p>
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <p className="text-sm text-gray-900 max-w-[200px] truncate">
+                                {item?.address || "N/A"}
+                              </p>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {item?.createdBy?.firstName || ""}{" "}
+                                  {item?.createdBy?.lastName || ""}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {item?.createdBy?.email || "N/A"}
+                                </p>
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-6 py-4">
+                              <div className="space-y-1">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {item?.createdAt
+                                    ? new Date(
+                                        item.createdAt
+                                      ).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                      })
+                                    : "N/A"}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {item?.createdAt
+                                    ? new Date(
+                                        item.createdAt
+                                      ).toLocaleTimeString("en-US", {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })
+                                    : "N/A"}
+                                </p>
+                              </div>
+                            </TableCell>
+                            <TableCell className="px-3 py-4">
+                              <Badge
+                                className={`text-xs px-2 py-1 ${
+                                  item?.status === "invited"
+                                    ? "bg-green-500/20 text-green-700"
+                                    : item?.status === "not-invited"
+                                    ? "bg-yellow-500/20 text-yellow-700"
+                                    : "bg-gray-500/20 text-gray-700"
+                                }`}
+                              >
+                                {item?.status
+                                  ?.replace("-", " ")
+                                  ?.toUpperCase() || "UNKNOWN"}
+                              </Badge>
+                            </TableCell>
+
+                            {/* <TableCell className="px-6 py-4 text-right">
+                              <div className="flex gap-2 justify-end">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="hover:bg-green-500 hover:text-white border-green-500 text-green-600"
+                                  disabled={item?.status === "invited"}
+                                >
+                                  <UserCheck className="w-4 h-4 mr-2" />
+                                  {item?.status === "invited"
+                                    ? "Invited"
+                                    : "Invite"}
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="hover:bg-red-500 hover:text-white border-red-500 text-red-600"
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Reject
+                                </Button>
+                              </div>
+                            </TableCell> */}
+                          </TableRow>
+                        )) || []}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Request Dealers Pagination */}
+            {(requestDealers?.length || 0) > 0 && (
+              <div className="flex justify-center items-center gap-4 mt-6">
+                <Button
+                  className=" hover:bg-[#CC5500]/90"
+                  variant="outline"
+                  size="sm"
+                  disabled={rdPage <= 1}
+                  onClick={() => setRdPage((p) => Math.max(1, p - 1))}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Page {rdPage} of {rdTotalPages || 1}
+                </span>
+                <Button
+                  className=" hover:bg-[#CC5500]/90"
+                  variant="outline"
+                  size="sm"
+                  disabled={rdPage >= (rdTotalPages || 1)}
+                  onClick={() => setRdPage((p) => p + 1)}
                 >
                   Next
                 </Button>

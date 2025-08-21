@@ -22,6 +22,8 @@ import {
 import { ViewRequestModal } from "@/components/common/ViewRequestModal";
 import { BidSubmissionModal } from "./BidSubmissionModal";
 import dealerApi from "@/api/dealer";
+import consumerApi from "@/api/consumer";
+import { useToast } from "@/hooks/use-toast";
 
 interface DashboardStats {
   activeRequests: number;
@@ -29,6 +31,7 @@ interface DashboardStats {
   revenue: number;
 }
 export const DealerDashboard: React.FC = () => {
+  const { toast } = useToast();
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(
@@ -49,6 +52,7 @@ export const DealerDashboard: React.FC = () => {
     revenue: 0,
   });
   const [statsLoading, setStatsLoading] = useState(true);
+  const [completingBid, setCompletingBid] = useState<string | null>(null);
 
   // Fetch dashboard stats
   const fetchDashboardStats = async () => {
@@ -112,6 +116,10 @@ export const DealerDashboard: React.FC = () => {
             referenceId: req?.id || "",
             location: req?.location || undefined,
             biddingCount: typeof req?.biddings === "number" ? req.biddings : 0,
+            totalBids:
+              req?.totalBids ||
+              req?.biddingCount ||
+              (Array.isArray(req?.biddings) ? req.biddings.length : 0),
             createdBy: {
               firstName: req?.createdBy?.firstName || "",
               lastName: req?.createdBy?.lastName || "",
@@ -210,6 +218,10 @@ export const DealerDashboard: React.FC = () => {
         referenceId: req?.id || "",
         location: req?.location || undefined,
         biddingCount: typeof req?.biddings === "number" ? req.biddings : 0,
+        totalBids:
+          req?.totalBids ||
+          req?.biddingCount ||
+          (Array.isArray(req?.biddings) ? req.biddings.length : 0),
         createdBy: {
           firstName: req?.createdBy?.firstName || "",
           lastName: req?.createdBy?.lastName || "",
@@ -277,12 +289,41 @@ export const DealerDashboard: React.FC = () => {
     }
   }, [activeTab]);
 
-  const handleCompleteBid = async (bidId: string, status: BidStatus) => {
+  const handleCompleteBid = async (
+    bidId: string,
+    status: BidStatus,
+    serviceRequestId?: string
+  ) => {
     try {
+      setCompletingBid(bidId);
+
+      // Call dealer API to update bid status
       await dealerApi.biddingStatusUpdate(bidId, status);
+
+      // Call consumer API to update service request status if serviceRequestId is provided
+      if (serviceRequestId && status === BidStatus.COMPLETED) {
+        await consumerApi.consumerStatusUpdate(serviceRequestId, status);
+      }
+
+      // Show success message
+      toast({
+        title: "Success",
+        description:
+          "Bid and service request have been completed successfully.",
+      });
+
+      // Refresh the bidding requests after both API calls
       fetchBiddingRequests();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to complete bid:", error);
+      toast({
+        title: "Error",
+        description:
+          error?.message || "Failed to complete the bid. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setCompletingBid(null);
     }
   };
 
@@ -482,7 +523,7 @@ export const DealerDashboard: React.FC = () => {
                           </span>
                           <span className="flex items-center gap-1">
                             <MessageSquare className="w-4 h-4" />
-                            {request.biddingCount || request.bids.length} bids
+                            {request?.totalBids || 0} bids
                           </span>
                         </div>
                         <Button
@@ -562,13 +603,17 @@ export const DealerDashboard: React.FC = () => {
                                 onClick={() =>
                                   handleCompleteBid(
                                     bid?.id,
-                                    "completed" as BidStatus
+                                    "completed" as BidStatus,
+                                    bid?.serviceRequestId || request?.id
                                   )
                                 }
+                                disabled={completingBid === bid?.id}
                                 className=" hover:bg-[#CC5500]"
                               >
                                 <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
-                                Complete
+                                {completingBid === bid?.id
+                                  ? "Completing..."
+                                  : "Complete"}
                               </Button>
                             </div>
                           )}

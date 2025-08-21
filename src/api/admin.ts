@@ -31,6 +31,10 @@ class AdminApi extends BaseApi {
       ...data,
     });
   }
+
+  async getDashboardCardsData() {
+    return await this.get(`${this.baseUrl}/dashboard`);
+  }
 }
 
 export const adminApi = new AdminApi();

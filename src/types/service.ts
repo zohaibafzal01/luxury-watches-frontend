@@ -29,6 +29,7 @@ export interface ServiceRequest {
   biddings?: Bid[]; // From API response
   referenceId?: string;
   biddingCount?: number; // Number of bids from API
+  totalBids?: number; // Total number of bids for the request
   createdBy?: {
     firstName: string;
     lastName: string;
