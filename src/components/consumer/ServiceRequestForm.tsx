@@ -280,6 +280,29 @@ export const ServiceRequestForm: React.FC = () => {
       return;
     }
 
+    // Validate dealer fields when dealer option is selected
+    if (selectedAction === "dealer") {
+      const requiredFields = ["businessName", "phoneNo", "email"];
+
+      // Add address to required fields only if isUserExists is false
+      if (!isUserExists) {
+        requiredFields.push("address");
+      }
+
+      for (const field of requiredFields) {
+        if (!dealerData[field as keyof typeof dealerData]?.trim()) {
+          toast({
+            title: "Field Required",
+            description: `Please fill in the ${field
+              .replace(/([A-Z])/g, " $1")
+              .toLowerCase()} field.`,
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -301,6 +324,18 @@ export const ServiceRequestForm: React.FC = () => {
         };
       } else if (selectedAction === "dealer") {
         // For dealer selection, send two separate objects
+        const dealerPayload: any = {
+          businessName: dealerData?.businessName ?? "",
+          phoneNo: dealerData?.phoneNo ?? "",
+          email: dealerData?.email ?? "",
+          isUserExists: isUserExists,
+        };
+
+        // Only include address if isUserExists is false
+        if (!isUserExists) {
+          dealerPayload.address = dealerData?.address ?? "";
+        }
+
         payload = {
           serviceRequest: {
             brand: watchBrand ?? "",
@@ -309,13 +344,7 @@ export const ServiceRequestForm: React.FC = () => {
             issueDescription: description ?? "",
             deliveryPreference: deliveryPreference ?? "shipping",
           },
-          dealer: {
-            businessName: dealerData?.businessName ?? "",
-            phoneNo: dealerData?.phoneNo ?? "",
-            address: dealerData?.address ?? "",
-            email: dealerData?.email ?? "",
-            isUserExists: isUserExists,
-          },
+          dealer: dealerPayload,
         };
       }
 
@@ -599,7 +628,7 @@ export const ServiceRequestForm: React.FC = () => {
                         }
                         className="luxury-input"
                         placeholder="e.g., 123 Main St, Anytown, USA"
-                        required
+                        required={!isUserExists}
                       />
                       {showSuggestions.address && (
                         <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
