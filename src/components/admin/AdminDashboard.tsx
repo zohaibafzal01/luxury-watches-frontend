@@ -1105,14 +1105,14 @@ export const AdminDashboard: React.FC = () => {
                             </TableCell>
                             <TableCell className="px-6 py-4 text-right">
                               <div className="flex gap-2 justify-end">
-                                <Button
+                                {/* <Button
                                   variant="outline"
                                   size="sm"
                                   className="hover:bg-green-500 hover:text-white border-green-500 text-green-600"
                                 >
                                   <UserCheck className="w-4 h-4 mr-2" />
                                   Invite
-                                </Button>
+                                </Button> */}
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -1225,9 +1225,9 @@ export const AdminDashboard: React.FC = () => {
                           <TableHead className="font-semibold text-gray-700 px-6 py-4">
                             Request Date
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-700 px-6 py-4 text-right">
+                          {/* <TableHead className="font-semibold text-gray-700 px-6 py-4 text-right">
                             Status
-                          </TableHead>
+                          </TableHead> */}
                           {/* <TableHead className="font-semibold text-gray-700 px-6 py-4 text-right">
                             Actions
                           </TableHead> */}
@@ -1301,7 +1301,7 @@ export const AdminDashboard: React.FC = () => {
                                 </p>
                               </div>
                             </TableCell>
-                            <TableCell className="px-3 py-4">
+                            {/* <TableCell className="px-3 py-4">
                               <Badge
                                 className={`text-xs px-2 py-1 ${
                                   item?.status === "invited"
@@ -1315,7 +1315,7 @@ export const AdminDashboard: React.FC = () => {
                                   ?.replace("-", " ")
                                   ?.toUpperCase() || "UNKNOWN"}
                               </Badge>
-                            </TableCell>
+                            </TableCell> */}
 
                             {/* <TableCell className="px-6 py-4 text-right">
                               <div className="flex gap-2 justify-end">
@@ -1481,8 +1481,8 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Edit User Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="luxury-title text-2xl">
               Edit User
             </DialogTitle>
@@ -1491,211 +1491,220 @@ export const AdminDashboard: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           {editingUser && (
-            <div className="space-y-6">
-              {/* Profile Picture - At Top */}
-              <div className="space-y-4">
-                <label className="text-sm font-medium text-gray-700">
-                  Profile Picture
-                </label>
-                <div className="flex items-center space-x-4">
-                  {/* Current Profile Picture Preview with Avatar */}
-                  <div className="relative">
-                    <Avatar className="h-20 w-20 border-4 border-primary/20">
-                      <AvatarImage
-                        src={
-                          profileImagePreview ||
-                          (editFormData.profilePicture === "REMOVE"
-                            ? undefined
-                            : formatProfileImageUrl(
-                                editFormData.profilePicture
-                              ))
-                        }
-                        alt={editFormData.firstName}
+            <>
+              {/* Scrollable Content Area */}
+              <div className="flex-1 overflow-y-auto px-1 space-y-6">
+                {/* Profile Picture - At Top */}
+                <div className="space-y-4">
+                  <label className="text-sm font-medium text-gray-700">
+                    Profile Picture
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    {/* Current Profile Picture Preview with Avatar */}
+                    <div className="relative">
+                      <Avatar className="h-20 w-20 border-4 border-primary/20">
+                        <AvatarImage
+                          src={
+                            profileImagePreview ||
+                            (editFormData.profilePicture === "REMOVE"
+                              ? undefined
+                              : formatProfileImageUrl(
+                                  editFormData.profilePicture
+                                ))
+                          }
+                          alt={editFormData.firstName}
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary font-medium text-lg">
+                          {getInitials(
+                            editFormData.firstName,
+                            editFormData.lastName
+                          )}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      {/* Hidden file input */}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png"
+                        onChange={handleProfilePictureChange}
+                        className="hidden"
                       />
-                      <AvatarFallback className="bg-primary/10 text-primary font-medium text-lg">
-                        {getInitials(
-                          editFormData.firstName,
-                          editFormData.lastName
+
+                      {/* Camera/Upload button - only show if no image exists or image is marked for removal */}
+                      {(!editFormData.profilePicture ||
+                        editFormData.profilePicture === "REMOVE") &&
+                        !profileImagePreview && (
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
+                            onClick={handleCameraClick}
+                            disabled={isUploadingImage}
+                          >
+                            {isUploadingImage ? (
+                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                            ) : (
+                              <Camera className="h-4 w-4" />
+                            )}
+                          </Button>
                         )}
-                      </AvatarFallback>
-                    </Avatar>
 
-                    {/* Hidden file input */}
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/jpeg,image/jpg,image/png"
-                      onChange={handleProfilePictureChange}
-                      className="hidden"
-                    />
-
-                    {/* Camera/Upload button - only show if no image exists or image is marked for removal */}
-                    {(!editFormData.profilePicture ||
-                      editFormData.profilePicture === "REMOVE") &&
-                      !profileImagePreview && (
+                      {/* Remove image button - only show if there's an image and it's not marked for removal */}
+                      {((editFormData.profilePicture &&
+                        editFormData.profilePicture !== "REMOVE") ||
+                        profileImagePreview) && (
                         <Button
                           variant="outline"
                           size="icon"
-                          className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
-                          onClick={handleCameraClick}
+                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 hover:bg-red-600 border-red-500"
+                          onClick={removeProfileImage}
                           disabled={isUploadingImage}
                         >
-                          {isUploadingImage ? (
-                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                          ) : (
-                            <Camera className="h-4 w-4" />
-                          )}
+                          <X className="h-3 w-3 text-white" />
                         </Button>
                       )}
-
-                    {/* Remove image button - only show if there's an image and it's not marked for removal */}
-                    {((editFormData.profilePicture &&
-                      editFormData.profilePicture !== "REMOVE") ||
-                      profileImagePreview) && (
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 hover:bg-red-600 border-red-500"
-                        onClick={removeProfileImage}
-                        disabled={isUploadingImage}
-                      >
-                        <X className="h-3 w-3 text-white" />
-                      </Button>
-                    )}
+                    </div>
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* First Name */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      First Name
+                    </label>
+                    <Input
+                      value={editFormData.firstName}
+                      onChange={(e) =>
+                        handleEditFormChange("firstName", e.target.value)
+                      }
+                      placeholder="Enter first name"
+                      className="luxury-input"
+                    />
+                  </div>
+
+                  {/* Last Name */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Last Name
+                    </label>
+                    <Input
+                      value={editFormData.lastName}
+                      onChange={(e) =>
+                        handleEditFormChange("lastName", e.target.value)
+                      }
+                      placeholder="Enter last name"
+                      className="luxury-input"
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Email Address
+                    </label>
+                    <Input
+                      type="email"
+                      value={editFormData.email}
+                      onChange={(e) =>
+                        handleEditFormChange("email", e.target.value)
+                      }
+                      placeholder="Enter email address"
+                      className="luxury-input"
+                    />
+                  </div>
+
+                  {/* Phone Number */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Phone Number
+                    </label>
+                    <Input
+                      value={editFormData.phoneNo}
+                      onChange={(e) =>
+                        handleEditFormChange("phoneNo", e.target.value)
+                      }
+                      placeholder="Enter phone number"
+                      className="luxury-input"
+                    />
+                  </div>
+
+                  {/* Company Name */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Company Name
+                    </label>
+                    <Input
+                      value={editFormData.companyName}
+                      onChange={(e) =>
+                        handleEditFormChange("companyName", e.target.value)
+                      }
+                      placeholder="Enter company name"
+                      className="luxury-input"
+                    />
+                  </div>
+
+                  {/* Status */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Status
+                    </label>
+                    <Select
+                      value={editFormData.status}
+                      onValueChange={(value) =>
+                        handleEditFormChange("status", value)
+                      }
+                    >
+                      <SelectTrigger className="luxury-input">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="suspended">Suspended</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Address - Full Width */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Address
+                  </label>
+                  <Input
+                    value={editFormData.address}
+                    onChange={(e) =>
+                      handleEditFormChange("address", e.target.value)
+                    }
+                    placeholder="Enter address"
+                    className="luxury-input"
+                  />
+                </div>
+
+                {/* Bio - Full Width */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Bio
+                  </label>
+                  <Textarea
+                    value={editFormData.bio}
+                    onChange={(e) =>
+                      handleEditFormChange("bio", e.target.value)
+                    }
+                    placeholder="Enter bio"
+                    className="luxury-input min-h-[100px]"
+                    rows={4}
+                  />
+                </div>
+
+                {/* Action Buttons */}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* First Name */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    First Name
-                  </label>
-                  <Input
-                    value={editFormData.firstName}
-                    onChange={(e) =>
-                      handleEditFormChange("firstName", e.target.value)
-                    }
-                    placeholder="Enter first name"
-                    className="luxury-input"
-                  />
-                </div>
-
-                {/* Last Name */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Last Name
-                  </label>
-                  <Input
-                    value={editFormData.lastName}
-                    onChange={(e) =>
-                      handleEditFormChange("lastName", e.target.value)
-                    }
-                    placeholder="Enter last name"
-                    className="luxury-input"
-                  />
-                </div>
-
-                {/* Email */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Email Address
-                  </label>
-                  <Input
-                    type="email"
-                    value={editFormData.email}
-                    onChange={(e) =>
-                      handleEditFormChange("email", e.target.value)
-                    }
-                    placeholder="Enter email address"
-                    className="luxury-input"
-                  />
-                </div>
-
-                {/* Phone Number */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Phone Number
-                  </label>
-                  <Input
-                    value={editFormData.phoneNo}
-                    onChange={(e) =>
-                      handleEditFormChange("phoneNo", e.target.value)
-                    }
-                    placeholder="Enter phone number"
-                    className="luxury-input"
-                  />
-                </div>
-
-                {/* Company Name */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Company Name
-                  </label>
-                  <Input
-                    value={editFormData.companyName}
-                    onChange={(e) =>
-                      handleEditFormChange("companyName", e.target.value)
-                    }
-                    placeholder="Enter company name"
-                    className="luxury-input"
-                  />
-                </div>
-
-                {/* Status */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Status
-                  </label>
-                  <Select
-                    value={editFormData.status}
-                    onValueChange={(value) =>
-                      handleEditFormChange("status", value)
-                    }
-                  >
-                    <SelectTrigger className="luxury-input">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="suspended">Suspended</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Address - Full Width */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Address
-                </label>
-                <Input
-                  value={editFormData.address}
-                  onChange={(e) =>
-                    handleEditFormChange("address", e.target.value)
-                  }
-                  placeholder="Enter address"
-                  className="luxury-input"
-                />
-              </div>
-
-              {/* Bio - Full Width */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Bio</label>
-                <Textarea
-                  value={editFormData.bio}
-                  onChange={(e) => handleEditFormChange("bio", e.target.value)}
-                  placeholder="Enter bio"
-                  className="luxury-input min-h-[100px]"
-                  rows={4}
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+              {/* Fixed Footer */}
+              <div className="flex-shrink-0 flex justify-end gap-3 pt-4 border-t border-gray-200">
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -1716,15 +1725,15 @@ export const AdminDashboard: React.FC = () => {
                   {isProcessingAction ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
-            </div>
+            </>
           )}
         </DialogContent>
       </Dialog>
 
       {/* User Details Modal */}
       <Dialog open={isUserModalOpen} onOpenChange={setIsUserModalOpen}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="luxury-title text-2xl">
               User Profile
             </DialogTitle>
@@ -1733,185 +1742,191 @@ export const AdminDashboard: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           {selectedUser && (
-            <div className="space-y-6">
-              {/* Profile Header */}
-              <div className="flex items-center space-x-4 p-6 bg-gradient-to-br from-[#CC5500]/5 via-[#CC5500]/10 to-[#CC5500]/5 rounded-xl border border-[#CC5500]/20">
-                <div className="relative">
-                  <Avatar className="h-24 w-24 ring-4 ring-white shadow-lg">
-                    <AvatarImage
-                      src={formatProfileImageUrl(selectedUser?.profilePicture)}
-                      alt={selectedUser?.firstName}
-                    />
-                    <AvatarFallback className="bg-gradient-to-br from-[#CC5500] to-[#CC5500]/80 text-white text-2xl font-bold">
-                      {getInitials(
-                        selectedUser?.firstName,
-                        selectedUser?.lastName
-                      )}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute -bottom-1 -right-1">
-                    <Badge
-                      variant={
-                        selectedUser?.status === "active"
-                          ? "default"
-                          : "secondary"
-                      }
-                      className={`text-xs px-2 py-1 ${
-                        selectedUser?.status === "active"
-                          ? "bg-green-500 hover:bg-green-600"
-                          : "bg-gray-500"
-                      }`}
-                    >
-                      {selectedUser?.status?.toUpperCase() || "UNKNOWN"}
-                    </Badge>
+            <>
+              {/* Scrollable Content Area */}
+              <div className="flex-1 overflow-y-auto px-1 space-y-6">
+                {/* Profile Header */}
+                <div className="flex items-center space-x-4 p-6 bg-gradient-to-br from-[#CC5500]/5 via-[#CC5500]/10 to-[#CC5500]/5 rounded-xl border border-[#CC5500]/20">
+                  <div className="relative">
+                    <Avatar className="h-24 w-24 ring-4 ring-white shadow-lg">
+                      <AvatarImage
+                        src={formatProfileImageUrl(
+                          selectedUser?.profilePicture
+                        )}
+                        alt={selectedUser?.firstName}
+                      />
+                      <AvatarFallback className="bg-gradient-to-br from-[#CC5500] to-[#CC5500]/80 text-white text-2xl font-bold">
+                        {getInitials(
+                          selectedUser?.firstName,
+                          selectedUser?.lastName
+                        )}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -bottom-1 -right-1">
+                      <Badge
+                        variant={
+                          selectedUser?.status === "active"
+                            ? "default"
+                            : "secondary"
+                        }
+                        className={`text-xs px-2 py-1 ${
+                          selectedUser?.status === "active"
+                            ? "bg-green-500 hover:bg-green-600"
+                            : "bg-gray-500"
+                        }`}
+                      >
+                        {selectedUser?.status?.toUpperCase() || "UNKNOWN"}
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {selectedUser?.firstName || "N/A"}{" "}
-                    {selectedUser?.lastName || "N/A"}
-                  </h3>
-                  <p className="text-gray-600 text-base font-medium">
-                    {selectedUser?.email || "N/A"}
-                  </p>
-                  <p className="text-[#CC5500] text-base font-semibold capitalize mt-1">
-                    {selectedUser?.role || selectedUser?.accountType || "N/A"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Information Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Personal Information */}
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-lg text-gray-900 flex items-center border-b border-gray-200 pb-2">
-                    <div className="w-3 h-3 bg-[#CC5500] rounded-full mr-3"></div>
-                    Personal Details
-                  </h4>
-                  <div className="space-y-4">
-                    <div>
-                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        User ID
-                      </span>
-                      <p className="text-base font-medium text-gray-900 mt-1 select-all">
-                        {selectedUser?.id || "N/A"}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Name
-                      </span>
-                      <p className="text-base font-medium text-gray-900 mt-1">
-                        {selectedUser?.firstName || "Not provided"}{" "}
-                        {selectedUser?.lastName || ""}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Email Address
-                      </span>
-                      <p className="text-base font-medium text-gray-900 mt-1 break-all">
-                        {selectedUser?.email || "Not provided"}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Phone Number
-                      </span>
-                      <p className="text-base font-medium text-gray-900 mt-1">
-                        {selectedUser?.phoneNo || "Not provided"}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Address
-                      </span>
-                      <p className="text-base font-medium text-gray-900 mt-1">
-                        {selectedUser?.address || "Not provided"}
-                      </p>
-                    </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      {selectedUser?.firstName || "N/A"}{" "}
+                      {selectedUser?.lastName || "N/A"}
+                    </h3>
+                    <p className="text-gray-600 text-base font-medium">
+                      {selectedUser?.email || "N/A"}
+                    </p>
+                    <p className="text-[#CC5500] text-base font-semibold capitalize mt-1">
+                      {selectedUser?.role || selectedUser?.accountType || "N/A"}
+                    </p>
                   </div>
                 </div>
 
-                {/* Account Information */}
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-lg text-gray-900 flex items-center border-b border-gray-200 pb-2">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
-                    Account Details
-                  </h4>
+                {/* Information Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Personal Information */}
                   <div className="space-y-4">
-                    <div>
-                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Account Type
-                      </span>
-                      <p className="text-base font-medium text-gray-900 mt-1 capitalize">
-                        {selectedUser?.role ||
-                          selectedUser?.accountType ||
-                          "Not specified"}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Company Name
-                      </span>
-                      <p className="text-base font-medium text-gray-900 mt-1">
-                        {selectedUser?.companyName || "Not provided"}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Bio
-                      </span>
-                      <p className="text-base font-medium text-gray-900 mt-1">
-                        {selectedUser?.bio || "Not provided"}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Account Status
-                      </span>
-                      <div className="mt-1">
-                        <Badge
-                          variant={
-                            selectedUser?.status === "active"
-                              ? "default"
-                              : "secondary"
-                          }
-                          className={`text-sm px-3 py-1 ${
-                            selectedUser?.status === "active"
-                              ? "bg-green-500 hover:bg-green-600"
-                              : "bg-gray-500"
-                          }`}
-                        >
-                          {selectedUser?.status?.toUpperCase() || "UNKNOWN"}
-                        </Badge>
+                    <h4 className="font-semibold text-lg text-gray-900 flex items-center border-b border-gray-200 pb-2">
+                      <div className="w-3 h-3 bg-[#CC5500] rounded-full mr-3"></div>
+                      Personal Details
+                    </h4>
+                    <div className="space-y-4">
+                      <div>
+                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                          User ID
+                        </span>
+                        <p className="text-base font-medium text-gray-900 mt-1 select-all">
+                          {selectedUser?.id || "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                          Name
+                        </span>
+                        <p className="text-base font-medium text-gray-900 mt-1">
+                          {selectedUser?.firstName || "Not provided"}{" "}
+                          {selectedUser?.lastName || ""}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                          Email Address
+                        </span>
+                        <p className="text-base font-medium text-gray-900 mt-1 break-all">
+                          {selectedUser?.email || "Not provided"}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                          Phone Number
+                        </span>
+                        <p className="text-base font-medium text-gray-900 mt-1">
+                          {selectedUser?.phoneNo || "Not provided"}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                          Address
+                        </span>
+                        <p className="text-base font-medium text-gray-900 mt-1">
+                          {selectedUser?.address || "Not provided"}
+                        </p>
                       </div>
                     </div>
-                    <div>
-                      <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Last Updated
-                      </span>
-                      <p className="text-base font-medium text-gray-900 mt-1">
-                        {selectedUser?.updatedAt
-                          ? new Date(selectedUser.updatedAt).toLocaleDateString(
-                              "en-US",
-                              {
+                  </div>
+
+                  {/* Account Information */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-lg text-gray-900 flex items-center border-b border-gray-200 pb-2">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                      Account Details
+                    </h4>
+                    <div className="space-y-4">
+                      <div>
+                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                          Account Type
+                        </span>
+                        <p className="text-base font-medium text-gray-900 mt-1 capitalize">
+                          {selectedUser?.role ||
+                            selectedUser?.accountType ||
+                            "Not specified"}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                          Company Name
+                        </span>
+                        <p className="text-base font-medium text-gray-900 mt-1">
+                          {selectedUser?.companyName || "Not provided"}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                          Bio
+                        </span>
+                        <p className="text-base font-medium text-gray-900 mt-1">
+                          {selectedUser?.bio || "Not provided"}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                          Account Status
+                        </span>
+                        <div className="mt-1">
+                          <Badge
+                            variant={
+                              selectedUser?.status === "active"
+                                ? "default"
+                                : "secondary"
+                            }
+                            className={`text-sm px-3 py-1 ${
+                              selectedUser?.status === "active"
+                                ? "bg-green-500 hover:bg-green-600"
+                                : "bg-gray-500"
+                            }`}
+                          >
+                            {selectedUser?.status?.toUpperCase() || "UNKNOWN"}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                          Last Updated
+                        </span>
+                        <p className="text-base font-medium text-gray-900 mt-1">
+                          {selectedUser?.updatedAt
+                            ? new Date(
+                                selectedUser.updatedAt
+                              ).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "long",
                                 day: "numeric",
                                 hour: "2-digit",
                                 minute: "2-digit",
-                              }
-                            )
-                          : "Not available"}
-                      </p>
+                              })
+                            : "Not available"}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Close Button */}
               </div>
 
-              {/* Close Button */}
-              <div className="flex justify-end pt-4 border-t border-gray-200">
+              {/* Fixed Footer */}
+              <div className="flex-shrink-0 flex justify-end pt-4 border-t border-gray-200">
                 <Button
                   variant="outline"
                   onClick={() => setIsUserModalOpen(false)}
@@ -1920,7 +1935,7 @@ export const AdminDashboard: React.FC = () => {
                   Close
                 </Button>
               </div>
-            </div>
+            </>
           )}
         </DialogContent>
       </Dialog>

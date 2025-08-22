@@ -145,7 +145,7 @@ export const AdminLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md luxury-card">
         <CardHeader className="text-center">
           <div className="w-[24px] h-[16px] flex items-center justify-center mx-auto mb-4">
