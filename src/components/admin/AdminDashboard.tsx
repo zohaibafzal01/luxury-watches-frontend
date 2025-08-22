@@ -152,7 +152,7 @@ export const AdminDashboard: React.FC = () => {
 
   // Dashboard cards data state
   const [dashboardData, setDashboardData] = useState({
-    activeUsers: 0,
+    totalUsers: 0,
     dealers: 0,
     consumers: 0,
     serviceRequests: 0,
@@ -287,7 +287,7 @@ export const AdminDashboard: React.FC = () => {
 
       if (response?.success && response?.data) {
         setDashboardData({
-          activeUsers: response.data.activeUsers || 0,
+          totalUsers: response.data.totalUsers || 0,
           dealers: response.data.dealers || 0,
           consumers: response.data.consumers || 0,
           serviceRequests: response.data.serviceRequests || 0,
@@ -723,9 +723,9 @@ export const AdminDashboard: React.FC = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Active Users</p>
+                  <p className="text-sm text-muted-foreground">Total Users</p>
                   <p className="text-2xl font-bold text-[#CC5500]">
-                    {dashboardLoading ? "..." : dashboardData.activeUsers}
+                    {dashboardLoading ? "..." : dashboardData.totalUsers}
                   </p>
                 </div>
                 <Users className="w-8 h-8 text-[#CC5500]" />
