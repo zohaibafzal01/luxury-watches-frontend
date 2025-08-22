@@ -190,7 +190,7 @@ export const ProfileSettings: React.FC = () => {
 
   const getRoleColor = (role: string) => {
     const colors = {
-      admin: "text-red-400",
+      admin: "text-white",
       dealer: "text-white",
       wholesaler: "text-green-400",
       consumer: "text-white",

@@ -20,7 +20,7 @@ import BidListing from "./pages/BidListing";
 import NotFound from "./pages/NotFound";
 import WholesalerDashboard from "./pages/WholesalerDashboard";
 import ProfileSettings from "./pages/ProfileSettings";
-import { AdminLogin } from "./components/auth/AdminLogin";
+import AdminLogin from "./pages/AdminLogin";
 import { selectUserInfo } from "./redux/selectors/userSelectors";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";

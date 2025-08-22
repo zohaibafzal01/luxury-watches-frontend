@@ -57,6 +57,20 @@ export const ServiceRequestForm: React.FC = () => {
   const [referenceId, setReferenceId] = useState<string | null>(null);
   const [selectedAction, setSelectedAction] =
     useState<string>("ServiceRequestType");
+
+  // Function to format action text for display
+  const formatActionText = (action: string) => {
+    switch (action) {
+      case "ServiceRequestType":
+        return "Service Request Type";
+      case "dealer":
+        return "Dealer";
+      case "request-bid":
+        return "Request Bid";
+      default:
+        return action;
+    }
+  };
   const [dealerSearchResults, setDealerSearchResults] = useState<any[]>([]);
   const [isUserExists, setIsUserExists] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -435,7 +449,32 @@ export const ServiceRequestForm: React.FC = () => {
       <div className="container mx-auto max-w-2xl">
         <Card className="luxury-card">
           <CardHeader>
-            <CardTitle className="luxury-title">Service Request</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="luxury-title">Service Request</CardTitle>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2 hover:bg-[#CC5500]"
+                  >
+                    {formatActionText(selectedAction)}
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => handleActionSelect("dealer")}
+                  >
+                    Dealer
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleActionSelect("request-bid")}
+                  >
+                    Request Bid
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <CardDescription>
               Tell us about your watch and the service you need. Our network of
               certified dealers will provide competitive bids.
@@ -445,292 +484,7 @@ export const ServiceRequestForm: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Watch Information */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Watch Information</h3>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="flex items-center gap-2 hover:bg-[#CC5500]"
-                      >
-                        {selectedAction}
-                        <ChevronDown className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => handleActionSelect("dealer")}
-                      >
-                        Dealer
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleActionSelect("request-bid")}
-                      >
-                        Request Bid
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-
-                {/* Dealer-specific fields - only show when dealer option is selected */}
-                {selectedAction === "dealer" && (
-                  <>
-                    <div className="space-y-2 relative">
-                      <Label htmlFor="businessName">Business Name</Label>
-                      <Input
-                        id="businessName"
-                        name="businessName"
-                        value={dealerData?.businessName ?? ""}
-                        onChange={handleDealerDataChange}
-                        onFocus={() =>
-                          setShowSuggestions((prev) => ({
-                            ...prev,
-                            businessName:
-                              (dealerSearchResults?.length ?? 0) > 0,
-                          }))
-                        }
-                        onBlur={() =>
-                          setTimeout(
-                            () =>
-                              setShowSuggestions((prev) => ({
-                                ...prev,
-                                businessName: false,
-                              })),
-                            200
-                          )
-                        }
-                        className="luxury-input"
-                        placeholder="e.g., John Doe Watch Repair"
-                        required
-                      />
-                      {showSuggestions.businessName && (
-                        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
-                          {isSearching ? (
-                            <div className="p-2 text-center text-gray-500">
-                              Searching dealers...
-                            </div>
-                          ) : dealerSearchResults.length > 0 ? (
-                            dealerSearchResults.map((dealer, index) => (
-                              <div
-                                key={index}
-                                className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-                                onClick={() => handleDealerSelect(dealer)}
-                              >
-                                <div className="font-medium">
-                                  {dealer?.companyName ??
-                                    dealer?.businessName ??
-                                    "N/A"}
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                  {dealer?.email ?? "N/A"}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {dealer?.phoneNo ?? "N/A"} •{" "}
-                                  {dealer?.address ?? "N/A"}
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="p-2 text-center text-gray-500">
-                              No dealers found. You can create a new entry.
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-2 relative">
-                      <Label htmlFor="phoneNo">Phone Number</Label>
-                      <Input
-                        id="phoneNo"
-                        name="phoneNo"
-                        value={dealerData?.phoneNo ?? ""}
-                        onChange={handleDealerDataChange}
-                        onFocus={() =>
-                          setShowSuggestions((prev) => ({
-                            ...prev,
-                            phoneNo: dealerSearchResults.length > 0,
-                          }))
-                        }
-                        onBlur={() =>
-                          setTimeout(
-                            () =>
-                              setShowSuggestions((prev) => ({
-                                ...prev,
-                                phoneNo: false,
-                              })),
-                            200
-                          )
-                        }
-                        className="luxury-input"
-                        placeholder="e.g., +1234567890"
-                        required
-                      />
-                      {showSuggestions.phoneNo && (
-                        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
-                          {isSearching ? (
-                            <div className="p-2 text-center text-gray-500">
-                              Searching dealers...
-                            </div>
-                          ) : dealerSearchResults.length > 0 ? (
-                            dealerSearchResults.map((dealer, index) => (
-                              <div
-                                key={index}
-                                className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-                                onClick={() => handleDealerSelect(dealer)}
-                              >
-                                <div className="font-medium">
-                                  {dealer?.companyName ??
-                                    dealer?.businessName ??
-                                    "N/A"}
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                  {dealer?.email ?? "N/A"}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {dealer?.phoneNo ?? "N/A"} •{" "}
-                                  {dealer?.address ?? "N/A"}
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="p-2 text-center text-gray-500">
-                              No dealers found. You can create a new entry.
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-2 relative">
-                      <Label htmlFor="address">Address</Label>
-                      <Input
-                        id="address"
-                        name="address"
-                        value={dealerData?.address ?? ""}
-                        onChange={handleDealerDataChange}
-                        onFocus={() =>
-                          setShowSuggestions((prev) => ({
-                            ...prev,
-                            address: dealerSearchResults.length > 0,
-                          }))
-                        }
-                        onBlur={() =>
-                          setTimeout(
-                            () =>
-                              setShowSuggestions((prev) => ({
-                                ...prev,
-                                address: false,
-                              })),
-                            200
-                          )
-                        }
-                        className="luxury-input"
-                        placeholder="e.g., 123 Main St, Anytown, USA"
-                        required={!isUserExists}
-                      />
-                      {showSuggestions.address && (
-                        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
-                          {isSearching ? (
-                            <div className="p-2 text-center text-gray-500">
-                              Searching dealers...
-                            </div>
-                          ) : dealerSearchResults.length > 0 ? (
-                            dealerSearchResults.map((dealer, index) => (
-                              <div
-                                key={index}
-                                className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-                                onClick={() => handleDealerSelect(dealer)}
-                              >
-                                <div className="font-medium">
-                                  {dealer?.companyName ??
-                                    dealer?.businessName ??
-                                    "N/A"}
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                  {dealer?.email ?? "N/A"}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {dealer?.phoneNo ?? "N/A"} •{" "}
-                                  {dealer?.address ?? "N/A"}
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="p-2 text-center text-gray-500">
-                              No dealers found. You can create a new entry.
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-2 relative">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={dealerData?.email ?? ""}
-                        onChange={handleDealerDataChange}
-                        onFocus={() =>
-                          setShowSuggestions((prev) => ({
-                            ...prev,
-                            email: dealerSearchResults.length > 0,
-                          }))
-                        }
-                        onBlur={() =>
-                          setTimeout(
-                            () =>
-                              setShowSuggestions((prev) => ({
-                                ...prev,
-                                email: false,
-                              })),
-                            200
-                          )
-                        }
-                        className="luxury-input"
-                        placeholder="e.g., john.doe@example.com"
-                        required
-                      />
-                      {showSuggestions.email && (
-                        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
-                          {isSearching ? (
-                            <div className="p-2 text-center text-gray-500">
-                              Searching dealers...
-                            </div>
-                          ) : dealerSearchResults.length > 0 ? (
-                            dealerSearchResults.map((dealer, index) => (
-                              <div
-                                key={index}
-                                className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-                                onClick={() => handleDealerSelect(dealer)}
-                              >
-                                <div className="font-medium">
-                                  {dealer?.companyName ??
-                                    dealer?.businessName ??
-                                    "N/A"}
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                  {dealer?.email ?? "N/A"}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {dealer?.phoneNo ?? "N/A"} •{" "}
-                                  {dealer?.address ?? "N/A"}
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="p-2 text-center text-gray-500">
-                              No dealers found. You can create a new entry.
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
+                <h3 className="text-lg font-semibold">Watch Information</h3>
 
                 <div className="space-y-2">
                   <Label htmlFor="watchBrand">Brand</Label>
@@ -847,7 +601,7 @@ export const ServiceRequestForm: React.FC = () => {
 
               {/* Delivery Preference */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Delivery Preference</h3>
+                <h3 className="text-lg ">Delivery Preference</h3>
                 <RadioGroup
                   value={formData?.deliveryPreference ?? "shipping"}
                   onValueChange={handleDeliveryChange}
@@ -887,6 +641,265 @@ export const ServiceRequestForm: React.FC = () => {
                   )}
                 </div>
               </div> */}
+
+              {/* Dealer-specific fields - only show when dealer option is selected */}
+              {selectedAction === "dealer" && (
+                <>
+                  <h3 className="text-lg font-semibold">Dealer Information</h3>
+                  <div className="space-y-2 relative">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={dealerData?.email ?? ""}
+                      onChange={handleDealerDataChange}
+                      onFocus={() =>
+                        setShowSuggestions((prev) => ({
+                          ...prev,
+                          email: dealerSearchResults.length > 0,
+                        }))
+                      }
+                      onBlur={() =>
+                        setTimeout(
+                          () =>
+                            setShowSuggestions((prev) => ({
+                              ...prev,
+                              email: false,
+                            })),
+                          200
+                        )
+                      }
+                      className="luxury-input"
+                      placeholder="e.g., john.doe@example.com"
+                      required
+                    />
+                    {showSuggestions.email && (
+                      <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                        {isSearching ? (
+                          <div className="p-2 text-center text-gray-500">
+                            Searching dealers...
+                          </div>
+                        ) : dealerSearchResults.length > 0 ? (
+                          dealerSearchResults.map((dealer, index) => (
+                            <div
+                              key={index}
+                              className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                              onClick={() => handleDealerSelect(dealer)}
+                            >
+                              <div className="font-medium">
+                                {dealer?.companyName ??
+                                  dealer?.businessName ??
+                                  "N/A"}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {dealer?.email ?? "N/A"}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {dealer?.phoneNo ?? "N/A"} •{" "}
+                                {dealer?.address ?? "N/A"}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-2 text-center text-gray-500">
+                            No dealers found. You can create a new entry.
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 relative">
+                    <Label htmlFor="businessName">Business Name</Label>
+                    <Input
+                      id="businessName"
+                      name="businessName"
+                      value={dealerData?.businessName ?? ""}
+                      onChange={handleDealerDataChange}
+                      onFocus={() =>
+                        setShowSuggestions((prev) => ({
+                          ...prev,
+                          businessName: (dealerSearchResults?.length ?? 0) > 0,
+                        }))
+                      }
+                      onBlur={() =>
+                        setTimeout(
+                          () =>
+                            setShowSuggestions((prev) => ({
+                              ...prev,
+                              businessName: false,
+                            })),
+                          200
+                        )
+                      }
+                      className="luxury-input"
+                      placeholder="e.g., John Doe Watch Repair"
+                      required
+                    />
+                    {showSuggestions.businessName && (
+                      <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                        {isSearching ? (
+                          <div className="p-2 text-center text-gray-500">
+                            Searching dealers...
+                          </div>
+                        ) : dealerSearchResults.length > 0 ? (
+                          dealerSearchResults.map((dealer, index) => (
+                            <div
+                              key={index}
+                              className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                              onClick={() => handleDealerSelect(dealer)}
+                            >
+                              <div className="font-medium">
+                                {dealer?.companyName ??
+                                  dealer?.businessName ??
+                                  "N/A"}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {dealer?.email ?? "N/A"}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {dealer?.phoneNo ?? "N/A"} •{" "}
+                                {dealer?.address ?? "N/A"}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-2 text-center text-gray-500">
+                            No dealers found. You can create a new entry.
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 relative">
+                    <Label htmlFor="phoneNo">Phone Number</Label>
+                    <Input
+                      id="phoneNo"
+                      name="phoneNo"
+                      value={dealerData?.phoneNo ?? ""}
+                      onChange={handleDealerDataChange}
+                      onFocus={() =>
+                        setShowSuggestions((prev) => ({
+                          ...prev,
+                          phoneNo: dealerSearchResults.length > 0,
+                        }))
+                      }
+                      onBlur={() =>
+                        setTimeout(
+                          () =>
+                            setShowSuggestions((prev) => ({
+                              ...prev,
+                              phoneNo: false,
+                            })),
+                          200
+                        )
+                      }
+                      className="luxury-input"
+                      placeholder="e.g., +1234567890"
+                      required
+                    />
+                    {showSuggestions.phoneNo && (
+                      <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                        {isSearching ? (
+                          <div className="p-2 text-center text-gray-500">
+                            Searching dealers...
+                          </div>
+                        ) : dealerSearchResults.length > 0 ? (
+                          dealerSearchResults.map((dealer, index) => (
+                            <div
+                              key={index}
+                              className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                              onClick={() => handleDealerSelect(dealer)}
+                            >
+                              <div className="font-medium">
+                                {dealer?.companyName ??
+                                  dealer?.businessName ??
+                                  "N/A"}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {dealer?.email ?? "N/A"}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {dealer?.phoneNo ?? "N/A"} •{" "}
+                                {dealer?.address ?? "N/A"}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-2 text-center text-gray-500">
+                            No dealers found. You can create a new entry.
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 relative">
+                    <Label htmlFor="address">Address</Label>
+                    <Input
+                      id="address"
+                      name="address"
+                      value={dealerData?.address ?? ""}
+                      onChange={handleDealerDataChange}
+                      onFocus={() =>
+                        setShowSuggestions((prev) => ({
+                          ...prev,
+                          address: dealerSearchResults.length > 0,
+                        }))
+                      }
+                      onBlur={() =>
+                        setTimeout(
+                          () =>
+                            setShowSuggestions((prev) => ({
+                              ...prev,
+                              address: false,
+                            })),
+                          200
+                        )
+                      }
+                      className="luxury-input"
+                      placeholder="e.g., 123 Main St, Anytown, USA"
+                      required={!isUserExists}
+                    />
+                    {showSuggestions.address && (
+                      <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                        {isSearching ? (
+                          <div className="p-2 text-center text-gray-500">
+                            Searching dealers...
+                          </div>
+                        ) : dealerSearchResults.length > 0 ? (
+                          dealerSearchResults.map((dealer, index) => (
+                            <div
+                              key={index}
+                              className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                              onClick={() => handleDealerSelect(dealer)}
+                            >
+                              <div className="font-medium">
+                                {dealer?.companyName ??
+                                  dealer?.businessName ??
+                                  "N/A"}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {dealer?.email ?? "N/A"}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {dealer?.phoneNo ?? "N/A"} •{" "}
+                                {dealer?.address ?? "N/A"}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-2 text-center text-gray-500">
+                            No dealers found. You can create a new entry.
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
 
               <Button
                 type="submit"
